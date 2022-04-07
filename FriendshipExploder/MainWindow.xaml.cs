@@ -1,4 +1,6 @@
-﻿using System;
+﻿using FriendshipExploder.Controller;
+using FriendshipExploder.Logic;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +22,36 @@ namespace FriendshipExploder
     /// </summary>
     public partial class MainWindow : Window
     {
+        GameController gameCtrontroller;
+        MainMenuLogic mainMenuLogic;
+        GameLogic gameLogic;
+        
         public MainWindow()
         {
             InitializeComponent();
+            this.mainMenuLogic = new MainMenuLogic();
+            this.gameLogic = new GameLogic();
+            this.gameCtrontroller = new GameController(gameLogic); //Esetle gegyet írni menüre.
+
+            display.SetupModel(mainMenuLogic, gameLogic);
+        }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            display.Resize(new Size(grid.ActualWidth, grid.ActualHeight));
+            display.InvalidateVisual();
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            display.Resize(new Size(grid.ActualWidth, grid.ActualHeight));
+            display.InvalidateVisual();
+        }
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            gameCtrontroller.KeyPressed(e.Key);
+            display.InvalidateVisual();
         }
     }
 }
