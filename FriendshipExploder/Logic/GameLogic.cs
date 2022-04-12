@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using FriendshipExploder.Model;
 
 namespace FriendshipExploder.Logic
 {
@@ -32,30 +37,49 @@ namespace FriendshipExploder.Logic
         private Queue<string[]> playgrounds; //path-okat tartalmaz, előre generált pálxák? //Mert vagy beletesszük ak iválaszott pályát választott meccs számszor, vagy előre legeneráljuk a random pélykat, csak beletesszük, hogy melyik fix és melyik, mely random. VAgy kuka az egész és mindig más laapján generálunk random.
         //Lehet ide kéne betenn ia köztes képernyőket is pl.: MainMenu, playground, who win image, curren leaderboard image, next playground és így körbe.
 
+        //pályán lévő elemek (játékos, fal, stb.)
+        public List<IElement> Elements { get; set; }
+
+        public List<Player> Players { get; set; }
+
+        //játéktér mérete (cella x, cella y)
+        public int[] PlayGroundSize { get; set; }
+
+        //játéktér kezdete
+        private Vector StartPos { get; set; }
+        private Vector GameRectSize { get; set; }
+
         public GameLogic()
         {
+            Elements = new List<IElement>();
+            Players = new List<Player>();
+
             //Gueue példányosítás
             playgrounds = new Queue<string[]>();
 
             //Itt kéne a GameMátrixot példányosítani a fix mérettel.
-            GameMatrix = new PlaygroundItem[13, 17];
+            PlayGroundSize = new int[2];
+            PlayGroundSize[0] = 18;
+            PlayGroundSize[1] = 14;
+
+            GameMatrix = new PlaygroundItem[52, 68]; //4* méret (13x17)
 
             InfobarMatrix = new InfobarItem[2, 17];
 
             string[] grounds = new string[] {
-                "fffffffffffffffff",
-                "fp0wwwwwwwwwww00f",
-                "f0fwfwfwfwfwfwf0f",
-                "fwwwwwwwwwwwwwwwf",
-                "fwfwfwfwfwfwfwfwf",
-                "fwwwwwwwwwwwwwwwf",
-                "fwfwfwfwfwfwfwfwf",
-                "fwwwwwwwwwwwwwwwf",
-                "fwfwfwfwfwfwfwfwf",
-                "fwwwwwwwwwwwwwwwf",
-                "f0fwfwfwfwfwfwf0f",
-                "f00wwwwwwwwwww00f",
-                "fffffffffffffffff"
+                "0wfwfwfwfwfwfwfww",
+                "0w0wwwwwwwwwww00w",
+                "00fwfwfwfwfwfwf0w",
+                "0wwwwwwwwwwwwwwww",
+                "0wfwfwfwfwfwfwfww",
+                "0wwwwwwwwwwwwwwww",
+                "0wfwfwfwfwfwfwfww",
+                "0wwwwwwwwwwwwwwww",
+                "0wfwfwfwfwfwfwfww",
+                "0wwwwwwwwwwwwwwww",
+                "00fwfwfwfwfwfwf0w",
+                "0wwwwwwwwwwwwwwww",
+                "0wfwfwfwfwfwfwfww"
             };
 
             //Ha válaszott pálya design, akkor betöltjük azt válaszott mennyiségszer a queue-ba, ha randomizáltat választotak a fixek közül, akkor random tötljülk be a fixeket
@@ -70,20 +94,42 @@ namespace FriendshipExploder.Logic
             //Későbbi feature lehet: random generált pálya design.
         }
 
+        public void SetupSize(Vector startPos, Vector gameRectSize)
+        {
+            this.StartPos = startPos;
+            this.GameRectSize = gameRectSize;
+        }
+
         private void LoadNext(string[] grounds)
         {
             //Betöltjük a válaszott pályadesignt = enumok (vagy fix, vagy random kérés) a választott menyniségű játékossal.
-            for (int i = 0; i < GameMatrix.GetLength(0); i++)
+            for (int i = 0; i < PlayGroundSize[0]-1; i++)
             {
-                for (int j = 0; j < GameMatrix.GetLength(1); j++)
+                for (int j = 0; j < PlayGroundSize[1]-1; j++)
                 {
-                    GameMatrix[i, j] = ConvertToEnum(grounds[i][j]);
+                    switch (grounds[j][i])
+                    {
+                        case 'f':
+                            Elements.Add(new FixWall(0, i, j, new ImageBrush(new BitmapImage(new Uri(Path.Combine("Images", "FixWalls", "0_FixWall.png"), UriKind.RelativeOrAbsolute)))));
+                            break;
+                        case '0':
+                            Elements.Add(new Floor(0, i, j, new ImageBrush(new BitmapImage(new Uri(Path.Combine("Images", "Floors", "0_Floor.png"), UriKind.RelativeOrAbsolute)))));
+                            break;
+                        case 'w':
+                            Elements.Add(new Wall(0, i, j, new ImageBrush(new BitmapImage(new Uri(Path.Combine("Images", "Walls", "0_Wall.png"), UriKind.RelativeOrAbsolute)))));
+                            break;
+                        default:
+                            Elements.Add(new Floor(0, i, j, new ImageBrush(new BitmapImage(new Uri(Path.Combine("Images", "Floors", "0_Floor.png"), UriKind.RelativeOrAbsolute)))));
+                            break;
+                    }
                 }
             }
+
+            Players.Add(new Player(0, 200, 100, new ImageBrush(new BitmapImage(new Uri(Path.Combine("Images", "Players", "0_Player.png"), UriKind.RelativeOrAbsolute))))); //ez itt biztosan nincs jó helyen
         }
 
 
-        private PlaygroundItem ConvertToEnum(char chr)
+        /*private PlaygroundItem ConvertToEnum(char chr)
         {
             //Visszadjuk a chr alapján az adott pályaelemet, lehet hogy mi nem chr-rel dolgozunk, hanem stringgel, vag dicttel
             switch (chr)
@@ -96,40 +142,54 @@ namespace FriendshipExploder.Logic
                 default:
                     return PlaygroundItem.floor;
             }
-        }
+        }*/
 
         public enum PlayerAction //Action foglalt = beépített név
         {
             up, down, left, right, bomb, kick //Később: explode ha lesz időzítettünk
         }
 
-        private int[] PlaygroundItemIndexes(PlaygroundItem item)
+        private bool CanStepToPos(Vector pos, Player player)
         {
-            for (int row = 0; row < GameMatrix.GetLength(0); row++)
-            {
-                for (int col = 0; col < GameMatrix.GetLength(1); col++)
-                {
-                    if (GameMatrix[row, col] == item)// new int[] {i, j }
-                    {
-                        return new int[] { row, col };
-                    }
-                }
-            }
-
-            return new int[] { -1, -1 };
+            //odaléphet-e, de optimális lenne nem végigmenni minden elemen
+            return true;
         }
 
         public void Act(PlayerAction playerAction)//Sender is which player?
         {
-            int[] playerIndexes = PlaygroundItemIndexes(PlaygroundItem.player0);//de töb palyer is van. Valahogy meg kell adni, hogy melyik. VAgy arra is enum.
-
-            int row = playerIndexes[0];
-            int col = playerIndexes[1];
-
-            int previousRow = row;
-            int previousCol = col;
+            int posX = Players[0].X; //de töb palyer is van. Valahogy meg kell adni, hogy melyik. VAgy arra is enum.
+            int posY = Players[0].Y;
 
             switch (playerAction)
+            {
+                case PlayerAction.up:
+                    if (posY - 5 > 0 && CanStepToPos(new Vector(Players[0].X, Players[0].Y - 5), Players[0]))
+                    {
+                        Players[0].Y = Players[0].Y - 5;
+                    }
+                    break;
+                case PlayerAction.down:
+                    if (posY + 5 < ((PlayGroundSize[1] - 2) * GameRectSize.Y) && CanStepToPos(new Vector(Players[0].X, Players[0].Y + 5), Players[0]))
+                    {
+                        Players[0].Y = Players[0].Y + 5;
+                    }
+                    break;
+                case PlayerAction.left:
+                    if (posX - 5 > 0 && CanStepToPos(new Vector(Players[0].X - 5, Players[0].Y), Players[0]))
+                    {
+                        Players[0].X = Players[0].X - 5;
+                    }
+                    break;
+                case PlayerAction.right:
+                    if (posX + 5 < ((PlayGroundSize[0] - 2) * GameRectSize.X) && CanStepToPos(new Vector(Players[0].X + 5, Players[0].Y), Players[0]))
+                    {
+                        Players[0].X = Players[0].X + 5;
+                    }
+                    break;
+            }
+
+
+            /*switch (playerAction)
             {
                 case PlayerAction.up:
                     if (row - 1 >= 0 &&
@@ -175,18 +235,7 @@ namespace FriendshipExploder.Logic
 
                 default:
                     break;
-            }
-
-            if (GameMatrix[row, col] == PlaygroundItem.floor)
-            {
-                //ToDo: alap mindig legyen, igazából minden féle pályaelem lehet külön rétegen, aztán ott keressük. Nem nagy dolog. És akkor tényleg lehet a karakternek nagyobb mátrixa.
-                GameMatrix[row, col] = PlaygroundItem.player0;
-                GameMatrix[previousRow, previousCol] = PlaygroundItem.floor;
-            }
-            else
-            {
-                //Csak fordulás abba az irányba.
-            }
+            }*/
         }
 
     }
