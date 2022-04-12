@@ -11,11 +11,9 @@ namespace FriendshipExploder.Logic
 {
     public interface IGameModel
     {
-        PlaygroundItem[,] GameMatrix { get; set; }
-        InfobarItem[,] InfobarMatrix { get; set; }
         List<IElement> Elements { get; set; }
         int[] PlayGroundSize { get; set; }
         public List<Player> Players { get; set; }
-        public void SetupSize(Vector startPos, Vector gameRectSize);
+        public void SetupSize(Vector gameRectSize);
     }
 }

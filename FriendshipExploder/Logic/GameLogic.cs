@@ -31,8 +31,8 @@ namespace FriendshipExploder.Logic
         }
 
         //Pálya1, Pálya2, Pálya3, RandomGenerált, RandomSorsoltAMeglévőkből
-        public PlaygroundItem[,] GameMatrix { get; set; } //Fájlokból töltsük a három db fix pályatervet kiválasztás alapján, vagy hardcodeoljuk a három fix pályát? Hosz a random generált pályát úgy is kódban kénem egírni.
-        public InfobarItem[,] InfobarMatrix { get; set; }
+        //Fájlokból töltsük a három db fix pályatervet kiválasztás alapján, vagy hardcodeoljuk a három fix pályát? Hosz a random generált pályát úgy is kódban kénem egírni.
+
 
         private Queue<string[]> playgrounds; //path-okat tartalmaz, előre generált pálxák? //Mert vagy beletesszük ak iválaszott pályát választott meccs számszor, vagy előre legeneráljuk a random pélykat, csak beletesszük, hogy melyik fix és melyik, mely random. VAgy kuka az egész és mindig más laapján generálunk random.
         //Lehet ide kéne betenn ia köztes képernyőket is pl.: MainMenu, playground, who win image, curren leaderboard image, next playground és így körbe.
@@ -45,8 +45,7 @@ namespace FriendshipExploder.Logic
         //játéktér mérete (cella x, cella y)
         public int[] PlayGroundSize { get; set; }
 
-        //játéktér kezdete
-        private Vector StartPos { get; set; }
+        //kockák mérete
         private Vector GameRectSize { get; set; }
 
         public GameLogic()
@@ -61,10 +60,6 @@ namespace FriendshipExploder.Logic
             PlayGroundSize = new int[2];
             PlayGroundSize[0] = 18;
             PlayGroundSize[1] = 14;
-
-            GameMatrix = new PlaygroundItem[52, 68]; //4* méret (13x17)
-
-            InfobarMatrix = new InfobarItem[2, 17];
 
             string[] grounds = new string[] {
                 "0wfwfwfwfwfwfwfww",
@@ -94,9 +89,8 @@ namespace FriendshipExploder.Logic
             //Későbbi feature lehet: random generált pálya design.
         }
 
-        public void SetupSize(Vector startPos, Vector gameRectSize)
+        public void SetupSize(Vector gameRectSize)
         {
-            this.StartPos = startPos;
             this.GameRectSize = gameRectSize;
         }
 
@@ -127,22 +121,6 @@ namespace FriendshipExploder.Logic
 
             Players.Add(new Player(0, 200, 100, new ImageBrush(new BitmapImage(new Uri(Path.Combine("Images", "Players", "0_Player.png"), UriKind.RelativeOrAbsolute))))); //ez itt biztosan nincs jó helyen
         }
-
-
-        /*private PlaygroundItem ConvertToEnum(char chr)
-        {
-            //Visszadjuk a chr alapján az adott pályaelemet, lehet hogy mi nem chr-rel dolgozunk, hanem stringgel, vag dicttel
-            switch (chr)
-            {
-                case 'f': return PlaygroundItem.fixWall;
-                case 'p': return PlaygroundItem.player0;//majd tobbre irni
-                case '0': return PlaygroundItem.floor;
-                case 'w': return PlaygroundItem.wall;
-                //case 'w': return PlaygroundItem.wall;
-                default:
-                    return PlaygroundItem.floor;
-            }
-        }*/
 
         public enum PlayerAction //Action foglalt = beépített név
         {
