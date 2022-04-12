@@ -48,6 +48,9 @@ namespace FriendshipExploder.Logic
         //kockák mérete
         private Vector GameRectSize { get; set; }
 
+        //lépés nagysága
+        private int stepSize = 2;
+
         public GameLogic()
         {
             Elements = new List<IElement>();
@@ -119,7 +122,7 @@ namespace FriendshipExploder.Logic
                 }
             }
 
-            Players.Add(new Player(0, 200, 100, new ImageBrush(new BitmapImage(new Uri(Path.Combine("Images", "Players", "0_Player.png"), UriKind.RelativeOrAbsolute))))); //ez itt biztosan nincs jó helyen
+            Players.Add(new Player(0, 0, 0, new ImageBrush(new BitmapImage(new Uri(Path.Combine("Images", "Players", "0_Player.png"), UriKind.RelativeOrAbsolute))))); //ez itt biztosan nincs jó helyen
         }
 
         public enum PlayerAction //Action foglalt = beépített név
@@ -127,9 +130,15 @@ namespace FriendshipExploder.Logic
             up, down, left, right, bomb, kick //Később: explode ha lesz időzítettünk
         }
 
+        //odaléphet-e, de optimális lenne NEM végigmenni minden elemen
         private bool CanStepToPos(Vector pos, Player player)
         {
-            //odaléphet-e, de optimális lenne nem végigmenni minden elemen
+            int xCell = (int)(pos.X / GameRectSize.X);
+            int yCell = (int)(pos.Y / GameRectSize.Y);
+
+            var hasElement = Elements.Where(x => x.PosX == xCell && x.PosY == yCell && (x is Wall || x is FixWall));
+
+            //return hasElement.Count() > 0 ? false : true;
             return true;
         }
 
@@ -141,27 +150,27 @@ namespace FriendshipExploder.Logic
             switch (playerAction)
             {
                 case PlayerAction.up:
-                    if (posY - 5 > 0 && CanStepToPos(new Vector(Players[0].X, Players[0].Y - 5), Players[0]))
+                    if (posY - stepSize >= 0 && CanStepToPos(new Vector(Players[0].X, Players[0].Y - stepSize), Players[0]))
                     {
-                        Players[0].Y = Players[0].Y - 5;
+                        Players[0].Y = Players[0].Y - stepSize;
                     }
                     break;
                 case PlayerAction.down:
-                    if (posY + 5 < ((PlayGroundSize[1] - 2) * GameRectSize.Y) && CanStepToPos(new Vector(Players[0].X, Players[0].Y + 5), Players[0]))
+                    if (posY + stepSize < ((PlayGroundSize[1] - 2) * GameRectSize.Y) && CanStepToPos(new Vector(Players[0].X, Players[0].Y + stepSize), Players[0]))
                     {
-                        Players[0].Y = Players[0].Y + 5;
+                        Players[0].Y = Players[0].Y + stepSize;
                     }
                     break;
                 case PlayerAction.left:
-                    if (posX - 5 > 0 && CanStepToPos(new Vector(Players[0].X - 5, Players[0].Y), Players[0]))
+                    if (posX - stepSize >= 0 && CanStepToPos(new Vector(Players[0].X - stepSize, Players[0].Y), Players[0]))
                     {
-                        Players[0].X = Players[0].X - 5;
+                        Players[0].X = Players[0].X - stepSize;
                     }
                     break;
                 case PlayerAction.right:
-                    if (posX + 5 < ((PlayGroundSize[0] - 2) * GameRectSize.X) && CanStepToPos(new Vector(Players[0].X + 5, Players[0].Y), Players[0]))
+                    if (posX + stepSize < ((PlayGroundSize[0] - 2) * GameRectSize.X) && CanStepToPos(new Vector(Players[0].X + stepSize, Players[0].Y), Players[0]))
                     {
-                        Players[0].X = Players[0].X + 5;
+                        Players[0].X = Players[0].X + stepSize;
                     }
                     break;
             }
