@@ -22,31 +22,31 @@ namespace FriendshipExploder.Controller
             switch (key)
             {
                 case Key.Up:
-                    control.StartMove(GameLogic.PlayerAction.up, 0);
+                    await control.StartMove(GameLogic.PlayerAction.up, 0);
                     break;
                 case Key.W:
-                    control.StartMove(GameLogic.PlayerAction.up, 1);
+                    await control.StartMove(GameLogic.PlayerAction.up, 1);
                     break;
 
                 case Key.Down:
-                    control.StartMove(GameLogic.PlayerAction.down, 0);
+                    await control.StartMove(GameLogic.PlayerAction.down, 0);
                     break;
                 case Key.S:
-                    control.StartMove(GameLogic.PlayerAction.down, 1);
+                    await control.StartMove(GameLogic.PlayerAction.down, 1);
                     break;
 
                 case Key.Left:
-                    control.StartMove(GameLogic.PlayerAction.left, 0);
+                    await control.StartMove(GameLogic.PlayerAction.left, 0);
                     break;
                 case Key.A:
-                    control.StartMove(GameLogic.PlayerAction.left, 1);
+                    await control.StartMove(GameLogic.PlayerAction.left, 1);
                     break;
 
                 case Key.Right:
-                    control.StartMove(GameLogic.PlayerAction.right, 0);
+                    await control.StartMove(GameLogic.PlayerAction.right, 0);
                     break;
                 case Key.D:
-                    control.StartMove(GameLogic.PlayerAction.right, 1);
+                    await control.StartMove(GameLogic.PlayerAction.right, 1);
                     break;
             }
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,18 +10,23 @@ namespace FriendshipExploder.Model
 {
     public class Player
     {
-        public int X { get; set; }
-        public int Y { get; set; }
+        public Point Position { get; set; }
         public ImageBrush Image { get; set; }
-        public bool Moving { get; set; }
+        public bool MovingHorizontal { get; set; }
+        public bool MovingVertical { get; set; }
         public int Speed { get; set; }
 
-        public Player(int x, int y, ImageBrush image)
+        public Player(Point position, ImageBrush image)
         {
-            X = x;
-            Y = y;
+            Position = position;
             Image = image;
-            Moving = false;
+            MovingHorizontal = false;
+            MovingVertical = false;
+        }
+
+        public void Move(int x, int y)
+        {
+            Position = new Point(Position.X + x, Position.Y + y);
         }
 
     }

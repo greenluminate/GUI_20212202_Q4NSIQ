@@ -1,10 +1,10 @@
 ﻿using FriendshipExploder.Model;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 using static FriendshipExploder.Logic.GameLogic;
 
 namespace FriendshipExploder.Logic
@@ -14,6 +14,6 @@ namespace FriendshipExploder.Logic
         List<IElement> Elements { get; set; }
         int[] PlayGroundSize { get; set; }
         public List<Player> Players { get; set; }
-        public void SetupSize(Vector gameSize, Vector gameRectSize);
+        public void SetupSize(Point gameSize, Point gameRectSize);
     }
 }

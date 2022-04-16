@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace FriendshipExploder
 {
@@ -32,6 +33,11 @@ namespace FriendshipExploder
             this.mainMenuLogic = new MainMenuLogic();
             this.gameLogic = new GameLogic();
             this.gameCtrontroller = new GameController(gameLogic); //Esetle gegyet írni menüre.
+
+            DispatcherTimer timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromMilliseconds(30);
+            timer.Tick += Timer_Tick;
+            timer.Start();
 
             display.SetupModel(mainMenuLogic, gameLogic);
         }
@@ -57,6 +63,11 @@ namespace FriendshipExploder
         private void Window_KeyUp(object sender, KeyEventArgs e)
         {
             gameCtrontroller.KeyReleased(e.Key);
+            display.InvalidateVisual();
+        }
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
             display.InvalidateVisual();
         }
     }

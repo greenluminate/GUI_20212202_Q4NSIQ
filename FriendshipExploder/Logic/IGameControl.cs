@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FriendshipExploder.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ namespace FriendshipExploder.Logic
 {
     public interface IGameControl
     { 
-        public void StartMove(PlayerAction playerAction, int playerId);
+        public Task StartMove(PlayerAction playerAction, int playerId);
         public void StopMove(PlayerAction playerAction, int playerId);
     }
 }

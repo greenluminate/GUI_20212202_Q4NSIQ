@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -45,13 +45,10 @@ namespace FriendshipExploder.Logic
         public int[] PlayGroundSize { get; set; }
 
         //kockák mérete
-        private Vector GameRectSize { get; set; }
+        private Point GameRectSize { get; set; }
 
-        //alap sebesség
-        private int DefaultSpeed { get; set; }
+        private Point GameSize { get; set; }
 
-        //lépés nagysága
-        private int stepSize = 1;
 
         public GameLogic()
         {
@@ -94,11 +91,11 @@ namespace FriendshipExploder.Logic
             //Későbbi feature lehet: random generált pálya design.
         }
 
-        public void SetupSize(Vector gameSize, Vector gameRectSize)
+        public void SetupSize(Point gameSize, Point gameRectSize)
         {
             this.GameRectSize = gameRectSize;
-            this.DefaultSpeed = (int)gameRectSize.X / 50;
-            Players.ForEach(x => { x.Speed = (int)gameSize.X / 500; });
+            this.GameSize = gameSize;
+            Players.ForEach(x => { x.Speed = (int)gameSize.X / 300; });
         }
 
         private void LoadNext(string[] grounds)
@@ -126,7 +123,7 @@ namespace FriendshipExploder.Logic
                 }
             }
 
-            Players.Add(new Player(0, 0, new ImageBrush(new BitmapImage(new Uri(Path.Combine("Images", "Players", "0_Player.png"), UriKind.RelativeOrAbsolute)))));
+            Players.Add(new Player(new Point(100, 100), new ImageBrush(new BitmapImage(new Uri(Path.Combine("Images", "Players", "0_Player.png"), UriKind.RelativeOrAbsolute)))));
         }
 
         public enum PlayerAction //Action foglalt = beépített név
@@ -134,8 +131,8 @@ namespace FriendshipExploder.Logic
             up, down, left, right, bomb, kick //Később: explode ha lesz időzítettünk
         }
 
-        //odaléphet-e, de optimális lenne NEM végigmenni minden elemen
-        private bool CanStepToPos(Vector pos, Player player)
+        //Odaléphet-e a játékos
+        private bool CanStepToPos(Point pos, System.Windows.Vector direction, Player player)
         {
             int xCell = (int)(pos.X / GameRectSize.X);
             int yCell = (int)(pos.Y / GameRectSize.Y);
@@ -146,105 +143,88 @@ namespace FriendshipExploder.Logic
             return true;
         }
 
-        public async void StartMove(PlayerAction playerAction, int playerId)
+        //A játékos mozgásának kezdete, a controller hívja meg
+        public async Task StartMove(PlayerAction playerAction, int playerId)
         {
-            if (Players[playerId].Moving == false)
+            switch (playerAction)
             {
-                Players[playerId].Moving = true;
-                while (Players[playerId].Moving)
-                {
-                    Act(playerAction, playerId);
-                    await Task.Delay(1);
-                }
+                case PlayerAction.up:
+                case PlayerAction.down:
+                    if (Players[playerId].MovingVertical == false)
+                    {
+                        Players[playerId].MovingVertical = true;
+                        while (Players[playerId].MovingVertical)
+                        {
+                            Act(playerAction, playerId);
+                            await Task.Delay(1);
+                        }
+                    }
+                    break;
+                case PlayerAction.left:
+                case PlayerAction.right:
+                    if (Players[playerId].MovingHorizontal == false)
+                    {
+                        Players[playerId].MovingHorizontal = true;
+                        while (Players[playerId].MovingHorizontal)
+                        {
+                            Act(playerAction, playerId);
+                            await Task.Delay(1);
+                        }
+                    }
+                    break;
+            }
+            
+        }
+
+        //A játékos mozgásának vége, a controller hívja meg
+        public void StopMove(PlayerAction playerAction, int playerId)
+        {
+            switch (playerAction)
+            {
+                case PlayerAction.up:
+                case PlayerAction.down:
+                    Players[playerId].MovingVertical = false;
+                    break;
+                case PlayerAction.left:
+                case PlayerAction.right:
+                    Players[playerId].MovingHorizontal = false;
+                    break;
             }
         }
 
-        public void StopMove(PlayerAction playerAction, int playerId)
-        {
-            Players[playerId].Moving = false;
-        }
-
+        //A játékos mozgása
         public void Act(PlayerAction playerAction, int playerId)
         {
-            int posX = Players[0].X; //de töb palyer is van. Valahogy meg kell adni, hogy melyik. VAgy arra is enum.
-            int posY = Players[0].Y;
+            int posX = Players[0].Position.X;
+            int posY = Players[0].Position.Y;
 
             switch (playerAction)
             {
                 case PlayerAction.up:
-                    if (posY - stepSize >= 0 && CanStepToPos(new Vector(Players[0].X, Players[0].Y - stepSize), Players[0]))
+                    if (posY - 2 * Players[playerId].Speed >= 0 && CanStepToPos(Players[playerId].Position, new System.Windows.Vector(0, -1*Players[playerId].Speed), Players[0]))
                     {
-                        Players[0].Y = Players[0].Y - stepSize;
+                        Players[0].Move(0, -Players[playerId].Speed);
                     }
                     break;
                 case PlayerAction.down:
-                    if (posY + stepSize < ((PlayGroundSize[1] - 2) * GameRectSize.Y) && CanStepToPos(new Vector(Players[0].X, Players[0].Y + stepSize + GameRectSize.Y), Players[0]))
+                    if (posY + 2 * Players[playerId].Speed <= ((PlayGroundSize[1] - 2) * GameRectSize.Y) && CanStepToPos(Players[playerId].Position, new System.Windows.Vector(0, Players[playerId].Speed), Players[0]))
                     {
-                        Players[0].Y = Players[0].Y + stepSize;
+                        Players[0].Move(0, Players[playerId].Speed);
                     }
                     break;
                 case PlayerAction.left:
-                    if (posX - 2 * Players[playerId].Speed >= 0 && CanStepToPos(new Vector(Players[0].X - stepSize, Players[0].Y), Players[0]))
+                    if (posX - 2 * Players[playerId].Speed >= 0 && CanStepToPos(Players[playerId].Position, new System.Windows.Vector(-1*Players[playerId].Speed, 0), Players[0]))
                     {
-                        Players[0].X = Players[0].X - Players[playerId].Speed;
+                        Players[0].Move(-Players[playerId].Speed, 0);
                     }
                     break;
                 case PlayerAction.right:
-                    if (posX + 2 * Players[playerId].Speed < ((PlayGroundSize[0] - 2) * GameRectSize.X) && CanStepToPos(new Vector(Players[0].X + stepSize + GameRectSize.X, Players[0].Y), Players[0]))
+                    if (posX + 2 * Players[playerId].Speed <= ((PlayGroundSize[0] - 2) * GameRectSize.X) && CanStepToPos(Players[playerId].Position, new System.Windows.Vector(Players[playerId].Speed, 0), Players[0]))
                     {
-                        Players[0].X = Players[0].X + Players[playerId].Speed;
+                        Players[0].Move(Players[playerId].Speed, 0);
                     }
                     break;
             }
-
-
-            /*switch (playerAction)
-            {
-                case PlayerAction.up:
-                    if (row - 1 >= 0 &&
-                        GameMatrix[row - 1, col] != PlaygroundItem.fixWall &&
-                        GameMatrix[row - 1, col] != PlaygroundItem.wall)
-                    {
-                        row--;
-                    }
-                    break;
-
-                case PlayerAction.down:
-                    if (row + 1 <= GameMatrix.GetLength(0) - 1 &&
-                         GameMatrix[row + 1, col] != PlaygroundItem.fixWall &&
-                         GameMatrix[row + 1, col] != PlaygroundItem.wall)
-                    {
-                        row++;
-                    }
-                    break;
-
-                case PlayerAction.left:
-                    if (col - 1 >= 0 &&
-                         GameMatrix[row, col - 1] != PlaygroundItem.fixWall &&
-                         GameMatrix[row, col - 1] != PlaygroundItem.wall)
-                    {
-                        col--;
-                    }
-                    break;
-
-                case PlayerAction.right:
-                    if (col + 1 <= GameMatrix.GetLength(1) - 1 &&
-                         GameMatrix[row, col + 1] != PlaygroundItem.fixWall &&
-                         GameMatrix[row, col + 1] != PlaygroundItem.wall)
-                    {
-                        col++;
-                    }
-                    break;
-
-                case PlayerAction.bomb:
-                    break;
-
-                case PlayerAction.kick:
-                    break;
-
-                default:
-                    break;
-            }*/
         }
 
     }
