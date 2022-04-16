@@ -14,7 +14,6 @@ namespace FriendshipExploder.Logic
 {
     public class GameLogic : IGameModel, IGameControl
     {
-        private KeyBinding player1_keyBinding;
         public enum PlaygroundItem
         {
             player0, player1, palyer2, bomb, fire, fixWall, wall, floor, modderFloor, booster //Ezekhez mind van mappa
@@ -48,8 +47,11 @@ namespace FriendshipExploder.Logic
         //kockák mérete
         private Vector GameRectSize { get; set; }
 
+        //alap sebesség
+        private int DefaultSpeed { get; set; }
+
         //lépés nagysága
-        private int stepSize = 2;
+        private int stepSize = 1;
 
         public GameLogic()
         {
@@ -92,9 +94,11 @@ namespace FriendshipExploder.Logic
             //Későbbi feature lehet: random generált pálya design.
         }
 
-        public void SetupSize(Vector gameRectSize)
+        public void SetupSize(Vector gameSize, Vector gameRectSize)
         {
             this.GameRectSize = gameRectSize;
+            this.DefaultSpeed = (int)gameRectSize.X / 50;
+            Players.ForEach(x => { x.Speed = (int)gameSize.X / 500; });
         }
 
         private void LoadNext(string[] grounds)
@@ -122,7 +126,7 @@ namespace FriendshipExploder.Logic
                 }
             }
 
-            Players.Add(new Player(0, 0, 0, new ImageBrush(new BitmapImage(new Uri(Path.Combine("Images", "Players", "0_Player.png"), UriKind.RelativeOrAbsolute))))); //ez itt biztosan nincs jó helyen
+            Players.Add(new Player(0, 0, new ImageBrush(new BitmapImage(new Uri(Path.Combine("Images", "Players", "0_Player.png"), UriKind.RelativeOrAbsolute)))));
         }
 
         public enum PlayerAction //Action foglalt = beépített név
@@ -142,7 +146,25 @@ namespace FriendshipExploder.Logic
             return true;
         }
 
-        public void Act(PlayerAction playerAction)//Sender is which player?
+        public async void StartMove(PlayerAction playerAction, int playerId)
+        {
+            if (Players[playerId].Moving == false)
+            {
+                Players[playerId].Moving = true;
+                while (Players[playerId].Moving)
+                {
+                    Act(playerAction, playerId);
+                    await Task.Delay(1);
+                }
+            }
+        }
+
+        public void StopMove(PlayerAction playerAction, int playerId)
+        {
+            Players[playerId].Moving = false;
+        }
+
+        public void Act(PlayerAction playerAction, int playerId)
         {
             int posX = Players[0].X; //de töb palyer is van. Valahogy meg kell adni, hogy melyik. VAgy arra is enum.
             int posY = Players[0].Y;
@@ -156,21 +178,21 @@ namespace FriendshipExploder.Logic
                     }
                     break;
                 case PlayerAction.down:
-                    if (posY + stepSize < ((PlayGroundSize[1] - 2) * GameRectSize.Y) && CanStepToPos(new Vector(Players[0].X, Players[0].Y + stepSize), Players[0]))
+                    if (posY + stepSize < ((PlayGroundSize[1] - 2) * GameRectSize.Y) && CanStepToPos(new Vector(Players[0].X, Players[0].Y + stepSize + GameRectSize.Y), Players[0]))
                     {
                         Players[0].Y = Players[0].Y + stepSize;
                     }
                     break;
                 case PlayerAction.left:
-                    if (posX - stepSize >= 0 && CanStepToPos(new Vector(Players[0].X - stepSize, Players[0].Y), Players[0]))
+                    if (posX - 2 * Players[playerId].Speed >= 0 && CanStepToPos(new Vector(Players[0].X - stepSize, Players[0].Y), Players[0]))
                     {
-                        Players[0].X = Players[0].X - stepSize;
+                        Players[0].X = Players[0].X - Players[playerId].Speed;
                     }
                     break;
                 case PlayerAction.right:
-                    if (posX + stepSize < ((PlayGroundSize[0] - 2) * GameRectSize.X) && CanStepToPos(new Vector(Players[0].X + stepSize, Players[0].Y), Players[0]))
+                    if (posX + 2 * Players[playerId].Speed < ((PlayGroundSize[0] - 2) * GameRectSize.X) && CanStepToPos(new Vector(Players[0].X + stepSize + GameRectSize.X, Players[0].Y), Players[0]))
                     {
-                        Players[0].X = Players[0].X + stepSize;
+                        Players[0].X = Players[0].X + Players[playerId].Speed;
                     }
                     break;
             }

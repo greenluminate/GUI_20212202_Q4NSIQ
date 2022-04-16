@@ -14,6 +14,6 @@ namespace FriendshipExploder.Logic
         List<IElement> Elements { get; set; }
         int[] PlayGroundSize { get; set; }
         public List<Player> Players { get; set; }
-        public void SetupSize(Vector gameRectSize);
+        public void SetupSize(Vector gameSize, Vector gameRectSize);
     }
 }

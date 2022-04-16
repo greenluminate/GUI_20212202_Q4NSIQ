@@ -71,8 +71,8 @@ namespace FriendshipExploder.Renderer
                 int startX = gameRectWidth / 2;
                 startY = startY + gameRectHeight / 2;
 
-                //kezdet és kockaméret átadása a logic részére
-                gameModel.SetupSize(new Vector(gameRectWidth, gameRectHeight));
+                //kockaméret átadása a logic részére
+                gameModel.SetupSize(new Vector(size.Width, (size.Height - size.Height * 0.05)), new Vector(gameRectWidth, gameRectHeight));
 
 
                 //elemek kirajzolása

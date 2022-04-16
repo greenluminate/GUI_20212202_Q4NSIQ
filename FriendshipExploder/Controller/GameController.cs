@@ -17,39 +17,70 @@ namespace FriendshipExploder.Controller
             this.control = control;
         }
 
-        public void KeyPressed(Key key)//async await, hogy egyszerre több gomb is nyomható legyen.
+        public async void KeyPressed(Key key)
         {
             switch (key)
             {
                 case Key.Up:
-                    control.Act(GameLogic.PlayerAction.up);
+                    control.StartMove(GameLogic.PlayerAction.up, 0);
                     break;
                 case Key.W:
-                    control.Act(GameLogic.PlayerAction.up);
+                    control.StartMove(GameLogic.PlayerAction.up, 1);
                     break;
 
                 case Key.Down:
-                    control.Act(GameLogic.PlayerAction.down);
+                    control.StartMove(GameLogic.PlayerAction.down, 0);
                     break;
                 case Key.S:
-                    control.Act(GameLogic.PlayerAction.down);
+                    control.StartMove(GameLogic.PlayerAction.down, 1);
                     break;
 
                 case Key.Left:
-                    control.Act(GameLogic.PlayerAction.left);
+                    control.StartMove(GameLogic.PlayerAction.left, 0);
                     break;
                 case Key.A:
-                    control.Act(GameLogic.PlayerAction.left);
+                    control.StartMove(GameLogic.PlayerAction.left, 1);
                     break;
 
                 case Key.Right:
-                    control.Act(GameLogic.PlayerAction.right);
+                    control.StartMove(GameLogic.PlayerAction.right, 0);
                     break;
                 case Key.D:
-                    control.Act(GameLogic.PlayerAction.right);
+                    control.StartMove(GameLogic.PlayerAction.right, 1);
+                    break;
+            }
+        }
+
+        public void KeyReleased(Key key)
+        {
+            switch (key)
+            {
+                case Key.Up:
+                    control.StopMove(GameLogic.PlayerAction.up, 0);
+                    break;
+                case Key.W:
+                    control.StopMove(GameLogic.PlayerAction.up, 1);
                     break;
 
-                default:
+                case Key.Down:
+                    control.StopMove(GameLogic.PlayerAction.down, 0);
+                    break;
+                case Key.S:
+                    control.StopMove(GameLogic.PlayerAction.down, 1);
+                    break;
+
+                case Key.Left:
+                    control.StopMove(GameLogic.PlayerAction.left, 0);
+                    break;
+                case Key.A:
+                    control.StopMove(GameLogic.PlayerAction.left, 1);
+                    break;
+
+                case Key.Right:
+                    control.StopMove(GameLogic.PlayerAction.right, 0);
+                    break;
+                case Key.D:
+                    control.StopMove(GameLogic.PlayerAction.right, 1);
                     break;
             }
         }

@@ -6,10 +6,11 @@
         xmlns:local="clr-namespace:FriendshipExploder"
         xmlns:renderer="clr-namespace:FriendshipExploder.Renderer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800"
+        Title="MainWindow" Height="800" Width="800"
         SizeChanged="Window_SizeChanged"
         Loaded="Window_Loaded"
-        KeyDown="Window_KeyDown">
+        KeyDown="Window_KeyDown"
+        KeyUp="Window_KeyUp">
     
     <Grid x:Name="grid">
         <renderer:Display x:Name="display"/>

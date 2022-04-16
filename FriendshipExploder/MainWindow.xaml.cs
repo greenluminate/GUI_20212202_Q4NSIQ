@@ -53,5 +53,11 @@ namespace FriendshipExploder
             gameCtrontroller.KeyPressed(e.Key);
             display.InvalidateVisual();
         }
+
+        private void Window_KeyUp(object sender, KeyEventArgs e)
+        {
+            gameCtrontroller.KeyReleased(e.Key);
+            display.InvalidateVisual();
+        }
     }
 }
