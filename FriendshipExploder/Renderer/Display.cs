@@ -75,8 +75,8 @@ namespace FriendshipExploder.Renderer
                 //elemek kirajzolása
                 foreach (var element in gameModel.Elements)
                 {
-                    int x = startX + element.PosX * gameRectWidth;
-                    int y = startY + element.PosY * gameRectHeight;
+                    int x = startX + element.Position.X * gameRectWidth;
+                    int y = startY + element.Position.Y * gameRectHeight;
 
                     drawingContext.DrawRectangle(
                         element.Image,

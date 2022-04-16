@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,16 +10,12 @@ namespace FriendshipExploder.Model
 {
     public class Floor : IElement
     {
-        public int Id { get; set; }
-        public int PosX { get; set; }
-        public int PosY { get; set; }
+        public Point Position { get; set; }
         public ImageBrush Image { get; set; }
 
-        public Floor(int id, int posX, int posY, ImageBrush image)
+        public Floor(Point position, ImageBrush image)
         {
-            Id = id;
-            PosX = posX;
-            PosY = posY;
+            Position = position;
             Image = image;
         }
 

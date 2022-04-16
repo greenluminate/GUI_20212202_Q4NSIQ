@@ -108,22 +108,22 @@ namespace FriendshipExploder.Logic
                     switch (grounds[j][i])
                     {
                         case 'f':
-                            Elements.Add(new FixWall(0, i, j, new ImageBrush(new BitmapImage(new Uri(Path.Combine("Images", "FixWalls", "0_FixWall.png"), UriKind.RelativeOrAbsolute)))));
+                            Elements.Add(new FixWall(new Point(i, j), new ImageBrush(new BitmapImage(new Uri(Path.Combine("Images", "FixWalls", "0_FixWall.png"), UriKind.RelativeOrAbsolute)))));
                             break;
                         case '0':
-                            Elements.Add(new Floor(0, i, j, new ImageBrush(new BitmapImage(new Uri(Path.Combine("Images", "Floors", "0_Floor.png"), UriKind.RelativeOrAbsolute)))));
+                            Elements.Add(new Floor(new Point(i, j), new ImageBrush(new BitmapImage(new Uri(Path.Combine("Images", "Floors", "0_Floor.png"), UriKind.RelativeOrAbsolute)))));
                             break;
                         case 'w':
-                            Elements.Add(new Wall(0, i, j, new ImageBrush(new BitmapImage(new Uri(Path.Combine("Images", "Walls", "0_Wall.png"), UriKind.RelativeOrAbsolute)))));
+                            Elements.Add(new Wall(new Point(i, j), new ImageBrush(new BitmapImage(new Uri(Path.Combine("Images", "Walls", "0_Wall.png"), UriKind.RelativeOrAbsolute)))));
                             break;
                         default:
-                            Elements.Add(new Floor(0, i, j, new ImageBrush(new BitmapImage(new Uri(Path.Combine("Images", "Floors", "0_Floor.png"), UriKind.RelativeOrAbsolute)))));
+                            Elements.Add(new Floor(new Point(i, j), new ImageBrush(new BitmapImage(new Uri(Path.Combine("Images", "Floors", "0_Floor.png"), UriKind.RelativeOrAbsolute)))));
                             break;
                     }
                 }
             }
 
-            Players.Add(new Player(new Point(100, 100), new ImageBrush(new BitmapImage(new Uri(Path.Combine("Images", "Players", "0_Player.png"), UriKind.RelativeOrAbsolute)))));
+            Players.Add(new Player(new Point(10, 10), new ImageBrush(new BitmapImage(new Uri(Path.Combine("Images", "Players", "0_Player.png"), UriKind.RelativeOrAbsolute)))));
         }
 
         public enum PlayerAction //Action foglalt = beépített név
@@ -132,15 +132,23 @@ namespace FriendshipExploder.Logic
         }
 
         //Odaléphet-e a játékos
-        private bool CanStepToPos(Point pos, System.Windows.Vector direction, Player player)
+        private bool CanStepToPos(Player player, System.Windows.Vector direction)
         {
-            int xCell = (int)(pos.X / GameRectSize.X);
-            int yCell = (int)(pos.Y / GameRectSize.Y);
+            bool canStep = true;
+            Rectangle playerRect = new Rectangle(player.Position.X + (int)direction.X - (GameRectSize.X / 4), player.Position.Y + (int)direction.Y - (GameRectSize.Y / 4), GameRectSize.X / 2, GameRectSize.Y / 2);
 
-            var hasElement = Elements.Where(x => x.PosX == xCell && x.PosY == yCell && (x is Wall || x is FixWall));
-
-            //return hasElement.Count() > 0 ? false : true;
-            return true;
+            foreach (var element in Elements)
+            {
+                if (element is Wall || element is FixWall)
+                {
+                    Rectangle elementRect = new Rectangle(element.Position.X * GameRectSize.X, element.Position.Y * GameRectSize.Y, GameRectSize.X, GameRectSize.Y);
+                    if (playerRect.IntersectsWith(elementRect))
+                    {
+                        canStep = false;
+                    }
+                }
+            }
+            return canStep;
         }
 
         //A játékos mozgásának kezdete, a controller hívja meg
@@ -201,25 +209,25 @@ namespace FriendshipExploder.Logic
             switch (playerAction)
             {
                 case PlayerAction.up:
-                    if (posY - GameRectSize.Y / 4 - Players[playerId].Speed >= 0 && CanStepToPos(Players[playerId].Position, new System.Windows.Vector(0, -1*Players[playerId].Speed), Players[0]))
+                    if (posY - GameRectSize.Y / 4 - Players[playerId].Speed >= 0 && CanStepToPos(Players[playerId], new System.Windows.Vector(0, -1*Players[playerId].Speed)))
                     {
                         Players[0].Move(0, -Players[playerId].Speed);
                     }
                     break;
                 case PlayerAction.down:
-                    if (posY + GameRectSize.Y / 4 + Players[playerId].Speed <= (PlayGroundSize[1] - 1) * GameRectSize.Y && CanStepToPos(Players[playerId].Position, new System.Windows.Vector(0, Players[playerId].Speed), Players[0]))
+                    if (posY + GameRectSize.Y / 4 + Players[playerId].Speed <= (PlayGroundSize[1] - 1) * GameRectSize.Y && CanStepToPos(Players[playerId], new System.Windows.Vector(0, Players[playerId].Speed)))
                     {
                         Players[0].Move(0, Players[playerId].Speed);
                     }
                     break;
                 case PlayerAction.left:
-                    if (posX - GameRectSize.X / 4 - Players[playerId].Speed >= 0 && CanStepToPos(Players[playerId].Position, new System.Windows.Vector(-1*Players[playerId].Speed, 0), Players[0]))
+                    if (posX - GameRectSize.X / 4 - Players[playerId].Speed >= 0 && CanStepToPos(Players[playerId], new System.Windows.Vector(-1*Players[playerId].Speed, 0)))
                     {
                         Players[0].Move(-Players[playerId].Speed, 0);
                     }
                     break;
                 case PlayerAction.right:
-                    if (posX + GameRectSize.Y / 4 + Players[playerId].Speed <= ((PlayGroundSize[0] - 1) * GameRectSize.X) && CanStepToPos(Players[playerId].Position, new System.Windows.Vector(Players[playerId].Speed, 0), Players[0]))
+                    if (posX + GameRectSize.Y / 4 + Players[playerId].Speed <= ((PlayGroundSize[0] - 1) * GameRectSize.X) && CanStepToPos(Players[playerId], new System.Windows.Vector(Players[playerId].Speed, 0)))
                     {
                         Players[0].Move(Players[playerId].Speed, 0);
                     }

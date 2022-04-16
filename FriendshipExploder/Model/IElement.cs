@@ -1,12 +1,11 @@
-﻿using System.Windows.Media;
+﻿using System.Drawing;
+using System.Windows.Media;
 
 namespace FriendshipExploder.Model
 {
     public interface IElement
     {
-        int Id { get; set; }
         ImageBrush Image { get; set; }
-        int PosX { get; set; }
-        int PosY { get; set; }
+        public Point Position { get; set; }
     }
 }
