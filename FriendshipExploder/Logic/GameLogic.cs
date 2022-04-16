@@ -45,7 +45,7 @@ namespace FriendshipExploder.Logic
         public int[] PlayGroundSize { get; set; }
 
         //kockák mérete
-        private Point GameRectSize { get; set; }
+        private int GameRectSize { get; set; }
 
         private Point GameSize { get; set; }
 
@@ -91,7 +91,7 @@ namespace FriendshipExploder.Logic
             //Későbbi feature lehet: random generált pálya design.
         }
 
-        public void SetupSize(Point gameSize, Point gameRectSize)
+        public void SetupSize(Point gameSize, int gameRectSize)
         {
             this.GameRectSize = gameRectSize;
             this.GameSize = gameSize;
@@ -135,13 +135,13 @@ namespace FriendshipExploder.Logic
         private bool CanStepToPos(Player player, System.Windows.Vector direction)
         {
             bool canStep = true;
-            Rectangle playerRect = new Rectangle(player.Position.X + (int)direction.X - (GameRectSize.X / 4), player.Position.Y + (int)direction.Y - (GameRectSize.Y / 4), GameRectSize.X / 2, GameRectSize.Y / 2);
+            Rectangle playerRect = new Rectangle(player.Position.X + (int)direction.X - (GameRectSize / 4), player.Position.Y + (int)direction.Y - (GameRectSize / 4), GameRectSize / 2, GameRectSize / 2);
 
             foreach (var element in Elements)
             {
                 if (element is Wall || element is FixWall)
                 {
-                    Rectangle elementRect = new Rectangle(element.Position.X * GameRectSize.X, element.Position.Y * GameRectSize.Y, GameRectSize.X, GameRectSize.Y);
+                    Rectangle elementRect = new Rectangle(element.Position.X * GameRectSize, element.Position.Y * GameRectSize, GameRectSize, GameRectSize);
                     if (playerRect.IntersectsWith(elementRect))
                     {
                         canStep = false;
@@ -209,25 +209,25 @@ namespace FriendshipExploder.Logic
             switch (playerAction)
             {
                 case PlayerAction.up:
-                    if (posY - GameRectSize.Y / 4 - Players[playerId].Speed >= 0 && CanStepToPos(Players[playerId], new System.Windows.Vector(0, -1*Players[playerId].Speed)))
+                    if (posY - GameRectSize / 4 - Players[playerId].Speed >= 0 && CanStepToPos(Players[playerId], new System.Windows.Vector(0, -1*Players[playerId].Speed)))
                     {
                         Players[0].Move(0, -Players[playerId].Speed);
                     }
                     break;
                 case PlayerAction.down:
-                    if (posY + GameRectSize.Y / 4 + Players[playerId].Speed <= (PlayGroundSize[1] - 1) * GameRectSize.Y && CanStepToPos(Players[playerId], new System.Windows.Vector(0, Players[playerId].Speed)))
+                    if (posY + GameRectSize / 4 + Players[playerId].Speed <= (PlayGroundSize[1] - 1) * GameRectSize && CanStepToPos(Players[playerId], new System.Windows.Vector(0, Players[playerId].Speed)))
                     {
                         Players[0].Move(0, Players[playerId].Speed);
                     }
                     break;
                 case PlayerAction.left:
-                    if (posX - GameRectSize.X / 4 - Players[playerId].Speed >= 0 && CanStepToPos(Players[playerId], new System.Windows.Vector(-1*Players[playerId].Speed, 0)))
+                    if (posX - GameRectSize / 4 - Players[playerId].Speed >= 0 && CanStepToPos(Players[playerId], new System.Windows.Vector(-1*Players[playerId].Speed, 0)))
                     {
                         Players[0].Move(-Players[playerId].Speed, 0);
                     }
                     break;
                 case PlayerAction.right:
-                    if (posX + GameRectSize.Y / 4 + Players[playerId].Speed <= ((PlayGroundSize[0] - 1) * GameRectSize.X) && CanStepToPos(Players[playerId], new System.Windows.Vector(Players[playerId].Speed, 0)))
+                    if (posX + GameRectSize / 4 + Players[playerId].Speed <= ((PlayGroundSize[0] - 1) * GameRectSize) && CanStepToPos(Players[playerId], new System.Windows.Vector(Players[playerId].Speed, 0)))
                     {
                         Players[0].Move(Players[playerId].Speed, 0);
                     }

@@ -38,6 +38,8 @@ namespace FriendshipExploder.Renderer
                 int gameRectHeight = (int)((size.Height - size.Height * 0.05) / gameModel.PlayGroundSize[1]);
                 int startY = (int)(size.Height * 0.05);
 
+                int gameRectSize = gameRectWidth < gameRectHeight ? gameRectWidth : gameRectHeight;
+
 
                 //állapotsáv
                 drawingContext.DrawRectangle(Brushes.Beige, new Pen(Brushes.Black, 1),new Rect(0, 0, size.Width, size.Height * 0.05)); //5%-a a magasságnak
@@ -47,41 +49,41 @@ namespace FriendshipExploder.Renderer
                 ImageBrush brush = new ImageBrush(new BitmapImage(new Uri(Path.Combine("Images", "FixWalls", "0_FixWall.png"), UriKind.RelativeOrAbsolute)));
 
                 //sarkok
-                drawingContext.DrawRectangle(brush, new Pen(Brushes.Black, 0), new Rect(0, startY, gameRectWidth / 2, gameRectHeight / 2)); //bal felső
-                drawingContext.DrawRectangle(brush, new Pen(Brushes.Black, 0), new Rect((gameModel.PlayGroundSize[0] - 1) * gameRectWidth + gameRectWidth / 2, startY, gameRectWidth / 2, gameRectHeight / 2)); //jobb felső
-                drawingContext.DrawRectangle(brush, new Pen(Brushes.Black, 0), new Rect(0, startY + ((gameModel.PlayGroundSize[1] - 1) * gameRectHeight) + gameRectHeight / 2, gameRectWidth / 2, gameRectHeight / 2)); //bal alsó
-                drawingContext.DrawRectangle(brush, new Pen(Brushes.Black, 0), new Rect((gameModel.PlayGroundSize[0] - 1) * gameRectWidth + gameRectWidth / 2, startY + ((gameModel.PlayGroundSize[1] - 1) * gameRectHeight) + gameRectHeight / 2, gameRectWidth / 2, gameRectHeight / 2)); //jobb alsó
+                drawingContext.DrawRectangle(brush, new Pen(Brushes.Black, 0), new Rect(0, startY, gameRectSize / 2, gameRectSize / 2)); //bal felső
+                drawingContext.DrawRectangle(brush, new Pen(Brushes.Black, 0), new Rect((gameModel.PlayGroundSize[0] - 1) * gameRectSize + gameRectSize / 2, startY, gameRectSize / 2, gameRectSize / 2)); //jobb felső
+                drawingContext.DrawRectangle(brush, new Pen(Brushes.Black, 0), new Rect(0, startY + ((gameModel.PlayGroundSize[1] - 1) * gameRectSize) + gameRectSize / 2, gameRectSize / 2, gameRectSize / 2)); //bal alsó
+                drawingContext.DrawRectangle(brush, new Pen(Brushes.Black, 0), new Rect((gameModel.PlayGroundSize[0] - 1) * gameRectSize + gameRectSize / 2, startY + ((gameModel.PlayGroundSize[1] - 1) * gameRectSize) + gameRectSize / 2, gameRectSize / 2, gameRectSize / 2)); //jobb alsó
 
                 for (int i = 0; i < gameModel.PlayGroundSize[0] - 1; i++)
                 {
-                    drawingContext.DrawRectangle(brush, new Pen(Brushes.Black, 0), new Rect((i * gameRectWidth) + gameRectWidth / 2, startY, gameRectWidth, gameRectHeight / 2)); //felső sor
-                    drawingContext.DrawRectangle(brush, new Pen(Brushes.Black, 0), new Rect((i * gameRectWidth) + gameRectWidth / 2, startY + ((gameModel.PlayGroundSize[1] - 1) * gameRectHeight) + gameRectHeight / 2, gameRectWidth, gameRectHeight / 2)); //alsó sor
+                    drawingContext.DrawRectangle(brush, new Pen(Brushes.Black, 0), new Rect((i * gameRectSize) + gameRectSize / 2, startY, gameRectSize, gameRectSize / 2)); //felső sor
+                    drawingContext.DrawRectangle(brush, new Pen(Brushes.Black, 0), new Rect((i * gameRectSize) + gameRectSize / 2, startY + ((gameModel.PlayGroundSize[1] - 1) * gameRectSize) + gameRectSize / 2, gameRectSize, gameRectSize / 2)); //alsó sor
                 }
                 for (int i = 0; i < gameModel.PlayGroundSize[1] - 1; i++)
                 {
-                    drawingContext.DrawRectangle(brush, new Pen(Brushes.Black, 0), new Rect(0, startY + (i * gameRectHeight) + gameRectHeight / 2, gameRectWidth / 2, gameRectHeight)); //bal oldal
-                    drawingContext.DrawRectangle(brush, new Pen(Brushes.Black, 0), new Rect((gameModel.PlayGroundSize[0] - 1) * gameRectWidth + gameRectWidth / 2, startY + (i * gameRectHeight) + gameRectHeight / 2, gameRectWidth / 2, gameRectHeight)); //jobb oldal
+                    drawingContext.DrawRectangle(brush, new Pen(Brushes.Black, 0), new Rect(0, startY + (i * gameRectSize) + gameRectSize / 2, gameRectSize / 2, gameRectSize)); //bal oldal
+                    drawingContext.DrawRectangle(brush, new Pen(Brushes.Black, 0), new Rect((gameModel.PlayGroundSize[0] - 1) * gameRectSize + gameRectSize / 2, startY + (i * gameRectSize) + gameRectSize / 2, gameRectSize / 2, gameRectSize)); //jobb oldal
                 }
                 
 
                 //játéktér kezdete a bal felső sarokban a fal nélkül
-                int startX = gameRectWidth / 2;
-                startY = startY + gameRectHeight / 2;
+                int startX = gameRectSize / 2;
+                startY = startY + gameRectSize / 2;
 
                 //kockaméret átadása a logic részére
-                gameModel.SetupSize(new System.Drawing.Point((int)size.Width, (int)(size.Height - size.Height * 0.05)), new System.Drawing.Point(gameRectWidth, gameRectHeight));
+                gameModel.SetupSize(new System.Drawing.Point((int)size.Width, (int)(size.Height - size.Height * 0.05)), gameRectSize);
 
 
                 //elemek kirajzolása
                 foreach (var element in gameModel.Elements)
                 {
-                    int x = startX + element.Position.X * gameRectWidth;
-                    int y = startY + element.Position.Y * gameRectHeight;
+                    int x = startX + element.Position.X * gameRectSize;
+                    int y = startY + element.Position.Y * gameRectSize;
 
                     drawingContext.DrawRectangle(
                         element.Image,
                         new Pen(Brushes.Black, 0),
-                        new Rect(x, y, gameRectWidth, gameRectHeight)
+                        new Rect(x, y, gameRectSize, gameRectSize)
                     );
                 }
 
@@ -94,7 +96,7 @@ namespace FriendshipExploder.Renderer
                     drawingContext.DrawRectangle(
                         player.Image,
                         new Pen(Brushes.Black, 0),
-                        new Rect(x-gameRectWidth/4, y-gameRectHeight/4, gameRectWidth/2, gameRectHeight/2)
+                        new Rect(x- gameRectSize / 4, y- gameRectSize / 4, gameRectSize / 2, gameRectSize / 2)
                     );
                 }
             }
