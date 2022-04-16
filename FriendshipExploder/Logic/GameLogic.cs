@@ -57,13 +57,14 @@ namespace FriendshipExploder.Logic
 
             //Gueue példányosítás
             playgrounds = new Queue<string[]>();
-
-            //Itt kéne a GameMátrixot példányosítani a fix mérettel.
             PlayGroundSize = new int[2];
-            PlayGroundSize[0] = 18;
-            PlayGroundSize[1] = 14;
 
-            string[] grounds = new string[] {
+            string[] ground = LoadPlayground("playground_1.txt");
+
+            /*PlayGroundSize[0] = 18;
+            PlayGroundSize[1] = 14;*/
+
+            /*string[] grounds = new string[] {
                 "0wfwfwfwfwfwfwfww",
                 "0w0wwwwwwwwwww00w",
                 "00fwfwfwfwfwfwf0w",
@@ -77,18 +78,35 @@ namespace FriendshipExploder.Logic
                 "00fwfwfwfwfwfwf0w",
                 "0wwwwwwwwwwwwwwww",
                 "0wfwfwfwfwfwfwfww"
-            };
+            };*/
 
             //Ha válaszott pálya design, akkor betöltjük azt válaszott mennyiségszer a queue-ba, ha randomizáltat választotak a fixek közül, akkor random tötljülk be a fixeket
             for (int i = 0; i < 3; i++)
             {
-                playgrounds.Enqueue(grounds);
+                playgrounds.Enqueue(ground);
             }
 
             LoadNext(playgrounds.Dequeue());
 
             //Későbbi feature lehet: menüből választhatnak pályaméretet.
             //Későbbi feature lehet: random generált pálya design.
+        }
+
+        private string[] LoadPlayground(string file)
+        {
+            if (Directory.Exists("Playgrounds") && File.Exists(@$"Playgrounds\{file}"))
+            {
+                string[] rows = File.ReadAllLines(@$"Playgrounds\{file}");
+
+                PlayGroundSize[0] = rows[0].Length;
+                PlayGroundSize[1] = rows.Length;
+                return rows;
+            }
+            else
+            {
+                //hiba
+                return null;
+            }
         }
 
         public void SetupSize(Point gameSize, int gameRectSize)
