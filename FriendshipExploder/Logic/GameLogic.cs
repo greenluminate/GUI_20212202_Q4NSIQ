@@ -201,25 +201,25 @@ namespace FriendshipExploder.Logic
             switch (playerAction)
             {
                 case PlayerAction.up:
-                    if (posY - 2 * Players[playerId].Speed >= 0 && CanStepToPos(Players[playerId].Position, new System.Windows.Vector(0, -1*Players[playerId].Speed), Players[0]))
+                    if (posY - GameRectSize.Y / 4 - Players[playerId].Speed >= 0 && CanStepToPos(Players[playerId].Position, new System.Windows.Vector(0, -1*Players[playerId].Speed), Players[0]))
                     {
                         Players[0].Move(0, -Players[playerId].Speed);
                     }
                     break;
                 case PlayerAction.down:
-                    if (posY + 2 * Players[playerId].Speed <= ((PlayGroundSize[1] - 2) * GameRectSize.Y) && CanStepToPos(Players[playerId].Position, new System.Windows.Vector(0, Players[playerId].Speed), Players[0]))
+                    if (posY + GameRectSize.Y / 4 + Players[playerId].Speed <= (PlayGroundSize[1] - 1) * GameRectSize.Y && CanStepToPos(Players[playerId].Position, new System.Windows.Vector(0, Players[playerId].Speed), Players[0]))
                     {
                         Players[0].Move(0, Players[playerId].Speed);
                     }
                     break;
                 case PlayerAction.left:
-                    if (posX - 2 * Players[playerId].Speed >= 0 && CanStepToPos(Players[playerId].Position, new System.Windows.Vector(-1*Players[playerId].Speed, 0), Players[0]))
+                    if (posX - GameRectSize.X / 4 - Players[playerId].Speed >= 0 && CanStepToPos(Players[playerId].Position, new System.Windows.Vector(-1*Players[playerId].Speed, 0), Players[0]))
                     {
                         Players[0].Move(-Players[playerId].Speed, 0);
                     }
                     break;
                 case PlayerAction.right:
-                    if (posX + 2 * Players[playerId].Speed <= ((PlayGroundSize[0] - 2) * GameRectSize.X) && CanStepToPos(Players[playerId].Position, new System.Windows.Vector(Players[playerId].Speed, 0), Players[0]))
+                    if (posX + GameRectSize.Y / 4 + Players[playerId].Speed <= ((PlayGroundSize[0] - 1) * GameRectSize.X) && CanStepToPos(Players[playerId].Position, new System.Windows.Vector(Players[playerId].Speed, 0), Players[0]))
                     {
                         Players[0].Move(Players[playerId].Speed, 0);
                     }
