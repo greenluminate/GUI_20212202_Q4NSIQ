@@ -128,20 +128,14 @@ namespace FriendshipExploder.Logic
                         case 'f':
                             Elements.Add(new FixWall(new Point(i, j), new ImageBrush(new BitmapImage(new Uri(Path.Combine("Images", "FixWalls", "0_FixWall.png"), UriKind.RelativeOrAbsolute)))));
                             break;
-                        case '0':
-                            Elements.Add(new Floor(new Point(i, j), new ImageBrush(new BitmapImage(new Uri(Path.Combine("Images", "Floors", "0_Floor.png"), UriKind.RelativeOrAbsolute)))));
-                            break;
                         case 'w':
                             Elements.Add(new Wall(new Point(i, j), new ImageBrush(new BitmapImage(new Uri(Path.Combine("Images", "Walls", "0_Wall.png"), UriKind.RelativeOrAbsolute)))));
-                            break;
-                        default:
-                            Elements.Add(new Floor(new Point(i, j), new ImageBrush(new BitmapImage(new Uri(Path.Combine("Images", "Floors", "0_Floor.png"), UriKind.RelativeOrAbsolute)))));
                             break;
                     }
                 }
             }
 
-            Players.Add(new Player(new Point(10, 10), new ImageBrush(new BitmapImage(new Uri(Path.Combine("Images", "Players", "0_Player.png"), UriKind.RelativeOrAbsolute)))));
+            Players.Add(new Player(0, new Point(10, 10)));
         }
 
         public enum PlayerAction //Action foglalt = beépített név
@@ -229,25 +223,29 @@ namespace FriendshipExploder.Logic
                 case PlayerAction.up:
                     if (posY - GameRectSize / 4 - Players[playerId].Speed >= 0 && CanStepToPos(Players[playerId], new System.Windows.Vector(0, -1*Players[playerId].Speed)))
                     {
-                        Players[0].Move(0, -Players[playerId].Speed);
+                        Players[playerId].Move(0, -Players[playerId].Speed);
+                        Players[playerId].HeadDirection = PlayerDirection.up;
                     }
                     break;
                 case PlayerAction.down:
                     if (posY + GameRectSize / 4 + Players[playerId].Speed <= (PlayGroundSize[1] - 1) * GameRectSize && CanStepToPos(Players[playerId], new System.Windows.Vector(0, Players[playerId].Speed)))
                     {
-                        Players[0].Move(0, Players[playerId].Speed);
+                        Players[playerId].Move(0, Players[playerId].Speed);
+                        Players[playerId].HeadDirection = PlayerDirection.down;
                     }
                     break;
                 case PlayerAction.left:
                     if (posX - GameRectSize / 4 - Players[playerId].Speed >= 0 && CanStepToPos(Players[playerId], new System.Windows.Vector(-1*Players[playerId].Speed, 0)))
                     {
-                        Players[0].Move(-Players[playerId].Speed, 0);
+                        Players[playerId].Move(-Players[playerId].Speed, 0);
+                        Players[playerId].HeadDirection = PlayerDirection.left;
                     }
                     break;
                 case PlayerAction.right:
                     if (posX + GameRectSize / 4 + Players[playerId].Speed <= ((PlayGroundSize[0] - 1) * GameRectSize) && CanStepToPos(Players[playerId], new System.Windows.Vector(Players[playerId].Speed, 0)))
                     {
-                        Players[0].Move(Players[playerId].Speed, 0);
+                        Players[playerId].Move(Players[playerId].Speed, 0);
+                        Players[playerId].HeadDirection = PlayerDirection.right;
                     }
                     break;
             }

@@ -64,11 +64,16 @@ namespace FriendshipExploder.Renderer
                     drawingContext.DrawRectangle(brush, new Pen(Brushes.Black, 0), new Rect(0, startY + (i * gameRectSize) + gameRectSize / 2, gameRectSize / 2, gameRectSize)); //bal oldal
                     drawingContext.DrawRectangle(brush, new Pen(Brushes.Black, 0), new Rect((gameModel.PlayGroundSize[0] - 1) * gameRectSize + gameRectSize / 2, startY + (i * gameRectSize) + gameRectSize / 2, gameRectSize / 2, gameRectSize)); //jobb oldal
                 }
-                
+
 
                 //játéktér kezdete a bal felső sarokban a fal nélkül
                 int startX = gameRectSize / 2;
                 startY = startY + gameRectSize / 2;
+
+                //háttér renderelése
+                brush = new ImageBrush(new BitmapImage(new Uri(Path.Combine("Images", "Floors", "0_Floor.png"), UriKind.RelativeOrAbsolute)));
+                drawingContext.DrawRectangle(brush, new Pen(Brushes.Black, 0), new Rect(startX, startY, gameRectSize * (gameModel.PlayGroundSize[0] - 1), gameRectSize * (gameModel.PlayGroundSize[1] - 1))); //bal felső
+
 
                 //kockaméret átadása a logic részére
                 gameModel.SetupSize(new System.Drawing.Point((int)size.Width, (int)(size.Height - size.Height * 0.05)), gameRectSize);
@@ -93,8 +98,11 @@ namespace FriendshipExploder.Renderer
                     int x = startX + player.Position.X;
                     int y = startY + player.Position.Y;
 
+                    string dir = player.HeadDirection.ToString();
+                    ImageBrush playerImage = new ImageBrush(new BitmapImage(new Uri($"pack://application:,,,/Images/Players/{player.Id}_player_{dir}.png")));
+
                     drawingContext.DrawRectangle(
-                        player.Image,
+                        playerImage,
                         new Pen(Brushes.Black, 0),
                         new Rect(x- gameRectSize / 4, y- gameRectSize / 4, gameRectSize / 2, gameRectSize / 2)
                     );
