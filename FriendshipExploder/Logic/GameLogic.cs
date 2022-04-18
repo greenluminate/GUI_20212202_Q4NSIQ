@@ -111,9 +111,45 @@ namespace FriendshipExploder.Logic
 
         public void SetupSize(Point gameSize, int gameRectSize)
         {
+            //játékos reszponzivitás
+            FixCharacterPosition(gameRectSize);
+
             this.GameRectSize = gameRectSize;
             this.GameSize = gameSize;
             Players.ForEach(x => { x.Speed = (int)gameSize.X / 300; });
+        }
+
+        //karakter reszponzivitása átméretezésnél
+        private void FixCharacterPosition(int gameRectSize)
+        {
+            if (GameRectSize != 0)
+            {
+                int corrigSize = gameRectSize - this.GameRectSize;
+                Players.ForEach(x =>
+                {
+                    bool leftPlayground = false;
+
+                    if (x.Position.X - gameRectSize / 4 + corrigSize < 0) { x.SetPos(gameRectSize / 4, x.Position.Y); leftPlayground = true; } //bal
+                    else if (x.Position.X + gameRectSize / 4 + corrigSize > (PlayGroundSize[0] - 1) * GameRectSize) { x.SetPos(((PlayGroundSize[0] - 1) * GameRectSize) - (gameRectSize / 4), x.Position.Y); leftPlayground = true; } //jobb
+
+                    if (x.Position.Y - gameRectSize / 4 + corrigSize < 0) { x.SetPos(x.Position.X, gameRectSize / 4); leftPlayground = true; } //fent
+                    else if (x.Position.Y + gameRectSize / 4 + corrigSize > (PlayGroundSize[1] - 1) * GameRectSize) { x.SetPos(x.Position.X, ((PlayGroundSize[1] - 1) * GameRectSize) - (gameRectSize / 4)); leftPlayground = true; } //lent
+
+                    if (!leftPlayground)
+                    {
+                        if (CanStepToPos(x, new System.Windows.Vector(corrigSize, corrigSize)))
+                        {
+                            x.Move(corrigSize, corrigSize);
+                        }
+                        else
+                        {
+                            int cellX = x.Position.X / GameRectSize;
+                            int cellY = x.Position.Y / GameRectSize;
+                            x.SetPos(cellX * gameRectSize + (gameRectSize / 2), cellY * gameRectSize + (gameRectSize / 2));
+                        }
+                    }
+                });
+            }
         }
 
         private void LoadNext(string[] grounds)
@@ -135,7 +171,7 @@ namespace FriendshipExploder.Logic
                 }
             }
 
-            Players.Add(new Player(0, new Point(10, 10)));
+            Players.Add(new Player(0, new Point(15, 10)));
         }
 
         public enum PlayerAction //Action foglalt = beépített név

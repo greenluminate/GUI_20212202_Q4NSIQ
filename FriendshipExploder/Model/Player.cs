@@ -36,5 +36,10 @@ namespace FriendshipExploder.Model
             Position = new Point(Position.X + x, Position.Y + y);
         }
 
+        public void SetPos(int x, int y)
+        {
+            Position = new Point(x, y);
+        }
+
     }
 }
