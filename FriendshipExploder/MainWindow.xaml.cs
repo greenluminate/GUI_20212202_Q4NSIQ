@@ -26,7 +26,7 @@ namespace FriendshipExploder
         GameController gameCtrontroller;
         MainMenuLogic mainMenuLogic;
         GameLogic gameLogic;
-        
+
         public MainWindow()
         {
             InitializeComponent();
@@ -69,6 +69,30 @@ namespace FriendshipExploder
         private void Timer_Tick(object sender, EventArgs e)
         {
             display.InvalidateVisual();
+        }
+
+        private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+
+        }
+
+        private void display_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.Source.ToString() == "FriendshipExploder.Renderer.Display")
+            {
+                int x = (int)e.GetPosition(grid).X; //Egér pozíció lekérése & eltárolása
+                int y = (int)e.GetPosition(grid).Y;
+
+                for (int i = 0; i < mainMenuLogic.MenuElements.Count; i++)
+                {
+                    if (x <= (mainMenuLogic.MenuElements[i].Position.X + mainMenuLogic.MenuElements[i].SizeX) && y <= (mainMenuLogic.MenuElements[i].Position.Y + mainMenuLogic.MenuElements[i].SizeY)) //Kiszámolja, hogy az egér pozíciója a kirajzolt gomb keretein belül van-e 
+                    {
+                        mainMenuLogic.MenuElements[i].IsClicked = true;
+                        mainMenuLogic.MenuElements[i].Command.ToLower();
+                    }
+                    
+                }
+            }
         }
     }
 }

@@ -10,8 +10,9 @@
         SizeChanged="Window_SizeChanged"
         Loaded="Window_Loaded"
         KeyDown="Window_KeyDown"
-        KeyUp="Window_KeyUp">
-    
+        KeyUp="Window_KeyUp"
+        MouseLeftButtonDown="display_MouseLeftButtonDown">
+        
     <Grid x:Name="grid">
         <renderer:Display x:Name="display"/>
     </Grid>
