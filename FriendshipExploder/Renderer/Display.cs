@@ -31,23 +31,27 @@ namespace FriendshipExploder.Renderer
         protected override void OnRender(DrawingContext drawingContext)
         {
             base.OnRender(drawingContext);
-            bool canStart = false;
-            foreach (var element in mainMenuModel.MenuElements) //Végig járja a menü elemeket, azaz a gombokat
-            {
-                element.SizeX = 50;
-                element.SizeY = 50;
-                drawingContext.DrawRectangle(
-                    element.Brush,
-                    new Pen(Brushes.Gray, 0),
-                    new Rect(element.Position.X, element.Position.Y, element.SizeX, element.SizeY)
-                    );
-                if (element.IsClicked == true && element.Command == "start")
-                {
-                    canStart = true;
-                }
-            }
-            
-                if (gameModel != null && size.Width > 50 && size.Height > 50 && canStart == true )//ToDo: Ennél kisebbre ne lehessen állítani az ablakot, mint megkötés a windownál   Marci: Megnézi, hogy a megfelelő gomb lett-e megnyomva, hogy elkezdje a pálya renderelését
+            //bool canStart = false;
+            //if (canStart == false)
+            //{
+            //    foreach (var element in mainMenuModel.MenuElements) //Végig járja a menü elemeket, azaz a gombokat
+            //    {
+            //        element.SizeX = 50;
+            //        element.SizeY = 50;
+            //        drawingContext.DrawRectangle(
+            //            element.Brush,
+            //            new Pen(Brushes.Gray, 0),
+            //            new Rect(element.Position.X, element.Position.Y, element.SizeX, element.SizeY)
+            //            );
+            //        if (element.IsClicked == true && element.Command == "start")
+            //        {
+            //            canStart = true;
+            //        }
+            //    }
+
+            //}
+
+            if (gameModel != null && size.Width > 50 && size.Height > 50 /*&& canStart == true*/ )//ToDo: Ennél kisebbre ne lehessen állítani az ablakot, mint megkötés a windownál   Marci: Megnézi, hogy a megfelelő gomb lett-e megnyomva, hogy elkezdje a pálya renderelését
                 {
                     //kocka méretének meghatározása
                     int gameRectWidth = (int)(size.Width / gameModel.PlayGroundSize[0]);
