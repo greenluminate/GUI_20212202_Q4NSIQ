@@ -14,25 +14,6 @@ namespace FriendshipExploder.Logic
 {
     public class GameLogic : IGameModel, IGameControl
     {
-        public enum PlaygroundItem
-        {
-            player0, player1, palyer2, bomb, fire, fixWall, wall, floor, modderFloor, booster //Ezekhez mind van mappa
-        }
-
-        public enum InfobarItem
-        {
-            counter, score //killnum; socer darabszáma = játékosok száma a menüben kiválasztás után.
-        }
-
-        public enum Playground
-        {
-            pg0, pg1, pg2, pg3 //pg0 = Random válogatott
-        }
-
-        //Pálya1, Pálya2, Pálya3, RandomGenerált, RandomSorsoltAMeglévőkből
-        //Fájlokból töltsük a három db fix pályatervet kiválasztás alapján, vagy hardcodeoljuk a három fix pályát? Hosz a random generált pályát úgy is kódban kénem egírni.
-
-
         private Queue<string[]> playgrounds; //path-okat tartalmaz, előre generált pálxák? //Mert vagy beletesszük ak iválaszott pályát választott meccs számszor, vagy előre legeneráljuk a random pélykat, csak beletesszük, hogy melyik fix és melyik, mely random. VAgy kuka az egész és mindig más laapján generálunk random.
         //Lehet ide kéne betenn ia köztes képernyőket is pl.: MainMenu, playground, who win image, curren leaderboard image, next playground és így körbe.
 
@@ -55,7 +36,7 @@ namespace FriendshipExploder.Logic
             Elements = new List<IElement>();
             Players = new List<Player>();
 
-            //Gueue példányosítás
+            //Queue példányosítás
             playgrounds = new Queue<string[]>();
             PlayGroundSize = new int[2];
 
@@ -171,12 +152,12 @@ namespace FriendshipExploder.Logic
                 }
             }
 
-            Players.Add(new Player(0, new Point(15, 10)));
+            Players.Add(new Player(0, new Point(15, 10), Model.KeyBinding.upDownLeftRight));
         }
 
-        public enum PlayerAction //Action foglalt = beépített név
+        public enum PlayerAction
         {
-            up, down, left, right, bomb, kick //Később: explode ha lesz időzítettünk
+            up, down, left, right, W, A, S, D, bomb, kick //Később: explode ha lesz időzítettünk
         }
 
         //Odaléphet-e a játékos
@@ -199,57 +180,96 @@ namespace FriendshipExploder.Logic
             return canStep;
         }
 
-        //A játékos mozgásának kezdete, a controller hívja meg
-        public async Task StartMove(PlayerAction playerAction, int playerId)
+        private Player GetKeyBindingForPlayer(PlayerAction playerAction)
         {
+            Player pl = null;
+
             switch (playerAction)
             {
                 case PlayerAction.up:
                 case PlayerAction.down:
-                    if (Players[playerId].MovingVertical == false)
+                case PlayerAction.left:
+                case PlayerAction.right:
+                    pl = Players.Where(p => p.KeyBinding == Model.KeyBinding.upDownLeftRight).FirstOrDefault();
+                    break;
+                case PlayerAction.W:
+                case PlayerAction.S:
+                case PlayerAction.A:
+                case PlayerAction.D:
+                    pl = Players.Where(p => p.KeyBinding == Model.KeyBinding.WSAD).FirstOrDefault();
+                    break;
+            }
+            return pl;
+        }
+
+        //A játékos mozgásának kezdete, a controller hívja meg
+        public async Task StartMove(PlayerAction playerAction)
+        {
+            Player pl = GetKeyBindingForPlayer(playerAction);
+
+            switch (playerAction)
+            {
+                case PlayerAction.up:
+                case PlayerAction.down:
+                case PlayerAction.W:
+                case PlayerAction.S:
+                    if (pl != null && pl.MovingVertical == false)
                     {
-                        Players[playerId].MovingVertical = true;
-                        while (Players[playerId].MovingVertical)
+                        pl.MovingVertical = true;
+                        while (pl.MovingVertical)
                         {
-                            Act(playerAction, playerId);
+                            Act(playerAction, pl);
                             await Task.Delay(1);
                         }
                     }
                     break;
                 case PlayerAction.left:
                 case PlayerAction.right:
-                    if (Players[playerId].MovingHorizontal == false)
+                case PlayerAction.A:
+                case PlayerAction.D:
+                    if (pl != null && pl.MovingHorizontal == false)
                     {
-                        Players[playerId].MovingHorizontal = true;
-                        while (Players[playerId].MovingHorizontal)
+                        pl.MovingHorizontal = true;
+                        while (pl.MovingHorizontal)
                         {
-                            Act(playerAction, playerId);
+                            Act(playerAction, pl);
                             await Task.Delay(1);
                         }
                     }
                     break;
             }
-            
         }
 
         //A játékos mozgásának vége, a controller hívja meg
-        public void StopMove(PlayerAction playerAction, int playerId)
+        public void StopMove(PlayerAction playerAction)
         {
+            Player pl = GetKeyBindingForPlayer(playerAction);
+
             switch (playerAction)
             {
                 case PlayerAction.up:
                 case PlayerAction.down:
-                    Players[playerId].MovingVertical = false;
+                case PlayerAction.W:
+                case PlayerAction.S:
+                    if (pl != null)
+                    {
+                        pl.MovingVertical = false;
+                    }
                     break;
                 case PlayerAction.left:
                 case PlayerAction.right:
-                    Players[playerId].MovingHorizontal = false;
+                case PlayerAction.A:
+                case PlayerAction.D:
+                    if (pl != null)
+                    {
+                        pl.MovingHorizontal = false;
+                    }
                     break;
             }
         }
 
         //A játékos mozgása
-        public void Act(PlayerAction playerAction, int playerId)
+        public void Act(PlayerAction playerAction, Player pl)
         {
             int posX = Players[0].Position.X;
             int posY = Players[0].Position.Y;
@@ -257,31 +277,35 @@ namespace FriendshipExploder.Logic
             switch (playerAction)
             {
                 case PlayerAction.up:
-                    if (posY - GameRectSize / 4 - Players[playerId].Speed >= 0 && CanStepToPos(Players[playerId], new System.Windows.Vector(0, -1*Players[playerId].Speed)))
+                case PlayerAction.W:
+                    if (posY - GameRectSize / 4 - pl.Speed >= 0 && CanStepToPos(pl, new System.Windows.Vector(0, -1* pl.Speed)))
                     {
-                        Players[playerId].Move(0, -Players[playerId].Speed);
-                        Players[playerId].HeadDirection = PlayerDirection.up;
+                        pl.Move(0, -pl.Speed);
+                        pl.HeadDirection = PlayerDirection.up;
                     }
                     break;
                 case PlayerAction.down:
-                    if (posY + GameRectSize / 4 + Players[playerId].Speed <= (PlayGroundSize[1] - 1) * GameRectSize && CanStepToPos(Players[playerId], new System.Windows.Vector(0, Players[playerId].Speed)))
+                case PlayerAction.S:
+                    if (posY + GameRectSize / 4 + pl.Speed <= (PlayGroundSize[1] - 1) * GameRectSize && CanStepToPos(pl, new System.Windows.Vector(0, pl.Speed)))
                     {
-                        Players[playerId].Move(0, Players[playerId].Speed);
-                        Players[playerId].HeadDirection = PlayerDirection.down;
+                        pl.Move(0, pl.Speed);
+                        pl.HeadDirection = PlayerDirection.down;
                     }
                     break;
                 case PlayerAction.left:
-                    if (posX - GameRectSize / 4 - Players[playerId].Speed >= 0 && CanStepToPos(Players[playerId], new System.Windows.Vector(-1*Players[playerId].Speed, 0)))
+                case PlayerAction.A:
+                    if (posX - GameRectSize / 4 - pl.Speed >= 0 && CanStepToPos(pl, new System.Windows.Vector(-1* pl.Speed, 0)))
                     {
-                        Players[playerId].Move(-Players[playerId].Speed, 0);
-                        Players[playerId].HeadDirection = PlayerDirection.left;
+                        pl.Move(-pl.Speed, 0);
+                        pl.HeadDirection = PlayerDirection.left;
                     }
                     break;
                 case PlayerAction.right:
-                    if (posX + GameRectSize / 4 + Players[playerId].Speed <= ((PlayGroundSize[0] - 1) * GameRectSize) && CanStepToPos(Players[playerId], new System.Windows.Vector(Players[playerId].Speed, 0)))
+                case PlayerAction.D:
+                    if (posX + GameRectSize / 4 + pl.Speed <= ((PlayGroundSize[0] - 1) * GameRectSize) && CanStepToPos(pl, new System.Windows.Vector(pl.Speed, 0)))
                     {
-                        Players[playerId].Move(Players[playerId].Speed, 0);
-                        Players[playerId].HeadDirection = PlayerDirection.right;
+                        pl.Move(pl.Speed, 0);
+                        pl.HeadDirection = PlayerDirection.right;
                     }
                     break;
             }

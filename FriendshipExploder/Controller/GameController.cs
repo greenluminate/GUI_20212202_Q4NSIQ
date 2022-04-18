@@ -22,31 +22,31 @@ namespace FriendshipExploder.Controller
             switch (key)
             {
                 case Key.Up:
-                    await control.StartMove(GameLogic.PlayerAction.up, 0);
+                    await control.StartMove(GameLogic.PlayerAction.up);
                     break;
                 case Key.W:
-                    await control.StartMove(GameLogic.PlayerAction.up, 1);
+                    await control.StartMove(GameLogic.PlayerAction.W);
                     break;
 
                 case Key.Down:
-                    await control.StartMove(GameLogic.PlayerAction.down, 0);
+                    await control.StartMove(GameLogic.PlayerAction.down);
                     break;
                 case Key.S:
-                    await control.StartMove(GameLogic.PlayerAction.down, 1);
+                    await control.StartMove(GameLogic.PlayerAction.S);
                     break;
 
                 case Key.Left:
-                    await control.StartMove(GameLogic.PlayerAction.left, 0);
+                    await control.StartMove(GameLogic.PlayerAction.left);
                     break;
                 case Key.A:
-                    await control.StartMove(GameLogic.PlayerAction.left, 1);
+                    await control.StartMove(GameLogic.PlayerAction.A);
                     break;
 
                 case Key.Right:
-                    await control.StartMove(GameLogic.PlayerAction.right, 0);
+                    await control.StartMove(GameLogic.PlayerAction.right);
                     break;
                 case Key.D:
-                    await control.StartMove(GameLogic.PlayerAction.right, 1);
+                    await control.StartMove(GameLogic.PlayerAction.D);
                     break;
             }
         }
@@ -56,31 +56,31 @@ namespace FriendshipExploder.Controller
             switch (key)
             {
                 case Key.Up:
-                    control.StopMove(GameLogic.PlayerAction.up, 0);
+                    control.StopMove(GameLogic.PlayerAction.up);
                     break;
                 case Key.W:
-                    control.StopMove(GameLogic.PlayerAction.up, 1);
+                    control.StopMove(GameLogic.PlayerAction.W);
                     break;
 
                 case Key.Down:
-                    control.StopMove(GameLogic.PlayerAction.down, 0);
+                    control.StopMove(GameLogic.PlayerAction.down);
                     break;
                 case Key.S:
-                    control.StopMove(GameLogic.PlayerAction.down, 1);
+                    control.StopMove(GameLogic.PlayerAction.S);
                     break;
 
                 case Key.Left:
-                    control.StopMove(GameLogic.PlayerAction.left, 0);
+                    control.StopMove(GameLogic.PlayerAction.left);
                     break;
                 case Key.A:
-                    control.StopMove(GameLogic.PlayerAction.left, 1);
+                    control.StopMove(GameLogic.PlayerAction.A);
                     break;
 
                 case Key.Right:
-                    control.StopMove(GameLogic.PlayerAction.right, 0);
+                    control.StopMove(GameLogic.PlayerAction.right);
                     break;
                 case Key.D:
-                    control.StopMove(GameLogic.PlayerAction.right, 1);
+                    control.StopMove(GameLogic.PlayerAction.D);
                     break;
             }
         }

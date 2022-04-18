@@ -13,6 +13,11 @@ namespace FriendshipExploder.Model
         up, down, left, right
     }
 
+    public enum KeyBinding
+    {
+        upDownLeftRight, WSAD, ai
+    }
+
     public class Player
     {
         public int Id { get; set; }
@@ -21,14 +26,16 @@ namespace FriendshipExploder.Model
         public bool MovingVertical { get; set; }
         public int Speed { get; set; }
         public PlayerDirection HeadDirection { get; set; }
+        public KeyBinding KeyBinding { get; set; }
 
-        public Player(int id, Point position)
+        public Player(int id, Point position, KeyBinding keyBinding)
         {
             Position = position;
             Id = id;
             MovingHorizontal = false;
             MovingVertical = false;
             HeadDirection = PlayerDirection.right;
+            KeyBinding = keyBinding;
         }
 
         public void Move(int x, int y)
