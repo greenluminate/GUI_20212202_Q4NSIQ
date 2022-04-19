@@ -27,13 +27,12 @@ namespace FriendshipExploder
         MainMenuLogic mainMenuLogic;
         GameLogic gameLogic;
 
-        public MainWindow()
+        public MainWindow(GameController gameController, GameLogic gameLogic)
         {
             InitializeComponent();
             this.mainMenuLogic = new MainMenuLogic();
-            this.gameLogic = new GameLogic();
-            this.gameCtrontroller = new GameController(gameLogic); //Esetle gegyet írni menüre.
-
+            this.gameLogic = gameLogic;
+            this.gameCtrontroller = gameController; //Esetle gegyet írni menüre.
             DispatcherTimer timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromMilliseconds(30);
             timer.Tick += Timer_Tick;

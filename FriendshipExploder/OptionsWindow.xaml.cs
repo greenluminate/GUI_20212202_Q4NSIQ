@@ -1,4 +1,6 @@
-﻿using System;
+﻿using FriendshipExploder.Controller;
+using FriendshipExploder.Logic;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,11 +21,14 @@ namespace FriendshipExploder
     /// </summary>
     public partial class OptionsWindow : Window
     {
-        List<Key> keys = new List<Key>(); //Key elemek kigyűjtése egy listába, később valahogyan átadni a logicnak
+        GameController gameController;
+        GameLogic gameLogic;
         int counter = 0; //Számolja, hogy hol tart, így könnyen tudhatjuk, hogy a lista mely eleme melyik iránynak felelhet meg (fel:0, le:1 stb)
-        public OptionsWindow()
+        public OptionsWindow(GameController gameController, GameLogic gameLogic)
         {
             InitializeComponent();
+            this.gameController = gameController;
+            this.gameLogic = gameLogic;
             this.PreviewKeyDown += new KeyEventHandler(HandleKey);
 
         }
@@ -35,20 +40,21 @@ namespace FriendshipExploder
             {
                 case 0:
                     instructionsText.Text = "Le";
-                    keys.Add(pressed);
+                    gameController.keys.Add(pressed);
                     counter++;
                     break;
                 case 1:
                     instructionsText.Text = "Bal";
-                    keys.Add(pressed);
+                    gameController.keys.Add(pressed);
                     counter++;
                     break;
                 case 2:
                     instructionsText.Text = "Jobb";
-                    keys.Add(pressed);
+                    gameController.keys.Add(pressed);
                     counter++;
                     break;
                 case 3:
+                    gameController.keys.Add(pressed);
                     this.Close();
                     break;
             }

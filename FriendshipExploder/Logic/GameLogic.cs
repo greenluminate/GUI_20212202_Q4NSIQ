@@ -48,8 +48,6 @@ namespace FriendshipExploder.Logic
         private int GameRectSize { get; set; }
 
         private Point GameSize { get; set; }
-
-
         public GameLogic()
         {
             Elements = new List<IElement>();

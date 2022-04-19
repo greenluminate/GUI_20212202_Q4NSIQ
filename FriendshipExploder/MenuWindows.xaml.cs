@@ -1,4 +1,6 @@
-﻿using System;
+﻿using FriendshipExploder.Controller;
+using FriendshipExploder.Logic;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,9 +21,13 @@ namespace FriendshipExploder
     /// </summary>
     public partial class MenuWindows : Window
     {
+        GameController gameController; //Ezeket a példányokat kell átpasszolni a többi ablakhoz, különben az irányítás beállítása nem működik!!
+        GameLogic gameLogic;
         public MenuWindows()
         {
             InitializeComponent();
+            this.gameLogic = new GameLogic();
+            this.gameController = new GameController(gameLogic);
         }
 
         private void Start_Click(object sender, RoutedEventArgs e)
@@ -29,7 +35,7 @@ namespace FriendshipExploder
             //BeforePlay beforePlay = new BeforePlay();
             //this.Close();
             //beforePlay.Show();
-            MainWindow mainWindow = new MainWindow();
+            MainWindow mainWindow = new MainWindow(gameController, gameLogic);
             mainWindow.Show();
             this.Close();
 
@@ -37,7 +43,7 @@ namespace FriendshipExploder
 
         private void Options_Click(object sender, RoutedEventArgs e)
         {
-            OptionsWindow options = new OptionsWindow();
+            OptionsWindow options = new OptionsWindow(gameController, gameLogic);
             options.Show();
         }
     }

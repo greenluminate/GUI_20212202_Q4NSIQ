@@ -11,7 +11,8 @@ namespace FriendshipExploder.Controller
     public class GameController
     {
         IGameControl control;
-
+        public List<Key> keys = new List<Key>();
+        
         public GameController(IGameControl control)
         {
             this.control = control;
@@ -19,6 +20,22 @@ namespace FriendshipExploder.Controller
 
         public async void KeyPressed(Key key)
         {
+            //if (key == keys[0]) //Ki van kommentelve mert gettós, de amúgy ezzel működik (vagyis elindul ugyanezt be kéne rakni a KeyReleasedhez is)
+            //{
+            //    await control.StartMove(GameLogic.PlayerAction.up, 0);
+            //}
+            //else if (key == keys[1])
+            //{
+            //    await control.StartMove(GameLogic.PlayerAction.down, 0);
+            //}
+            //else if(key == keys[2])
+            //{
+            //    await control.StartMove(GameLogic.PlayerAction.left, 0);
+            //}
+            //else if(key == keys[3])
+            //{
+            //    await control.StartMove(GameLogic.PlayerAction.right, 0);
+            //}
             switch (key)
             {
                 case Key.Up:
