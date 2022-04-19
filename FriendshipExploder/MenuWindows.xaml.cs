@@ -26,10 +26,19 @@ namespace FriendshipExploder
 
         private void Start_Click(object sender, RoutedEventArgs e)
         {
+            //BeforePlay beforePlay = new BeforePlay();
+            //this.Close();
+            //beforePlay.Show();
             MainWindow mainWindow = new MainWindow();
-            this.Close();
             mainWindow.Show();
+            this.Close();
 
+        }
+
+        private void Options_Click(object sender, RoutedEventArgs e)
+        {
+            OptionsWindow options = new OptionsWindow();
+            options.Show();
         }
     }
 }

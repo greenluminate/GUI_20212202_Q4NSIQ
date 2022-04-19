@@ -13,7 +13,8 @@
             <RowDefinition Height="3*"/>
         </Grid.RowDefinitions>
         <Button x:Name="Start" Grid.Row="0" Content="Start!" Margin="200,30" Padding="10" Click="Start_Click" />
-        <Button x:Name="Exit" Grid.Row="1" Content="Exit!" Margin="200,30" Padding="10" />
+        <Button x:Name="Options" Grid.Row="1" Content="Options!" Margin="200,30" Padding="10" Click="Options_Click" />
+        <Button x:Name="Exit" Grid.Row="2" Content="Exit!" Margin="200,30" Padding="10" />
 
     </Grid>
 </Window>
