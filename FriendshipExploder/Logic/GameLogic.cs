@@ -332,6 +332,8 @@ namespace FriendshipExploder.Logic
             Thread.Sleep(1000);//1 másodperc előny a valódi játékosoknak
             while (true)//ToDo: Majd amgí nem igaz, hogy vége
             {
+                IElement[,] elements = new IElement[GameSize.X - 1, GameSize.Y - 1];
+                Elements.ForEach(element => elements[element.Position.X, element.Position.Y] = element);
                 //ToDo: amíg az időből nem telt el 30 perc, addig keressen fixen skilleket. Az legyen a prioritása.
                 Player nearestPlayer = NearestPlayer(ai);
                 //ToDO: ha bomba van a közelében bújjon el.
@@ -344,38 +346,42 @@ namespace FriendshipExploder.Logic
                 else
                 {
                     //ToDo: follow player
-                    if (nearestPlayer.Position.X - ai.Position.X < 0)
+                    if (nearestPlayer.Position.X - ai.Position.X < 0 && CanStepToPos(ai, new System.Windows.Vector(-1 * ai.Speed, 0)))
                     {
                         StartMove(PlayerAction.left, ai);
                         StopMove(PlayerAction.left, ai);
                     }
 
-                    if (nearestPlayer.Position.Y - ai.Position.Y < 0)
+                    if (!CanStepToPos(ai, new System.Windows.Vector(-1 * ai.Speed, 0)))
+                    {
+                        int aiNextPosX = ai.Position.X + (-1 * ai.Speed);//Kiszervezni az egészet külön metódusba.
+                        int aiNextPosY = ai.Position.Y;
+                        //IElement blockingElement = elements[aiNextPosX, aiNextPosY];
+                        List<Point> availablePath = FindAvailablePath(ai, aiNextPosX, aiNextPosY);
+                        List<PlayerAction> availableRoundaboutActions = FindAvailableRoundaboutActions(ai, aiNextPosX, aiNextPosY);
+                        //availableRoundaboutActions.ForEach(Action => Action.Pop);
+                        //ToDo: jó irány keresése a megkerüléshez, majd móaction-ök meghívása sorban.
+                        ;
+                    }
+
+                    if (nearestPlayer.Position.Y - ai.Position.Y < 0 && CanStepToPos(ai, new System.Windows.Vector(0, -1 * ai.Speed)))
                     {
                         StartMove(PlayerAction.up, ai);
-
                         StopMove(PlayerAction.up, ai);
                     }
 
-                    if (nearestPlayer.Position.X - ai.Position.X > 0)
+                    if (nearestPlayer.Position.X - ai.Position.X > 0 && CanStepToPos(ai, new System.Windows.Vector(ai.Speed, 0)))
                     {
                         StartMove(PlayerAction.right, ai);
                         StopMove(PlayerAction.right, ai);
                     }
 
-                    if (nearestPlayer.Position.Y - ai.Position.Y > 0)
+                    if (nearestPlayer.Position.Y - ai.Position.Y > 0 && CanStepToPos(ai, new System.Windows.Vector(0, ai.Speed)))
                     {
                         StartMove(PlayerAction.down, ai);
                         StopMove(PlayerAction.down, ai);
                     }
                 }
-                //ToDO: átlóshaladáshoz egyszerre hívás.
-                //CanStepToPos(ai, new System.Windows.Vector(0, -1 * ai.Speed));//föl
-                //CanStepToPos(ai, new System.Windows.Vector(0, ai.Speed));//le
-                //CanStepToPos(ai, new System.Windows.Vector(-1 * ai.Speed, 0));//balra
-                //CanStepToPos(ai, new System.Windows.Vector(ai.Speed, 0));//jobbra
-                //await StartMove(PlayerAction.down, ai);
-                //StopMove(PlayerAction.down, ai);
             }
         }
 
@@ -390,6 +396,56 @@ namespace FriendshipExploder.Logic
         {
             return Math.Abs(player.Position.X - ai.Position.X) +
                    Math.Abs(player.Position.Y - ai.Position.Y);
+        }
+
+        private List<Point> FindAvailablePath(Player ai, int aiNextPosX, int aiNextPosY)
+        {
+            List<Point> availablePath = new List<Point>();
+            for (int x = -1 * (GameRectSize / 2); x < (GameRectSize / 2); x++)
+            {
+                for (int y = -1 * (GameRectSize / 2); y < (GameRectSize / 2); y++)
+                {
+                    if (!(ai.Position.X + x == aiNextPosX && ai.Position.Y + y == aiNextPosY) && CanStepToPos(ai, new System.Windows.Vector(x * ai.Speed, y * ai.Speed)))
+                    {
+                        availablePath.Add(new Point(ai.Position.X + (x * ai.Speed), ai.Position.Y + (y * ai.Speed)));
+                    }
+                }
+            }
+            return availablePath;
+        }
+
+        private List<PlayerAction> FindAvailableRoundaboutActions(Player ai, int aiNextPosX, int aiNextPosY)
+        {
+            List<PlayerAction> availableActions = new List<PlayerAction>();
+            for (int x = -1 * (GameRectSize / 2); x < (GameRectSize / 2); x++)
+            {
+                for (int y = -1 * (GameRectSize / 2); y < (GameRectSize / 2); y++)
+                {
+                    if (!(ai.Position.X + x == aiNextPosX && ai.Position.Y + y == aiNextPosY) && CanStepToPos(ai, new System.Windows.Vector(x * ai.Speed, y * ai.Speed)))
+                    {
+                        if (ai.Position.X + x - ai.Position.X < 0)
+                        {
+                            availableActions.Add(PlayerAction.left);
+                        }
+
+                        if (ai.Position.Y + y - ai.Position.Y < 0)
+                        {
+                            availableActions.Add(PlayerAction.up);
+                        }
+
+                        if (ai.Position.X + x - ai.Position.X > 0)
+                        {
+                            availableActions.Add(PlayerAction.right);
+                        }
+
+                        if (ai.Position.Y + y - ai.Position.Y > 0)
+                        {
+                            availableActions.Add(PlayerAction.down);
+                        }
+                    }
+                }
+            }
+            return availableActions;
         }
     }
 }
