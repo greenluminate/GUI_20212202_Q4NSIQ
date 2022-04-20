@@ -8,6 +8,8 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="800" Width="800"
         SizeChanged="Window_SizeChanged"
+        WindowState="Maximized"
+        WindowStyle="None"
         Loaded="Window_Loaded"
         KeyDown="Window_KeyDown"
         KeyUp="Window_KeyUp">

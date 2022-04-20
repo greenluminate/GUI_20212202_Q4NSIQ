@@ -156,7 +156,7 @@ namespace FriendshipExploder.Logic
             Players.Add(new Player(0, new Point(15, 10), Model.KeyBinding.upDownLeftRight));
             Players.Add(new Player(1, new Point(15, 220), Model.KeyBinding.WSAD));
             Players.Add(new Player(2, new Point(15, 70), Model.KeyBinding.ai));
-            Players.Add(new Player(3, new Point(15, 300), Model.KeyBinding.ai));
+            Players.Add(new Player(3, new Point(16, 400), Model.KeyBinding.ai));
             //ToDo: TaskCreator => TODO: Async void-> while everything
             AITaskCreator();
         }
