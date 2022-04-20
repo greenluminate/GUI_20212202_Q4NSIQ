@@ -154,9 +154,9 @@ namespace FriendshipExploder.Logic
             }
 
             Players.Add(new Player(0, new Point(15, 10), Model.KeyBinding.upDownLeftRight));
-            Players.Add(new Player(1, new Point(15, 60), Model.KeyBinding.WSAD));
-            Players.Add(new Player(2, new Point(15, 120), Model.KeyBinding.ai));
-            //Players.Add(new Player(1, new Point(15, 180), Model.KeyBinding.ai));
+            Players.Add(new Player(1, new Point(15, 220), Model.KeyBinding.WSAD));
+            Players.Add(new Player(2, new Point(15, 70), Model.KeyBinding.ai));
+            Players.Add(new Player(3, new Point(15, 300), Model.KeyBinding.ai));
             //ToDo: TaskCreator => TODO: Async void-> while everything
             AITaskCreator();
         }
@@ -334,6 +334,7 @@ namespace FriendshipExploder.Logic
             {
                 //ToDo: amíg az időből nem telt el 30 perc, addig keressen fixen skilleket. Az legyen a prioritása.
                 Player nearestPlayer = NearestPlayer(ai);
+                //ToDO: ha bomba van a közelében bújjon el.
                 //Az Elements lista = NotAvailablePoints;
                 if (PositionDifference(nearestPlayer, ai) <= 20)//ToDo: ai.Bomb.explosionSize vagy ami lesz
                 {

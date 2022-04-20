@@ -19,6 +19,10 @@
     <None Remove="Images\Players\2_player_left.png" />
     <None Remove="Images\Players\2_player_right.png" />
     <None Remove="Images\Players\2_player_up.png" />
+    <None Remove="Images\Players\3_player_down.png" />
+    <None Remove="Images\Players\3_player_left.png" />
+    <None Remove="Images\Players\3_player_right.png" />
+    <None Remove="Images\Players\3_player_up.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,6 +38,10 @@
     <Resource Include="Images\Players\2_player_left.png" />
     <Resource Include="Images\Players\2_player_right.png" />
     <Resource Include="Images\Players\2_player_up.png" />
+    <Resource Include="Images\Players\3_player_down.png" />
+    <Resource Include="Images\Players\3_player_left.png" />
+    <Resource Include="Images\Players\3_player_right.png" />
+    <Resource Include="Images\Players\3_player_up.png" />
   </ItemGroup>
 
   <ItemGroup>
