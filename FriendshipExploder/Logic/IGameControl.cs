@@ -10,7 +10,7 @@ namespace FriendshipExploder.Logic
 {
     public interface IGameControl
     { 
-        public Task StartMove(PlayerAction playerAction);
-        public void StopMove(PlayerAction playerAction);
+        public Task StartMove(PlayerAction playerAction, Player ai = null);
+        public void StopMove(PlayerAction playerAction, Player ai = null);
     }
 }

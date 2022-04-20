@@ -154,9 +154,9 @@ namespace FriendshipExploder.Logic
             }
 
             Players.Add(new Player(0, new Point(15, 10), Model.KeyBinding.upDownLeftRight));
-            //Players.Add(new Player(1, new Point(15, 60), Model.KeyBinding.WSAD));
+            Players.Add(new Player(1, new Point(15, 60), Model.KeyBinding.WSAD));
             Players.Add(new Player(2, new Point(15, 120), Model.KeyBinding.ai));
-            Players.Add(new Player(1, new Point(15, 180), Model.KeyBinding.ai));
+            //Players.Add(new Player(1, new Point(15, 180), Model.KeyBinding.ai));
             //ToDo: TaskCreator => TODO: Async void-> while everything
             AITaskCreator();
         }
@@ -209,9 +209,9 @@ namespace FriendshipExploder.Logic
         }
 
         //A játékos mozgásának kezdete, a controller hívja meg
-        public async Task StartMove(PlayerAction playerAction)
+        public async Task StartMove(PlayerAction playerAction, Player ai = null)
         {
-            Player pl = GetKeyBindingForPlayer(playerAction);
+            Player pl = ai is null ? GetKeyBindingForPlayer(playerAction) : ai;
 
             switch (playerAction)
             {
@@ -247,9 +247,9 @@ namespace FriendshipExploder.Logic
         }
 
         //A játékos mozgásának vége, a controller hívja meg
-        public void StopMove(PlayerAction playerAction)
+        public void StopMove(PlayerAction playerAction, Player ai = null)
         {
-            Player pl = GetKeyBindingForPlayer(playerAction);
+            Player pl = ai is null ? GetKeyBindingForPlayer(playerAction) : ai;
 
             switch (playerAction)
             {
@@ -323,17 +323,72 @@ namespace FriendshipExploder.Logic
             ais.AddRange(Players.Where(player => player.KeyBinding == Model.KeyBinding.ai));
 
             List<Task> aiTasks = ais.Select(ai => new Task(() => AIWakeUp(ai), TaskCreationOptions.LongRunning)).ToList();
-            //ToDO kirakni a tasklistet;
+            //ToDo: kirakni a tasklistet;
             Parallel.ForEach(aiTasks, task => task.Start());//Hogy amennyire csak lehet egyszerre induljanak
         }
 
         private async void AIWakeUp(Player ai)
         {
-            Thread.Sleep(10000);
-            while (true)//Majd EndGame ha kész lesz
+            Thread.Sleep(1000);//1 másodperc előny a valódi játékosoknak
+            while (true)//ToDo: Majd amgí nem igaz, hogy vége
             {
-                Act(PlayerAction.down, ai);
+                //ToDo: amíg az időből nem telt el 30 perc, addig keressen fixen skilleket. Az legyen a prioritása.
+                Player nearestPlayer = NearestPlayer(ai);
+                //Az Elements lista = NotAvailablePoints;
+                if (PositionDifference(nearestPlayer, ai) <= 20)//ToDo: ai.Bomb.explosionSize vagy ami lesz
+                {
+                    //ToDo: Go and Install bomb
+                    //ToDo: hide and wait until Explosion + x seconds
+                }
+                else
+                {
+                    //ToDo: follow player
+                    if (nearestPlayer.Position.X - ai.Position.X < 0)
+                    {
+                        StartMove(PlayerAction.left, ai);
+                        StopMove(PlayerAction.left, ai);
+                    }
+
+                    if (nearestPlayer.Position.Y - ai.Position.Y < 0)
+                    {
+                        StartMove(PlayerAction.up, ai);
+
+                        StopMove(PlayerAction.up, ai);
+                    }
+
+                    if (nearestPlayer.Position.X - ai.Position.X > 0)
+                    {
+                        StartMove(PlayerAction.right, ai);
+                        StopMove(PlayerAction.right, ai);
+                    }
+
+                    if (nearestPlayer.Position.Y - ai.Position.Y > 0)
+                    {
+                        StartMove(PlayerAction.down, ai);
+                        StopMove(PlayerAction.down, ai);
+                    }
+                }
+                //ToDO: átlóshaladáshoz egyszerre hívás.
+                //CanStepToPos(ai, new System.Windows.Vector(0, -1 * ai.Speed));//föl
+                //CanStepToPos(ai, new System.Windows.Vector(0, ai.Speed));//le
+                //CanStepToPos(ai, new System.Windows.Vector(-1 * ai.Speed, 0));//balra
+                //CanStepToPos(ai, new System.Windows.Vector(ai.Speed, 0));//jobbra
+                //await StartMove(PlayerAction.down, ai);
+                //StopMove(PlayerAction.down, ai);
             }
+        }
+
+        private Player NearestPlayer(Player ai)
+        {
+            return Players.OrderBy(player => PositionDifference(player, ai))
+                          .Where(player => player.Id != ai.Id)
+                          .FirstOrDefault();
+        }
+
+        private double PositionDifference(Player player, Player ai)
+        {
+            return Math.Abs(player.Position.X - ai.Position.X) +
+                   Math.Abs(player.Position.Y - ai.Position.Y);
         }
     }
 }
