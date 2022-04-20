@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -136,9 +137,9 @@ namespace FriendshipExploder.Logic
         private void LoadNext(string[] grounds)
         {
             //Betöltjük a válaszott pályadesignt = enumok (vagy fix, vagy random kérés) a választott menyniségű játékossal.
-            for (int i = 0; i < PlayGroundSize[0]-1; i++)
+            for (int i = 0; i < PlayGroundSize[0] - 1; i++)
             {
-                for (int j = 0; j < PlayGroundSize[1]-1; j++)
+                for (int j = 0; j < PlayGroundSize[1] - 1; j++)
                 {
                     switch (grounds[j][i])
                     {
@@ -153,6 +154,11 @@ namespace FriendshipExploder.Logic
             }
 
             Players.Add(new Player(0, new Point(15, 10), Model.KeyBinding.upDownLeftRight));
+            //Players.Add(new Player(1, new Point(15, 60), Model.KeyBinding.WSAD));
+            Players.Add(new Player(2, new Point(15, 120), Model.KeyBinding.ai));
+            Players.Add(new Player(1, new Point(15, 180), Model.KeyBinding.ai));
+            //ToDo: TaskCreator => TODO: Async void-> while everything
+            AITaskCreator();
         }
 
         public enum PlayerAction
@@ -278,7 +284,7 @@ namespace FriendshipExploder.Logic
             {
                 case PlayerAction.up:
                 case PlayerAction.W:
-                    if (posY - GameRectSize / 4 - pl.Speed >= 0 && CanStepToPos(pl, new System.Windows.Vector(0, -1* pl.Speed)))
+                    if (posY - GameRectSize / 4 - pl.Speed >= 0 && CanStepToPos(pl, new System.Windows.Vector(0, -1 * pl.Speed)))
                     {
                         pl.Move(0, -pl.Speed);
                         pl.HeadDirection = PlayerDirection.up;
@@ -294,7 +300,7 @@ namespace FriendshipExploder.Logic
                     break;
                 case PlayerAction.left:
                 case PlayerAction.A:
-                    if (posX - GameRectSize / 4 - pl.Speed >= 0 && CanStepToPos(pl, new System.Windows.Vector(-1* pl.Speed, 0)))
+                    if (posX - GameRectSize / 4 - pl.Speed >= 0 && CanStepToPos(pl, new System.Windows.Vector(-1 * pl.Speed, 0)))
                     {
                         pl.Move(-pl.Speed, 0);
                         pl.HeadDirection = PlayerDirection.left;
@@ -311,5 +317,23 @@ namespace FriendshipExploder.Logic
             }
         }
 
+        private void AITaskCreator()
+        {
+            List<Player> ais = new List<Player>();
+            ais.AddRange(Players.Where(player => player.KeyBinding == Model.KeyBinding.ai));
+
+            List<Task> aiTasks = ais.Select(ai => new Task(() => AIWakeUp(ai), TaskCreationOptions.LongRunning)).ToList();
+            //ToDO kirakni a tasklistet;
+            Parallel.ForEach(aiTasks, task => task.Start());//Hogy amennyire csak lehet egyszerre induljanak
+        }
+
+        private async void AIWakeUp(Player ai)
+        {
+            Thread.Sleep(10000);
+            while (true)//Majd EndGame ha kész lesz
+            {
+                Act(PlayerAction.down, ai);
+            }
+        }
     }
 }
