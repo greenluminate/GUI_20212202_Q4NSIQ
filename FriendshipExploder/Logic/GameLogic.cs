@@ -275,7 +275,7 @@ namespace FriendshipExploder.Logic
         }
 
         //A játékos mozgása
-        public void Act(PlayerAction playerAction, Player pl)
+        public async void Act(PlayerAction playerAction, Player pl)
         {
             int posX = Players[0].Position.X;
             int posY = Players[0].Position.Y;
