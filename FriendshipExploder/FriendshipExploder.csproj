@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Images\GameBackground\0_GameBackground.jpg" />
     <None Remove="Images\Players\0_player_down.png" />
     <None Remove="Images\Players\0_player_left.png" />
     <None Remove="Images\Players\0_player_right.png" />
@@ -26,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Images\GameBackground\0_GameBackground.jpg" />
     <Resource Include="Images\Players\0_player_down.png" />
     <Resource Include="Images\Players\0_player_left.png" />
     <Resource Include="Images\Players\0_player_right.png" />
@@ -57,5 +59,11 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Images\Bombs\" />
+    <Folder Include="Images\Boosters\" />
+    <Folder Include="Images\FireParts\" />
   </ItemGroup>
 </Project>
