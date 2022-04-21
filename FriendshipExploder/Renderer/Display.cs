@@ -34,11 +34,11 @@ namespace FriendshipExploder.Renderer
             if (gameModel != null && size.Width > 50 && size.Height > 50)//ToDo: Ennél kisebbre ne lehessen állítani az ablakot, mint megkötés a windownál.
             {
                 //kocka méretének meghatározása
-                int gameRectWidth = (int)(size.Width / gameModel.PlayGroundSize[0]);
-                int gameRectHeight = (int)((size.Height - size.Height * 0.05) / gameModel.PlayGroundSize[1]);
-                int startY = (int)(size.Height * 0.05);
+                double gameRectWidth = (size.Width / gameModel.PlayGroundSize[0]);
+                double gameRectHeight = ((size.Height - size.Height * 0.05) / gameModel.PlayGroundSize[1]);
+                double startY = (size.Height * 0.05);
 
-                int gameRectSize = gameRectWidth < gameRectHeight ? gameRectWidth : gameRectHeight;
+                double gameRectSize = gameRectWidth < gameRectHeight ? gameRectWidth : gameRectHeight;
 
 
                 //állapotsáv
@@ -67,7 +67,7 @@ namespace FriendshipExploder.Renderer
 
 
                 //játéktér kezdete a bal felső sarokban a fal nélkül
-                int startX = gameRectSize / 2;
+                double startX = gameRectSize / 2;
                 startY = startY + gameRectSize / 2;
 
                 //háttér renderelése
@@ -76,14 +76,14 @@ namespace FriendshipExploder.Renderer
 
 
                 //kockaméret átadása a logic részére
-                gameModel.SetupSize(new System.Drawing.Point((int)size.Width, (int)(size.Height - size.Height * 0.05)), gameRectSize);
+                gameModel.SetupSize(new System.Drawing.Point((int)size.Width, (int)(size.Height - size.Height * 0.05)), (int)gameRectSize);
 
 
                 //elemek kirajzolása
                 foreach (var element in gameModel.Elements)
                 {
-                    int x = startX + element.Position.X * gameRectSize;
-                    int y = startY + element.Position.Y * gameRectSize;
+                    double x = startX + element.Position.X * gameRectSize;
+                    double y = startY + element.Position.Y * gameRectSize;
 
                     drawingContext.DrawRectangle(
                         element.Image,
@@ -95,8 +95,8 @@ namespace FriendshipExploder.Renderer
                 //játékosok kirajzolása
                 foreach (var player in gameModel.Players)
                 {
-                    int x = startX + player.Position.X;
-                    int y = startY + player.Position.Y;
+                    double x = startX + player.Position.X;
+                    double y = startY + player.Position.Y;
 
                     string dir = player.HeadDirection.ToString();
                     ImageBrush playerImage = new ImageBrush(new BitmapImage(new Uri($"pack://application:,,,/Images/Players/{player.Id}_player_{dir}.png")));
