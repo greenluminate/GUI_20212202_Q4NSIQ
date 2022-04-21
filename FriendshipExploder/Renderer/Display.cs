@@ -1,6 +1,7 @@
 ﻿using FriendshipExploder.Logic;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -115,6 +116,7 @@ namespace FriendshipExploder.Renderer
                         new Rect(x - gameRectSize / 4, y - gameRectSize / 4, gameRectSize / 2, gameRectSize / 2)
                     );
                 }
+                drawingContext.DrawText(new FormattedText(gameModel.Timer, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Verdana"), 30, Brushes.White, VisualTreeHelper.GetDpi(this).PixelsPerDip), new Point(size.Width / 2 - (30 * 1.5), size.Height * 0.025));
             }
         }
 

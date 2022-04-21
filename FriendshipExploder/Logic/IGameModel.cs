@@ -15,5 +15,6 @@ namespace FriendshipExploder.Logic
         int[] PlayGroundSize { get; set; }
         public List<Player> Players { get; set; }
         public void SetupSize(Point gameSize, int gameRectSize);
+        public string Timer { get; set; }
     }
 }

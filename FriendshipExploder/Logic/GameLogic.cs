@@ -31,6 +31,7 @@ namespace FriendshipExploder.Logic
 
         private Point GameSize { get; set; }
 
+        public string Timer { get; set; }
 
         public GameLogic()
         {
@@ -159,6 +160,24 @@ namespace FriendshipExploder.Logic
             Players.Add(new Player(3, new Point(16, 400), Model.KeyBinding.ai));
             //ToDo: TaskCreator => TODO: Async void-> while everything
             AITaskCreator();
+            CountDown(150);
+
+        }
+
+        private void CountDown(int seconds)
+        {
+            Task countDownTask = new Task(() =>
+            {
+                DateTime StartTime = new DateTime(1, 1, 1, 0, 2, 30);
+                this.Timer = StartTime.ToString(@"mm\:ss");
+                Thread.Sleep(2000);
+                DateTime StartDate = DateTime.Now;
+                while (!this.Timer.Equals("00:00"))
+                {
+                    this.Timer = StartTime.AddSeconds(-(DateTime.Now.Second - StartDate.Second)).ToString(@"mm\:ss");
+                }
+            }, TaskCreationOptions.LongRunning);
+            countDownTask.Start();
         }
 
         public enum PlayerAction
