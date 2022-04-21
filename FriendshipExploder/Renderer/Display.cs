@@ -48,7 +48,7 @@ namespace FriendshipExploder.Renderer
 
                 double gameRectSize = gameRectWidth < gameRectHeight ? gameRectWidth : gameRectHeight;
 
-                double startX = ((size.Width - (gameRectSize * (gameModel.PlayGroundSize[0] - 1))) / 2);
+                double startX = ((size.Width - (gameRectSize * (gameModel.PlayGroundSize[0]))) / 2);
 
                 //állapotsáv
                 //drawingContext.DrawRectangle(Brushes.Beige, new Pen(Brushes.Black, 1),new Rect(0, 0, size.Width, size.Height * 0.05)); //5%-a a magasságnak
