@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <None Remove="Images\GameBackground\0_GameBackground.jpg" />
+    <None Remove="Images\GameBackground\0_timerbg.png" />
     <None Remove="Images\Players\0_player_down.png" />
     <None Remove="Images\Players\0_player_left.png" />
     <None Remove="Images\Players\0_player_right.png" />
@@ -28,6 +29,7 @@
 
   <ItemGroup>
     <Resource Include="Images\GameBackground\0_GameBackground.jpg" />
+    <Resource Include="Images\GameBackground\0_timerbg.png" />
     <Resource Include="Images\Players\0_player_down.png" />
     <Resource Include="Images\Players\0_player_left.png" />
     <Resource Include="Images\Players\0_player_right.png" />

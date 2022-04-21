@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 
 namespace FriendshipExploder.Renderer
@@ -116,9 +117,10 @@ namespace FriendshipExploder.Renderer
                         new Rect(x - gameRectSize / 4, y - gameRectSize / 4, gameRectSize / 2, gameRectSize / 2)
                     );
                 }
+                brush = new ImageBrush(new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "GameBackground", "0_timerbg.png"), UriKind.RelativeOrAbsolute)));
+                drawingContext.DrawRectangle(brush, new Pen(Brushes.Black, 0), new Rect(size.Width / 2 -(gameRectSize * 1.5) , 0, gameRectSize * 3, size.Height * 0.05 + gameRectSize/2));
                 drawingContext.DrawText(new FormattedText(gameModel.Timer, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Verdana"), 30, Brushes.White, VisualTreeHelper.GetDpi(this).PixelsPerDip), new Point(size.Width / 2 - (30 * 1.5), size.Height * 0.025));
             }
         }
-
     }
 }
