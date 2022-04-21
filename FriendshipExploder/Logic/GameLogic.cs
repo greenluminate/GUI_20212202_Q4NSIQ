@@ -168,7 +168,7 @@ namespace FriendshipExploder.Logic
         {
             Task countDownTask = new Task(() =>
             {
-                DateTime StartTime = new DateTime(1, 1, 1, 0, 2, 30);
+                DateTime StartTime = new DateTime(1, 1, 1, 0, seconds / 60, seconds % 60);
                 this.Timer = StartTime.ToString(@"mm\:ss");
                 Thread.Sleep(2000);
                 DateTime StartDate = DateTime.Now;
