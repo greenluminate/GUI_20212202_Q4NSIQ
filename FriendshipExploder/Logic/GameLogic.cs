@@ -231,6 +231,8 @@ namespace FriendshipExploder.Logic
                     BombUnderPlayer = Elements[playerCurrentIndexX, playerCurrentIndexY];
                 }
 
+                bool canStep = true;
+
                 for (int i = 0; i < Elements.GetLength(0); i++)
                 {
                     for (int j = 0; j < Elements.GetLength(1); j++)
@@ -240,18 +242,20 @@ namespace FriendshipExploder.Logic
                             Rectangle elementRect = new Rectangle(i * GameRectSize, j * GameRectSize, GameRectSize, GameRectSize);
                             if (playerRect.IntersectsWith(elementRect))
                             {
-                                if (Elements[i, j] is Bomb && playerPrevRect.IntersectsWith(elementRect))
+                                if (!(Elements[i, j] is Bomb && playerPrevRect.IntersectsWith(elementRect)))
                                 {
-                                    return true;
+                                    canStep = false;
                                 }
-                                return false;
+                                
+                                //return false;
                             }
                         }
                     }
                 }
+                return canStep;
             }
 
-            return true;
+            //return true;
         }
 
         private Player GetKeyBindingForPlayer(PlayerAction playerAction)
