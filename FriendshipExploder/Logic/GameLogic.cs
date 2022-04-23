@@ -418,8 +418,8 @@ namespace FriendshipExploder.Logic
                         //Itt beadható, ha scheduled, de még nem tudom, hogyan nézem meg, higy le van e nyomva az action is közben
                         Bomb newBomb = pl.Bomb.BombCopy(
                                         new Point(
-                                            (int)Math.Floor((decimal)(pl.Position.X / GameRectSize)),
-                                            (int)Math.Floor((decimal)(pl.Position.Y / GameRectSize))),
+                                            (int)Math.Floor((decimal)((pl.Position.X + (playerWidthRate * GameRectSize) / 2) / GameRectSize)),
+                                            (int)Math.Floor((decimal)((pl.Position.Y + ((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize) / 2) / GameRectSize))),
                                         new ImageBrush(
                                             new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "Bombs", "bomb.png"),
                                             UriKind.RelativeOrAbsolute))));
