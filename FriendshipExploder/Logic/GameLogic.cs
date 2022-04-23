@@ -33,8 +33,8 @@ namespace FriendshipExploder.Logic
 
         public string Timer { get; set; }
 
-        private object _ElementsListLockObject;
-        private object _PlayersListLockObject;
+        public object _ElementsListLockObject { get; set; }
+        public object _PlayersListLockObject { get; set; }
 
         public GameLogic()
         {
@@ -164,10 +164,10 @@ namespace FriendshipExploder.Logic
                 }
             }
 
-            Players.Add(new Player(0, new Point(15, 10), Model.KeyBinding.upDownLeftRight));
-            Players.Add(new Player(1, new Point(15, 220), Model.KeyBinding.WSAD));
-            Players.Add(new Player(2, new Point(15, 70), Model.KeyBinding.ai));
-            Players.Add(new Player(3, new Point(16, 400), Model.KeyBinding.ai));
+            Players.Add(new Player(0, new Point(0, 0), Model.KeyBinding.upDownLeftRight));
+            Players.Add(new Player(1, new Point(0, 1), Model.KeyBinding.WSAD));
+            Players.Add(new Player(2, new Point(0, 8), Model.KeyBinding.ai));
+            Players.Add(new Player(3, new Point(0, 9), Model.KeyBinding.ai));
 
             AITaskCreator();
             CountDown(150);
@@ -201,21 +201,48 @@ namespace FriendshipExploder.Logic
         //Odaléphet-e a játékos
         private bool CanStepToPos(Player player, System.Windows.Vector direction)
         {
-            bool canStep = true;
+
             Rectangle playerRect = new Rectangle(player.Position.X + (int)direction.X - (GameRectSize / 4), player.Position.Y + (int)direction.Y - (GameRectSize / 4), GameRectSize / 2, GameRectSize / 2);
 
-            foreach (var element in Elements)
+            int playerCurrentIndexX = (int)Math.Floor((decimal)(player.Position.X / GameRectSize));
+            int playerCurrentIndexY = (int)Math.Floor((decimal)(player.Position.Y / GameRectSize));
+
+            //int playerNextIndexX = (int)Math.Floor((decimal)((player.Position.X + direction.X - (GameRectSize / 4) + (GameRectSize / 2)) / GameRectSize));
+            //int playerNextIndexY = (int)Math.Floor((decimal)((player.Position.Y + direction.Y - (GameRectSize / 4) + (GameRectSize / 2)) / GameRectSize));
+
+            //if (direction.Y > 0)//Ha lefelé szeretnénk menni, ne lógjunk belea cellába.
+            //{
+            //    playerNextIndexY = (int)Math.Floor((decimal)((player.Position.Y + direction.Y + (GameRectSize / 4)) / GameRectSize * 1.15));
+            //}
+
+            lock (_ElementsListLockObject)
             {
-                if (element is Wall || element is FixWall || element is Bomb)
+                foreach (var element in Elements)
                 {
+                    //Ha a játékos lépés előtti koordinátája éppen bomba, akkor léphet ugyan oda, hogy le tudjon jutni róla.
+                    IElement BombUnderPlayer = null;
+                    if (playerCurrentIndexX == element.Position.X &&
+                        playerCurrentIndexY == element.Position.Y &&
+                        element is Bomb)
+                    {
+                        BombUnderPlayer = element;
+                    }
+
                     Rectangle elementRect = new Rectangle(element.Position.X * GameRectSize, element.Position.Y * GameRectSize, GameRectSize, GameRectSize);
                     if (playerRect.IntersectsWith(elementRect))
+                    //if (playerNextIndexX == element.Position.X && playerNextIndexY == element.Position.Y && (element is Wall || element is FixWall || element is Bomb))
                     {
-                        canStep = false;
+                        if (element is Bomb && element == BombUnderPlayer)
+                        {
+                            return true;
+                        }
+
+                        return false;
                     }
                 }
             }
-            return canStep;
+
+            return true;
         }
 
         private Player GetKeyBindingForPlayer(PlayerAction playerAction)
@@ -320,11 +347,15 @@ namespace FriendshipExploder.Logic
                 //Bomba lerakása
                 case PlayerAction.bombudlr:
                 case PlayerAction.bombwasd:
+                    Act(PlayerAction.bombudlr, pl);
+                    await Task.Delay(1);
                     break;
 
                 //Action
                 case PlayerAction.actionudlr:
                 case PlayerAction.actionwasd:
+                    Act(PlayerAction.bombudlr, pl);
+                    await Task.Delay(1);
                     break;
             }
         }
@@ -332,8 +363,8 @@ namespace FriendshipExploder.Logic
         //A játékos mozgása
         public async void Act(PlayerAction playerAction, Player pl)
         {
-            int posX = Players[0].Position.X;
-            int posY = Players[0].Position.Y;
+            int posX = pl.Position.X;
+            int posY = pl.Position.Y;
 
             switch (playerAction)
             {
@@ -373,6 +404,60 @@ namespace FriendshipExploder.Logic
                 //Bomba lerakása
                 case PlayerAction.bombudlr:
                 case PlayerAction.bombwasd:
+                    if (pl.BombList.Count < pl.BombAmount)
+                    {
+                        //Itt beadható, ha scheduled, de még nem tudom, hogyan nézem meg, higy le van e nyomva az action is közben
+                        Bomb newBomb = pl.Bomb.BombCopy(
+                                        new Point(
+                                            (int)Math.Floor((decimal)(pl.Position.X / GameRectSize)),
+                                            (int)Math.Floor((decimal)(pl.Position.Y / GameRectSize))),
+                                        new ImageBrush(
+                                            new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "Bombs", "bomb.png"),
+                                            UriKind.RelativeOrAbsolute))));
+                        lock (pl._bombListLockObject)
+                        {
+                            pl.BombList.Add(newBomb);
+                        }
+
+
+                        lock (_ElementsListLockObject)
+                        {
+                            Elements.Add(newBomb);
+                        }
+
+                        new Task(() =>
+                        {
+                            Thread.Sleep(3000);//x másodperc múlva robba na bomba
+                            Bomb bomb = null;
+
+                            lock (_ElementsListLockObject)
+                            {
+                                bomb = (Bomb)Elements.Where(bomb => bomb.Equals(newBomb)).FirstOrDefault();
+                            }
+
+                            if (bomb != null)
+                            {
+                                bomb.Image = new ImageBrush(
+                                                new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "FireParts", "explosion.png"),
+                                                UriKind.RelativeOrAbsolute)));
+                            }
+
+                            newBomb.Image.Freeze();
+                            Thread.Sleep(500);
+
+                            lock (pl._bombListLockObject)
+                            {
+                                pl.BombList.Remove(newBomb);
+                            }
+
+                            lock (_ElementsListLockObject)
+                            {
+                                Elements.Remove(bomb);
+                            }
+
+                        }, TaskCreationOptions.LongRunning).Start();
+                    }
+                    //Rövid taskkal felrobbantani.
                     break;
 
                 //Action
@@ -398,7 +483,10 @@ namespace FriendshipExploder.Logic
             while (true)//ToDo: Majd amgí nem igaz, hogy vége
             {
                 IElement[,] elements = new IElement[GameSize.X - 1, GameSize.Y - 1];
-                Elements.ForEach(element => elements[element.Position.X, element.Position.Y] = element);
+                lock (_ElementsListLockObject)
+                {
+                    Elements.ForEach(element => elements[element.Position.X, element.Position.Y] = element);
+                }
                 //ToDo: amíg az időből nem telt el 30 perc, addig keressen fixen skilleket. Az legyen a prioritása.
                 Player nearestPlayer = NearestPlayer(ai);
                 //ToDO: ha bomba van a közelében bújjon el.

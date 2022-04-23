@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <None Remove="Images\Bombs\bomb.jpg" />
+    <None Remove="Images\Bombs\bomb.png" />
     <None Remove="Images\FireParts\explosion.png" />
     <None Remove="Images\FixWalls\0_FixWall.png" />
     <None Remove="Images\Floors\0_Floor.png" />
@@ -34,7 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Images\Bombs\bomb.jpg" />
+    <Resource Include="Images\Bombs\bomb.png" />
     <Resource Include="Images\FireParts\explosion.png" />
     <Resource Include="Images\FixWalls\0_FixWall.png" />
     <Resource Include="Images\Floors\0_Floor.png" />

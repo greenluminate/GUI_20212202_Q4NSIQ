@@ -16,5 +16,7 @@ namespace FriendshipExploder.Logic
         public List<Player> Players { get; set; }
         public void SetupSize(Point gameSize, int gameRectSize);
         public string Timer { get; set; }
+        public object _ElementsListLockObject { get; set; }
+        public object _PlayersListLockObject { get; set; }
     }
 }

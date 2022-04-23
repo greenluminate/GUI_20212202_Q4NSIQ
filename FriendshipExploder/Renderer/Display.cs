@@ -90,35 +90,44 @@ namespace FriendshipExploder.Renderer
 
 
                 //elemek kirajzolása
-                foreach (var element in gameModel.Elements)
+                lock (gameModel._ElementsListLockObject)
                 {
-                    double x = startX + element.Position.X * gameRectSize;
-                    double y = startY + element.Position.Y * gameRectSize;
+                    foreach (var element in gameModel.Elements)
+                    {
+                        double x = startX + element.Position.X * gameRectSize;
+                        double y = startY + element.Position.Y * gameRectSize;
 
-                    drawingContext.DrawRectangle(
-                        element.Image,
-                        new Pen(Brushes.Black, 0),
-                        new Rect(x, y, gameRectSize, gameRectSize)
-                    );
+                        drawingContext.DrawRectangle(
+                            element.Image,
+                            new Pen(Brushes.Black, 0),
+                            new Rect(x, y, gameRectSize, gameRectSize)
+                        );
+                    }
                 }
-
                 //játékosok kirajzolása
-                foreach (var player in gameModel.Players)
+                lock (gameModel._PlayersListLockObject)
                 {
-                    double x = startX + player.Position.X;
-                    double y = startY + player.Position.Y;
+                    foreach (var player in gameModel.Players)
+                    {
+                        double x = startX + player.Position.X;
+                        double y = startY + player.Position.Y;
 
-                    string dir = player.HeadDirection.ToString();
-                    ImageBrush playerImage = new ImageBrush(new BitmapImage(new Uri($"pack://application:,,,/Images/Players/{player.Id}_player_{dir}.png")));
+                        string dir = player.HeadDirection.ToString();
+                        ImageBrush playerImage = new ImageBrush(new BitmapImage(new Uri($"pack://application:,,,/Images/Players/{player.Id}_player_{dir}.png")));
 
-                    drawingContext.DrawRectangle(
-                        playerImage,
-                        new Pen(Brushes.Black, 0),
-                        new Rect(x - gameRectSize / 4, y - gameRectSize / 4, gameRectSize / 2, gameRectSize / 2)
-                    );
+                        double playerHeightRate = 1.15;
+                        double playerWidthRate = 0.8;
+
+                        drawingContext.DrawRectangle(
+                            playerImage,
+                            new Pen(Brushes.Black, 0),
+                            new Rect(x - gameRectSize / 4, y - gameRectSize / 4, gameRectSize / 2, gameRectSize / 2)
+                        //new Rect(x - gameRectSize * playerHeightRate / 4, y - gameRectSize * playerHeightRate / 4, gameRectSize * playerWidthRate, gameRectSize * playerHeightRate)
+                        );
+                    }
                 }
                 brush = new ImageBrush(new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "GameBackground", "0_timerbg.png"), UriKind.RelativeOrAbsolute)));
-                drawingContext.DrawRectangle(brush, new Pen(Brushes.Black, 0), new Rect(size.Width / 2 -(gameRectSize * 1.5) , 0, gameRectSize * 3, size.Height * 0.05 + gameRectSize/2));
+                drawingContext.DrawRectangle(brush, new Pen(Brushes.Black, 0), new Rect(size.Width / 2 - (gameRectSize * 1.5), 0, gameRectSize * 3, size.Height * 0.05 + gameRectSize / 2));
                 drawingContext.DrawText(new FormattedText(gameModel.Timer, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Verdana"), 30, Brushes.White, VisualTreeHelper.GetDpi(this).PixelsPerDip), new Point(size.Width / 2 - (30 * 1.5), size.Height * 0.025));
                 //30-ast lecserélni responsive értékre.
             }

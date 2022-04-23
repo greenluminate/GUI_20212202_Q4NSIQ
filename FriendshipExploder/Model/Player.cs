@@ -32,6 +32,7 @@ namespace FriendshipExploder.Model
         public int BombAmount { get; set; } //1-5 db bombája lehet a játékosnak a pályán egyszerre.
         public bool CanKick { get; set; } //Amikor a játékos megnyom egy adott gombot a bomba felé fordulva, előtte állva, a bomba addig halad, amíg akadályt nem ér.
         public bool CanSchedule { get; private set; } //Csak akkor tehet le gomb kombinációval időzített bombát, ha képes ilyenre.
+        public object _bombListLockObject;
 
         public Player(int id, Point position, KeyBinding keyBinding)
         {
@@ -43,6 +44,7 @@ namespace FriendshipExploder.Model
             KeyBinding = keyBinding;
             Bomb = new Bomb(this);
             BombList = new List<Bomb>();
+            _bombListLockObject = new object();
             BombAmount = 1;
         }
 
