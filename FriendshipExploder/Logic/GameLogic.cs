@@ -209,7 +209,7 @@ namespace FriendshipExploder.Logic
         //Odaléphet-e a játékos
         private bool CanStepToPos(Player player, System.Windows.Vector direction)
         {
-
+            Rectangle playerPrevRect = new Rectangle(player.Position.X, player.Position.Y, (int)(playerWidthRate * GameRectSize), (int)((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize));
             Rectangle playerRect = new Rectangle(player.Position.X + (int)direction.X, player.Position.Y + (int)direction.Y, (int)(playerWidthRate * GameRectSize), (int)((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize));
             
             int playerCurrentIndexX = (int)Math.Floor((decimal)(player.Position.X / GameRectSize));
@@ -240,7 +240,7 @@ namespace FriendshipExploder.Logic
                             Rectangle elementRect = new Rectangle(i * GameRectSize, j * GameRectSize, GameRectSize, GameRectSize);
                             if (playerRect.IntersectsWith(elementRect))
                             {
-                                if (Elements[i, j] is Bomb && Elements[i, j] == BombUnderPlayer)
+                                if (Elements[i, j] is Bomb && playerPrevRect.IntersectsWith(elementRect))
                                 {
                                     return true;
                                 }
