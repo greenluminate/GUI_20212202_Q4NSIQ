@@ -33,12 +33,16 @@ namespace FriendshipExploder.Logic
 
         public string Timer { get; set; }
 
+        private object _ElementsListLockObject;
+        private object _PlayersListLockObject;
+
         public GameLogic()
         {
+            _ElementsListLockObject = new object();
+            _PlayersListLockObject = new object();
             Elements = new List<IElement>();
             Players = new List<Player>();
 
-            //Queue példányosítás
             playgrounds = new Queue<string[]>();
             PlayGroundSize = new int[2];
 
@@ -63,7 +67,7 @@ namespace FriendshipExploder.Logic
                 "0wfwfwfwfwfwfwfww"
             };*/
 
-            //Ha válaszott pálya design, akkor betöltjük azt válaszott mennyiségszer a queue-ba, ha randomizáltat választotak a fixek közül, akkor random tötljülk be a fixeket
+            //Ha választott pálya design, akkor betöltjük azt válaszott mennyiségszer a queue-ba, ha randomizáltat választotak a fixek közül, akkor random tötljülk be a fixeket
             for (int i = 0; i < 3; i++)
             {
                 playgrounds.Enqueue(ground);
@@ -145,10 +149,16 @@ namespace FriendshipExploder.Logic
                     switch (grounds[j][i])
                     {
                         case 'f':
-                            Elements.Add(new FixWall(new Point(i, j), new ImageBrush(new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "FixWalls", "0_FixWall.png"), UriKind.RelativeOrAbsolute)))));
+                            lock (_ElementsListLockObject)
+                            {
+                                Elements.Add(new FixWall(new Point(i, j), new ImageBrush(new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "FixWalls", "0_FixWall.png"), UriKind.RelativeOrAbsolute)))));
+                            }
                             break;
                         case 'w':
-                            Elements.Add(new Wall(new Point(i, j), new ImageBrush(new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "Walls", "0_Wall.png"), UriKind.RelativeOrAbsolute)))));
+                            lock (_ElementsListLockObject)
+                            {
+                                Elements.Add(new Wall(new Point(i, j), new ImageBrush(new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "Walls", "0_Wall.png"), UriKind.RelativeOrAbsolute)))));
+                            }
                             break;
                     }
                 }
@@ -158,7 +168,7 @@ namespace FriendshipExploder.Logic
             Players.Add(new Player(1, new Point(15, 220), Model.KeyBinding.WSAD));
             Players.Add(new Player(2, new Point(15, 70), Model.KeyBinding.ai));
             Players.Add(new Player(3, new Point(16, 400), Model.KeyBinding.ai));
-            //ToDo: TaskCreator => TODO: Async void-> while everything
+
             AITaskCreator();
             CountDown(150);
 
@@ -182,7 +192,10 @@ namespace FriendshipExploder.Logic
 
         public enum PlayerAction
         {
-            up, down, left, right, W, A, S, D, bomb, kick //Később: explode ha lesz időzítettünk
+            up, down, left, right,
+            W, A, S, D,
+            bombudlr, bombwasd,
+            actionudlr, actionwasd
         }
 
         //Odaléphet-e a játékos
@@ -193,7 +206,7 @@ namespace FriendshipExploder.Logic
 
             foreach (var element in Elements)
             {
-                if (element is Wall || element is FixWall)
+                if (element is Wall || element is FixWall || element is Bomb)
                 {
                     Rectangle elementRect = new Rectangle(element.Position.X * GameRectSize, element.Position.Y * GameRectSize, GameRectSize, GameRectSize);
                     if (playerRect.IntersectsWith(elementRect))
@@ -215,12 +228,16 @@ namespace FriendshipExploder.Logic
                 case PlayerAction.down:
                 case PlayerAction.left:
                 case PlayerAction.right:
+                case PlayerAction.bombudlr:
+                case PlayerAction.actionudlr:
                     pl = Players.Where(p => p.KeyBinding == Model.KeyBinding.upDownLeftRight).FirstOrDefault();
                     break;
                 case PlayerAction.W:
                 case PlayerAction.S:
                 case PlayerAction.A:
                 case PlayerAction.D:
+                case PlayerAction.bombwasd:
+                case PlayerAction.actionwasd:
                     pl = Players.Where(p => p.KeyBinding == Model.KeyBinding.WSAD).FirstOrDefault();
                     break;
             }
@@ -266,7 +283,7 @@ namespace FriendshipExploder.Logic
         }
 
         //A játékos mozgásának vége, a controller hívja meg
-        public void StopMove(PlayerAction playerAction, Player ai = null)
+        public async void StopMove(PlayerAction playerAction, Player ai = null)
         {
             Player pl = ai is null ? GetKeyBindingForPlayer(playerAction) : ai;
 
@@ -289,6 +306,25 @@ namespace FriendshipExploder.Logic
                     {
                         pl.MovingHorizontal = false;
                     }
+                    break;
+            }
+        }
+
+        //A játékos bombával kapcsolatos cselekvései
+        public async Task StartAct(PlayerAction playerAction, Player ai = null)
+        {
+            Player pl = ai is null ? GetKeyBindingForPlayer(playerAction) : ai;
+
+            switch (playerAction)
+            {
+                //Bomba lerakása
+                case PlayerAction.bombudlr:
+                case PlayerAction.bombwasd:
+                    break;
+
+                //Action
+                case PlayerAction.actionudlr:
+                case PlayerAction.actionwasd:
                     break;
             }
         }
@@ -332,6 +368,16 @@ namespace FriendshipExploder.Logic
                         pl.Move(pl.Speed, 0);
                         pl.HeadDirection = PlayerDirection.right;
                     }
+                    break;
+
+                //Bomba lerakása
+                case PlayerAction.bombudlr:
+                case PlayerAction.bombwasd:
+                    break;
+
+                //Action
+                case PlayerAction.actionudlr:
+                case PlayerAction.actionwasd:
                     break;
             }
         }

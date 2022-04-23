@@ -48,6 +48,22 @@ namespace FriendshipExploder.Controller
                 case Key.D:
                     await control.StartMove(GameLogic.PlayerAction.D);
                     break;
+
+                //Bomba lerakása
+                case Key.RightShift:
+                    await control.StartAct(GameLogic.PlayerAction.bombudlr);
+                    break;
+                case Key.LeftShift:
+                    await control.StartAct(GameLogic.PlayerAction.bombwasd);
+                    break;
+
+                //Action
+                case Key.RightCtrl:
+                    await control.StartAct(GameLogic.PlayerAction.actionudlr);
+                    break;
+                case Key.LeftCtrl:
+                    await control.StartAct(GameLogic.PlayerAction.actionwasd);
+                    break;
             }
         }
 

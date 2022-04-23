@@ -7,8 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Images\Bombs\bomb.jpg" />
+    <None Remove="Images\FireParts\explosion.png" />
+    <None Remove="Images\FixWalls\0_FixWall.png" />
+    <None Remove="Images\Floors\0_Floor.png" />
     <None Remove="Images\GameBackground\0_GameBackground.jpg" />
     <None Remove="Images\GameBackground\0_timerbg.png" />
+    <None Remove="Images\ModderFloors\0_ModderFloor.png" />
     <None Remove="Images\Players\0_player_down.png" />
     <None Remove="Images\Players\0_player_left.png" />
     <None Remove="Images\Players\0_player_right.png" />
@@ -25,11 +30,17 @@
     <None Remove="Images\Players\3_player_left.png" />
     <None Remove="Images\Players\3_player_right.png" />
     <None Remove="Images\Players\3_player_up.png" />
+    <None Remove="Images\Walls\0_Wall.png" />
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Images\Bombs\bomb.jpg" />
+    <Resource Include="Images\FireParts\explosion.png" />
+    <Resource Include="Images\FixWalls\0_FixWall.png" />
+    <Resource Include="Images\Floors\0_Floor.png" />
     <Resource Include="Images\GameBackground\0_GameBackground.jpg" />
     <Resource Include="Images\GameBackground\0_timerbg.png" />
+    <Resource Include="Images\ModderFloors\0_ModderFloor.png" />
     <Resource Include="Images\Players\0_player_down.png" />
     <Resource Include="Images\Players\0_player_left.png" />
     <Resource Include="Images\Players\0_player_right.png" />
@@ -46,6 +57,7 @@
     <Resource Include="Images\Players\3_player_left.png" />
     <Resource Include="Images\Players\3_player_right.png" />
     <Resource Include="Images\Players\3_player_up.png" />
+    <Resource Include="Images\Walls\0_Wall.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -64,8 +76,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Images\Bombs\" />
     <Folder Include="Images\Boosters\" />
-    <Folder Include="Images\FireParts\" />
   </ItemGroup>
 </Project>
