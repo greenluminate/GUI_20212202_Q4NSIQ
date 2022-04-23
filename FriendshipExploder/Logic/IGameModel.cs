@@ -11,12 +11,15 @@ namespace FriendshipExploder.Logic
 {
     public interface IGameModel
     {
-        List<IElement> Elements { get; set; }
+        public IElement[,] Elements { get; set; }
         int[] PlayGroundSize { get; set; }
         public List<Player> Players { get; set; }
         public void SetupSize(Point gameSize, int gameRectSize);
         public string Timer { get; set; }
         public object _ElementsListLockObject { get; set; }
         public object _PlayersListLockObject { get; set; }
+        public double PlayerHeightRate { get; set; }
+        public double PlayerHeightRateHangsIn { get; set; }
+        public double playerWidthRate { get; set; }
     }
 }

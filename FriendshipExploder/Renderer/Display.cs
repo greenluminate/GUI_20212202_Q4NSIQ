@@ -92,7 +92,24 @@ namespace FriendshipExploder.Renderer
                 //elemek kirajzolása
                 lock (gameModel._ElementsListLockObject)
                 {
-                    foreach (var element in gameModel.Elements)
+                    for (int i = 0; i < gameModel.Elements.GetLength(0); i++)
+                    {
+                        for (int j = 0; j < gameModel.Elements.GetLength(1); j++)
+                        {
+                            if (gameModel.Elements[i, j] != null)
+                            {
+                                double x = startX + i * gameRectSize;
+                                double y = startY + j * gameRectSize;
+
+                                drawingContext.DrawRectangle(
+                                    gameModel.Elements[i, j].Image,
+                                    new Pen(Brushes.Black, 0),
+                                    new Rect(x, y, gameRectSize, gameRectSize)
+                                );
+                            }
+                        }
+                    }
+                    /*foreach (var element in gameModel.Elements)
                     {
                         double x = startX + element.Position.X * gameRectSize;
                         double y = startY + element.Position.Y * gameRectSize;
@@ -102,7 +119,7 @@ namespace FriendshipExploder.Renderer
                             new Pen(Brushes.Black, 0),
                             new Rect(x, y, gameRectSize, gameRectSize)
                         );
-                    }
+                    }*/
                 }
                 //játékosok kirajzolása
                 lock (gameModel._PlayersListLockObject)
@@ -115,13 +132,10 @@ namespace FriendshipExploder.Renderer
                         string dir = player.HeadDirection.ToString();
                         ImageBrush playerImage = new ImageBrush(new BitmapImage(new Uri($"pack://application:,,,/Images/Players/{player.Id}_player_{dir}.png")));
 
-                        double playerHeightRate = 1.15;
-                        double playerWidthRate = 0.8;
-
                         drawingContext.DrawRectangle(
                             playerImage,
                             new Pen(Brushes.Black, 0),
-                            new Rect(x - gameRectSize / 4, y - gameRectSize / 4, gameRectSize / 2, gameRectSize / 2)
+                            new Rect(x, y - (gameRectSize * gameModel.PlayerHeightRateHangsIn), gameModel.playerWidthRate * gameRectSize, gameModel.PlayerHeightRate * gameRectSize)
                         //new Rect(x - gameRectSize * playerHeightRate / 4, y - gameRectSize * playerHeightRate / 4, gameRectSize * playerWidthRate, gameRectSize * playerHeightRate)
                         );
                     }

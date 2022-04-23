@@ -19,7 +19,7 @@ namespace FriendshipExploder.Logic
         //Lehet ide kéne betenn ia köztes képernyőket is pl.: MainMenu, playground, who win image, curren leaderboard image, next playground és így körbe.
 
         //pályán lévő elemek (játékos, fal, stb.)
-        public List<IElement> Elements { get; set; }
+        public IElement[,] Elements { get; set; }
 
         public List<Player> Players { get; set; }
 
@@ -35,18 +35,26 @@ namespace FriendshipExploder.Logic
 
         public object _ElementsListLockObject { get; set; }
         public object _PlayersListLockObject { get; set; }
+        public double PlayerHeightRate { get; set; }
+        public double PlayerHeightRateHangsIn { get; set; }
+        public double playerWidthRate { get; set; }
 
         public GameLogic()
         {
             _ElementsListLockObject = new object();
             _PlayersListLockObject = new object();
-            Elements = new List<IElement>();
             Players = new List<Player>();
 
             playgrounds = new Queue<string[]>();
             PlayGroundSize = new int[2];
 
+            PlayerHeightRate = 0.8;
+            PlayerHeightRateHangsIn = 0.2;
+            playerWidthRate = 0.6;
+
             string[] ground = LoadPlayground("playground_1.txt");
+
+            Elements = new IElement[PlayGroundSize[0], PlayGroundSize[1]];
 
             /*PlayGroundSize[0] = 18;
             PlayGroundSize[1] = 14;*/
@@ -116,11 +124,11 @@ namespace FriendshipExploder.Logic
                 {
                     bool leftPlayground = false;
 
-                    if (x.Position.X - gameRectSize / 4 + corrigSize < 0) { x.SetPos(gameRectSize / 4, x.Position.Y); leftPlayground = true; } //bal
-                    else if (x.Position.X + gameRectSize / 4 + corrigSize > (PlayGroundSize[0] - 1) * GameRectSize) { x.SetPos(((PlayGroundSize[0] - 1) * GameRectSize) - (gameRectSize / 4), x.Position.Y); leftPlayground = true; } //jobb
+                    if (x.Position.X + corrigSize < 0) { x.SetPos(0, x.Position.Y); leftPlayground = true; } //bal
+                    else if (x.Position.X + (playerWidthRate * GameRectSize) + corrigSize > (PlayGroundSize[0] - 1) * GameRectSize) { x.SetPos((int)(((PlayGroundSize[0] - 1) * GameRectSize) - (playerWidthRate * GameRectSize)), x.Position.Y); leftPlayground = true; } //jobb
 
-                    if (x.Position.Y - gameRectSize / 4 + corrigSize < 0) { x.SetPos(x.Position.X, gameRectSize / 4); leftPlayground = true; } //fent
-                    else if (x.Position.Y + gameRectSize / 4 + corrigSize > (PlayGroundSize[1] - 1) * GameRectSize) { x.SetPos(x.Position.X, ((PlayGroundSize[1] - 1) * GameRectSize) - (gameRectSize / 4)); leftPlayground = true; } //lent
+                    if (x.Position.Y + corrigSize < 0) { x.SetPos(x.Position.X, 0); leftPlayground = true; } //fent
+                    else if (x.Position.Y + (PlayerHeightRate * gameRectSize) + corrigSize > (PlayGroundSize[1] - 1) * GameRectSize) { x.SetPos(x.Position.X, (int)(((PlayGroundSize[1] - 1) * GameRectSize) - (playerWidthRate * GameRectSize))); leftPlayground = true; } //lent
 
                     if (!leftPlayground)
                     {
@@ -151,13 +159,13 @@ namespace FriendshipExploder.Logic
                         case 'f':
                             lock (_ElementsListLockObject)
                             {
-                                Elements.Add(new FixWall(new Point(i, j), new ImageBrush(new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "FixWalls", "0_FixWall.png"), UriKind.RelativeOrAbsolute)))));
+                                Elements[i,j] = new FixWall(new Point(i, j), new ImageBrush(new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "FixWalls", "0_FixWall.png"), UriKind.RelativeOrAbsolute))));
                             }
                             break;
                         case 'w':
                             lock (_ElementsListLockObject)
                             {
-                                Elements.Add(new Wall(new Point(i, j), new ImageBrush(new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "Walls", "0_Wall.png"), UriKind.RelativeOrAbsolute)))));
+                                Elements[i, j] = new Wall(new Point(i, j), new ImageBrush(new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "Walls", "0_Wall.png"), UriKind.RelativeOrAbsolute))));
                             }
                             break;
                     }
@@ -202,8 +210,8 @@ namespace FriendshipExploder.Logic
         private bool CanStepToPos(Player player, System.Windows.Vector direction)
         {
 
-            Rectangle playerRect = new Rectangle(player.Position.X + (int)direction.X - (GameRectSize / 4), player.Position.Y + (int)direction.Y - (GameRectSize / 4), GameRectSize / 2, GameRectSize / 2);
-
+            Rectangle playerRect = new Rectangle(player.Position.X + (int)direction.X, player.Position.Y + (int)direction.Y, (int)(playerWidthRate * GameRectSize), (int)((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize));
+            
             int playerCurrentIndexX = (int)Math.Floor((decimal)(player.Position.X / GameRectSize));
             int playerCurrentIndexY = (int)Math.Floor((decimal)(player.Position.Y / GameRectSize));
 
@@ -217,27 +225,28 @@ namespace FriendshipExploder.Logic
 
             lock (_ElementsListLockObject)
             {
-                foreach (var element in Elements)
+                IElement BombUnderPlayer = null;
+                if (Elements[playerCurrentIndexX, playerCurrentIndexY] is Bomb)
                 {
-                    //Ha a játékos lépés előtti koordinátája éppen bomba, akkor léphet ugyan oda, hogy le tudjon jutni róla.
-                    IElement BombUnderPlayer = null;
-                    if (playerCurrentIndexX == element.Position.X &&
-                        playerCurrentIndexY == element.Position.Y &&
-                        element is Bomb)
-                    {
-                        BombUnderPlayer = element;
-                    }
+                    BombUnderPlayer = Elements[playerCurrentIndexX, playerCurrentIndexY];
+                }
 
-                    Rectangle elementRect = new Rectangle(element.Position.X * GameRectSize, element.Position.Y * GameRectSize, GameRectSize, GameRectSize);
-                    if (playerRect.IntersectsWith(elementRect))
-                    //if (playerNextIndexX == element.Position.X && playerNextIndexY == element.Position.Y && (element is Wall || element is FixWall || element is Bomb))
+                for (int i = 0; i < Elements.GetLength(0); i++)
+                {
+                    for (int j = 0; j < Elements.GetLength(1); j++)
                     {
-                        if (element is Bomb && element == BombUnderPlayer)
+                        if (Elements[i, j] != null)
                         {
-                            return true;
+                            Rectangle elementRect = new Rectangle(i * GameRectSize, j * GameRectSize, GameRectSize, GameRectSize);
+                            if (playerRect.IntersectsWith(elementRect))
+                            {
+                                if (Elements[i, j] is Bomb && Elements[i, j] == BombUnderPlayer)
+                                {
+                                    return true;
+                                }
+                                return false;
+                            }
                         }
-
-                        return false;
                     }
                 }
             }
@@ -370,7 +379,7 @@ namespace FriendshipExploder.Logic
             {
                 case PlayerAction.up:
                 case PlayerAction.W:
-                    if (posY - GameRectSize / 4 - pl.Speed >= 0 && CanStepToPos(pl, new System.Windows.Vector(0, -1 * pl.Speed)))
+                    if (posY - pl.Speed >= 0 && CanStepToPos(pl, new System.Windows.Vector(0, -1 * pl.Speed)))
                     {
                         pl.Move(0, -pl.Speed);
                         pl.HeadDirection = PlayerDirection.up;
@@ -378,7 +387,7 @@ namespace FriendshipExploder.Logic
                     break;
                 case PlayerAction.down:
                 case PlayerAction.S:
-                    if (posY + GameRectSize / 4 + pl.Speed <= (PlayGroundSize[1] - 1) * GameRectSize && CanStepToPos(pl, new System.Windows.Vector(0, pl.Speed)))
+                    if (posY + ((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize) + pl.Speed <= (PlayGroundSize[1] - 1) * GameRectSize && CanStepToPos(pl, new System.Windows.Vector(0, pl.Speed)))
                     {
                         pl.Move(0, pl.Speed);
                         pl.HeadDirection = PlayerDirection.down;
@@ -386,7 +395,7 @@ namespace FriendshipExploder.Logic
                     break;
                 case PlayerAction.left:
                 case PlayerAction.A:
-                    if (posX - GameRectSize / 4 - pl.Speed >= 0 && CanStepToPos(pl, new System.Windows.Vector(-1 * pl.Speed, 0)))
+                    if (posX - pl.Speed >= 0 && CanStepToPos(pl, new System.Windows.Vector(-1 * pl.Speed, 0)))
                     {
                         pl.Move(-pl.Speed, 0);
                         pl.HeadDirection = PlayerDirection.left;
@@ -394,7 +403,7 @@ namespace FriendshipExploder.Logic
                     break;
                 case PlayerAction.right:
                 case PlayerAction.D:
-                    if (posX + GameRectSize / 4 + pl.Speed <= ((PlayGroundSize[0] - 1) * GameRectSize) && CanStepToPos(pl, new System.Windows.Vector(pl.Speed, 0)))
+                    if (posX + (playerWidthRate * GameRectSize) + pl.Speed <= ((PlayGroundSize[0] - 1) * GameRectSize) && CanStepToPos(pl, new System.Windows.Vector(pl.Speed, 0)))
                     {
                         pl.Move(pl.Speed, 0);
                         pl.HeadDirection = PlayerDirection.right;
@@ -419,10 +428,13 @@ namespace FriendshipExploder.Logic
                             pl.BombList.Add(newBomb);
                         }
 
+                        int i = (int)Math.Floor((decimal)(pl.Position.X / GameRectSize));
+                        int j = (int)Math.Floor((decimal)(pl.Position.Y / GameRectSize));
+
 
                         lock (_ElementsListLockObject)
                         {
-                            Elements.Add(newBomb);
+                            Elements[i, j] = newBomb;
                         }
 
                         new Task(() =>
@@ -432,7 +444,8 @@ namespace FriendshipExploder.Logic
 
                             lock (_ElementsListLockObject)
                             {
-                                bomb = (Bomb)Elements.Where(bomb => bomb.Equals(newBomb)).FirstOrDefault();
+                                bomb = (Bomb)Elements[i, j];
+                                //bomb = (Bomb)Array.Find(Elements, bomb => bomb.Equals(newBomb));
                             }
 
                             if (bomb != null)
@@ -452,7 +465,8 @@ namespace FriendshipExploder.Logic
 
                             lock (_ElementsListLockObject)
                             {
-                                Elements.Remove(bomb);
+                                Elements[i, j] = null;
+                                //Elements.Remove(bomb);
                             }
 
                         }, TaskCreationOptions.LongRunning).Start();
@@ -482,11 +496,11 @@ namespace FriendshipExploder.Logic
             Thread.Sleep(1000);//1 másodperc előny a valódi játékosoknak
             while (true)//ToDo: Majd amgí nem igaz, hogy vége
             {
-                IElement[,] elements = new IElement[GameSize.X - 1, GameSize.Y - 1];
-                lock (_ElementsListLockObject)
+                //IElement[,] elements = new IElement[GameSize.X - 1, GameSize.Y - 1];
+                /*lock (_ElementsListLockObject)
                 {
                     Elements.ForEach(element => elements[element.Position.X, element.Position.Y] = element);
-                }
+                }*/
                 //ToDo: amíg az időből nem telt el 30 perc, addig keressen fixen skilleket. Az legyen a prioritása.
                 Player nearestPlayer = NearestPlayer(ai);
                 //ToDO: ha bomba van a közelében bújjon el.
