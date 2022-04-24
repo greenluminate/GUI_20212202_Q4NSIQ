@@ -1,5 +1,6 @@
 ﻿using FriendshipExploder.Controller;
 using FriendshipExploder.Logic;
+using FriendshipExploder.Menu;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,6 +41,9 @@ namespace FriendshipExploder
             timer.Start();
 
             display.SetupModel(mainMenuLogic, gameLogic);
+
+            MainMenu menu = new MainMenu(gameLogic);
+            menu.ShowDialog();
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)

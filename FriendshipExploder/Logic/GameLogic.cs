@@ -54,55 +54,29 @@ namespace FriendshipExploder.Logic
             PlayerHeightRateHangsIn = 0.2;
             PlayerWidthRate = 0.6;
 
-            string[] ground = LoadPlayground("playground_1.txt");
-
-            Elements = new IElement[PlayGroundSize[0], PlayGroundSize[1]];
-
-            /*PlayGroundSize[0] = 18;
-            PlayGroundSize[1] = 14;*/
-
-            /*string[] grounds = new string[] {
-                "0wfwfwfwfwfwfwfww",
-                "0w0wwwwwwwwwww00w",
-                "00fwfwfwfwfwfwf0w",
-                "0wwwwwwwwwwwwwwww",
-                "0wfwfwfwfwfwfwfww",
-                "0wwwwwwwwwwwwwwww",
-                "0wfwfwfwfwfwfwfww",
-                "0wwwwwwwwwwwwwwww",
-                "0wfwfwfwfwfwfwfww",
-                "0wwwwwwwwwwwwwwww",
-                "00fwfwfwfwfwfwf0w",
-                "0wwwwwwwwwwwwwwww",
-                "0wfwfwfwfwfwfwfww"
-            };*/
-
             //Ha választott pálya design, akkor betöltjük azt válaszott mennyiségszer a queue-ba, ha randomizáltat választotak a fixek közül, akkor random tötljülk be a fixeket
-            for (int i = 0; i < 3; i++)
-            {
-                playgrounds.Enqueue(ground);
-            }
 
-            LoadNext(playgrounds.Dequeue());
 
             //Későbbi feature lehet: menüből választhatnak pályaméretet.
             //Későbbi feature lehet: random generált pálya design.
         }
 
-        private string[] LoadPlayground(string file)
+        public void LoadPlayground(string file)
         {
-            if (Directory.Exists("Playgrounds") && File.Exists(@$"Playgrounds\{file}"))
+            if (Directory.Exists("Playgrounds") && File.Exists(file))
             {
-                string[] rows = File.ReadAllLines(@$"Playgrounds\{file}");
+                string[] rows = File.ReadAllLines(file);
 
                 PlayGroundSize[0] = rows[0].Length;
                 PlayGroundSize[1] = rows.Length;
-                return rows;
-            }
-            else
-            {
-                //hiba
-                return null;
+
+                Elements = new IElement[PlayGroundSize[0], PlayGroundSize[1]];
+
+                for (int i = 0; i < 3; i++)
+                {
+                    playgrounds.Enqueue(rows);
+                }
+                LoadNext(playgrounds.Dequeue());
             }
         }
 
@@ -173,11 +147,6 @@ namespace FriendshipExploder.Logic
                     }
                 }
             }
-
-            Players.Add(new Player(0, new Point(0, 0), Model.KeyBinding.upDownLeftRight));
-            Players.Add(new Player(1, new Point(0, 1), Model.KeyBinding.WSAD));
-            Players.Add(new Player(2, new Point(0, 8), Model.KeyBinding.ai));
-            Players.Add(new Player(3, new Point(0, 9), Model.KeyBinding.ai));
 
             AITaskCreator();
             CountDown(150);

@@ -1,5 +1,8 @@
-﻿using System;
+﻿using FriendshipExploder.Logic;
+using FriendshipExploder.Model;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,9 +26,14 @@ namespace FriendshipExploder.Menu
         private int activePlayer = 0;
         private string[] keyBinding = { "[Disabled]", "[Up][Down][Left][Right]", "[W][S][A][D]", "[Ai]" };
         private int[] playerKeyBinding = { 0, 0, 0};
+        private List<string> playGrounds = new List<string>();
+        private int activePlayground = 0;
 
-        public MainMenu()
+        private IGameModel GameModel { get; set; }
+
+        public MainMenu(IGameModel model)
         {
+            this.GameModel = model;
             InitializeComponent();
             ChangeColumn();
             LoadPlaygrounds();
@@ -100,8 +108,19 @@ namespace FriendshipExploder.Menu
             {
                 if (playerKeyBinding[activePlayer] < 3)
                 {
-                    playerKeyBinding[activePlayer]++;
-
+                    if(playerKeyBinding.Any(bd => bd == playerKeyBinding[activePlayer] + 1))
+                    {
+                        //már van
+                        //ChangeKeyBinding(true);
+                    }
+                    else
+                    {
+                        playerKeyBinding[activePlayer]++;
+                    }
+                }
+                else
+                {
+                    playerKeyBinding[activePlayer] = 0;
                 }
             }
             else
@@ -118,14 +137,33 @@ namespace FriendshipExploder.Menu
             player2KeyBinding.Content = keyBinding[playerKeyBinding[2]];
         }
 
+        private void ChangeActivePlayground()
+        {
+            playgrounds.SelectedIndex = activePlayground;
+        }
+
         private void LoadPlaygrounds()
         {
-            Label pl = new Label();
-            pl.Foreground = new SolidColorBrush(Colors.White);
-            pl.FontSize = 24;
-            pl.FontWeight = FontWeights.Bold;
-            pl.Content = "Playground 1";
-            playgrounds.Items.Add(pl);
+            string[] files = Directory.GetFiles("Playgrounds", "*.txt");
+            foreach (var playground in files)
+            {
+                Border br = new Border();
+                br.BorderBrush = new SolidColorBrush(Colors.LightGray);
+                br.BorderThickness = new Thickness(2);
+                br.Margin = new Thickness(10);
+                br.HorizontalAlignment = HorizontalAlignment.Stretch;
+
+                Label pl = new Label();
+                pl.Foreground = new SolidColorBrush(Colors.White);
+                pl.FontSize = 24;
+                pl.FontWeight = FontWeights.Bold;
+                pl.Content = System.IO.Path.GetFileNameWithoutExtension(@"Playgrounds\" + playground);
+                br.Child = pl;
+
+                playgrounds.Items.Add(br);
+                playGrounds.Add(playground);
+            }
+            playgrounds.SelectedIndex = 0;
         }
 
         private void menu_KeyDown(object sender, KeyEventArgs e)
@@ -138,12 +176,22 @@ namespace FriendshipExploder.Menu
                         activePlayer--;
                         ChangeActivePlayer();
                     }
+                    else if (activeColumn == 2 && activePlayground > 0)
+                    {
+                        activePlayground--;
+                        ChangeActivePlayground();
+                    }
                     break;
                 case Key.Down:
                     if (activeColumn == 1 && activePlayer < 2)
                     {
                         activePlayer++;
                         ChangeActivePlayer();
+                    }
+                    else if (activeColumn == 2 && activePlayground < playGrounds.Count)
+                    {
+                        activePlayground++;
+                        ChangeActivePlayground();
                     }
                     break;
                 case Key.Left:
@@ -164,6 +212,44 @@ namespace FriendshipExploder.Menu
                         activeColumn++;
                         ChangeColumn();
                     }
+                    else if (activeColumn == 2)
+                    {
+                        //játék betöltés
+                        if (playerKeyBinding[0] != 0)
+                        {
+                            GameModel.Players.Add(new Player(0, new System.Drawing.Point(0, 0), IntToEnum(playerKeyBinding[0])));
+                        }
+                        if (playerKeyBinding[1] != 0)
+                        {
+                            GameModel.Players.Add(new Player(1, new System.Drawing.Point(0, 20), IntToEnum(playerKeyBinding[1])));
+                        }
+                        if (playerKeyBinding[2] != 0)
+                        {
+                            GameModel.Players.Add(new Player(2, new System.Drawing.Point(0, 40), IntToEnum(playerKeyBinding[2])));
+                        }
+
+                        GameModel.LoadPlayground(playGrounds[playgrounds.SelectedIndex]);
+                        this.DialogResult = true;
+                    }
+                    break;
+            }
+        }
+
+        private Model.KeyBinding IntToEnum(int binding)
+        {
+            switch (binding)
+            {
+                case 1:
+                    return Model.KeyBinding.upDownLeftRight;
+                    break;
+                case 2:
+                    return Model.KeyBinding.WSAD;
+                    break;
+                case 3:
+                    return Model.KeyBinding.ai;
+                    break;
+                default:
+                    return Model.KeyBinding.upDownLeftRight;
                     break;
             }
         }

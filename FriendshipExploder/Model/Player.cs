@@ -48,6 +48,19 @@ namespace FriendshipExploder.Model
             BombAmount = 1;
         }
 
+        public void SetupKeyBinding(int binding)
+        {
+            switch (binding)
+            {
+                case 0:
+                    break;
+                case 1:
+                    break;
+                case 2:
+                    break;
+            }
+        }
+
         public void Move(int x, int y)
         {
             Position = new Point(Position.X + x, Position.Y + y);

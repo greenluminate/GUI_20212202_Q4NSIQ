@@ -75,8 +75,7 @@
                 <RowDefinition Height="2*"></RowDefinition>
                 <RowDefinition Height="1*"></RowDefinition>
             </Grid.RowDefinitions>
-            <ListBox x:Name="playgrounds" Grid.Row="1" Background="Transparent" HorizontalContentAlignment="Center">
-                
+            <ListBox x:Name="playgrounds" Grid.Row="1" Background="Transparent" HorizontalContentAlignment="Stretch">
             </ListBox>
         </Grid>
     </Grid>
