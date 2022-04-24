@@ -194,7 +194,10 @@ namespace FriendshipExploder.Logic
                 DateTime StartDate = DateTime.Now;
                 while (!this.Timer.Equals("00:00"))
                 {
-                    this.Timer = StartTime.AddSeconds(-(DateTime.Now.Second - StartDate.Second)).ToString(@"mm\:ss");
+                    if (!GamePaused)
+                    {
+                        this.Timer = StartTime.AddSeconds(-(DateTime.Now.Second - StartDate.Second)).ToString(@"mm\:ss");
+                    }
                 }
             }, TaskCreationOptions.LongRunning);
             countDownTask.Start();
