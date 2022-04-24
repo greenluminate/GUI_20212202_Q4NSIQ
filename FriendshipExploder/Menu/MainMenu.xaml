@@ -69,5 +69,15 @@
             </Border>
             
         </Grid>
+        <Grid Grid.Column="2" x:Name="thirdColumn">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"></RowDefinition>
+                <RowDefinition Height="2*"></RowDefinition>
+                <RowDefinition Height="1*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <ListBox x:Name="playgrounds" Grid.Row="1" Background="Transparent" HorizontalContentAlignment="Center">
+                
+            </ListBox>
+        </Grid>
     </Grid>
 </Window>

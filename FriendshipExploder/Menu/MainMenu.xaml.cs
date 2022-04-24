@@ -27,7 +27,8 @@ namespace FriendshipExploder.Menu
         public MainMenu()
         {
             InitializeComponent();
-            AfterSelect();
+            ChangeColumn();
+            LoadPlaygrounds();
         }
 
         private void Exit(object sender, RoutedEventArgs e)
@@ -38,7 +39,7 @@ namespace FriendshipExploder.Menu
         private void NewGame(object sender, RoutedEventArgs e)
         {
             activeColumn = 1;
-            AfterSelect();
+            ChangeColumn();
         }
 
         private void menu_Loaded(object sender, RoutedEventArgs e)
@@ -46,24 +47,27 @@ namespace FriendshipExploder.Menu
             menu.Background = new ImageBrush(new BitmapImage(new Uri($"pack://application:,,,/Images/GameBackground/0_GameBackground.jpg")));
         }
 
-        private void AfterSelect()
+        private void ChangeColumn()
         {
             switch (activeColumn)
             {
                 case 0:
                     firstColumn.Opacity = 1;
                     secondColumn.Opacity = 0.2;
+                    thirdColumn.Opacity = 0.2;
                     break;
                 case 1:
                     ChangeActivePlayer();
                     firstColumn.Opacity = 0.2;
                     secondColumn.Opacity = 1;
+                    thirdColumn.Opacity = 0.2;
                     newGame.IsEnabled = false;
                     exitGame.IsEnabled = false;
                     break;
                 case 2:
                     firstColumn.Opacity = 0.2;
                     secondColumn.Opacity = 0.2;
+                    thirdColumn.Opacity = 1;
                     break;
             }
         }
@@ -114,6 +118,16 @@ namespace FriendshipExploder.Menu
             player2KeyBinding.Content = keyBinding[playerKeyBinding[2]];
         }
 
+        private void LoadPlaygrounds()
+        {
+            Label pl = new Label();
+            pl.Foreground = new SolidColorBrush(Colors.White);
+            pl.FontSize = 24;
+            pl.FontWeight = FontWeights.Bold;
+            pl.Content = "Playground 1";
+            playgrounds.Items.Add(pl);
+        }
+
         private void menu_KeyDown(object sender, KeyEventArgs e)
         {
             switch (e.Key)
@@ -142,6 +156,13 @@ namespace FriendshipExploder.Menu
                     if (activeColumn == 1)
                     {
                         ChangeKeyBinding(true);
+                    }
+                    break;
+                case Key.Enter:
+                    if (activeColumn == 1)
+                    {
+                        activeColumn++;
+                        ChangeColumn();
                     }
                     break;
             }
