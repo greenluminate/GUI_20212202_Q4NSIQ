@@ -108,10 +108,10 @@ namespace FriendshipExploder.Menu
             {
                 if (playerKeyBinding[activePlayer] < 3)
                 {
-                    if(playerKeyBinding.Any(bd => bd == playerKeyBinding[activePlayer] + 1))
+                    if(playerKeyBinding.Any(bd => bd == playerKeyBinding[activePlayer] + 1) && (playerKeyBinding[activePlayer] + 1 != 0 || playerKeyBinding[activePlayer] + 1 != 3))
                     {
                         //már van
-                        //ChangeKeyBinding(true);
+                        playerKeyBinding[activePlayer] = playerKeyBinding[activePlayer] == 1 ? 2 : 3;
                     }
                     else
                     {
@@ -127,8 +127,20 @@ namespace FriendshipExploder.Menu
             {
                 if (playerKeyBinding[activePlayer] > 0)
                 {
-                    playerKeyBinding[activePlayer]--;
+                    if (playerKeyBinding.Any(bd => bd == playerKeyBinding[activePlayer] - 1) && (playerKeyBinding[activePlayer] - 1 != 0 || playerKeyBinding[activePlayer] - 1 != 3))
+                    {
+                        //már van
+                        playerKeyBinding[activePlayer] = playerKeyBinding[activePlayer] == 2 ? 1 : 0;
+                    }
+                    else
+                    {
+                        playerKeyBinding[activePlayer]--;
+                    }
 
+                }
+                else
+                {
+                    playerKeyBinding[activePlayer] = 3;
                 }
             }
             
