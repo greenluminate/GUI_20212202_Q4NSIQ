@@ -135,7 +135,7 @@ namespace FriendshipExploder.Renderer
                         drawingContext.DrawRectangle(
                             playerImage,
                             new Pen(Brushes.Black, 0),
-                            new Rect(x, y - (gameRectSize * gameModel.PlayerHeightRateHangsIn), gameModel.playerWidthRate * gameRectSize, gameModel.PlayerHeightRate * gameRectSize)
+                            new Rect(x, y - (gameRectSize * gameModel.PlayerHeightRateHangsIn), gameModel.PlayerWidthRate * gameRectSize, gameModel.PlayerHeightRate * gameRectSize)
                         //new Rect(x - gameRectSize * playerHeightRate / 4, y - gameRectSize * playerHeightRate / 4, gameRectSize * playerWidthRate, gameRectSize * playerHeightRate)
                         );
                     }

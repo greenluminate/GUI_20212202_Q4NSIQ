@@ -14,6 +14,7 @@
     <None Remove="Images\Floors\0_Floor.png" />
     <None Remove="Images\GameBackground\0_GameBackground.jpg" />
     <None Remove="Images\GameBackground\0_timerbg.png" />
+    <None Remove="Images\GameBackground\pausedBackground.png" />
     <None Remove="Images\ModderFloors\0_ModderFloor.png" />
     <None Remove="Images\Players\0_player_down.png" />
     <None Remove="Images\Players\0_player_left.png" />
@@ -41,6 +42,7 @@
     <Resource Include="Images\Floors\0_Floor.png" />
     <Resource Include="Images\GameBackground\0_GameBackground.jpg" />
     <Resource Include="Images\GameBackground\0_timerbg.png" />
+    <Resource Include="Images\GameBackground\pausedBackground.png" />
     <Resource Include="Images\ModderFloors\0_ModderFloor.png" />
     <Resource Include="Images\Players\0_player_down.png" />
     <Resource Include="Images\Players\0_player_left.png" />

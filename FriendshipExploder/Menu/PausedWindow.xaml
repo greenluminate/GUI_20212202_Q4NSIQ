@@ -1,0 +1,51 @@
+﻿<Window x:Class="FriendshipExploder.Menu.PausedWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FriendshipExploder.Menu"
+        mc:Ignorable="d"
+        x:Name="pausedWindow"
+        Title="Game Paused" Height="300" Width="640"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        Loaded="Window_Loaded"
+        KeyDown="pausedWindow_KeyDown">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Column="1">
+            <Border BorderBrush="DimGray" BorderThickness="2" Margin="0,20,0,0">
+                <Label Content="Game paused" VerticalContentAlignment="Center" 
+                   HorizontalContentAlignment="Center" FontSize="24" FontWeight="Bold" Foreground="Gray"/>
+            </Border>
+            <Button Content="Resume" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                       FontSize="20" FontWeight="Bold" Margin="20,40,20,0" Click="Resume" Foreground="White" Background="DimGray">
+                <Button.Resources>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="CornerRadius" Value="10"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+            <Button Content="Main menu" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                       FontSize="20" FontWeight="Bold" Margin="20,20,20,0" Click="MainMenu" Foreground="White" Background="DimGray">
+                <Button.Resources>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="CornerRadius" Value="10"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+            <Button Content="Exit" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                       FontSize="20" FontWeight="Bold" Margin="20,20,20,0" Click="Exit" Foreground="White" Background="DimGray">
+                <Button.Resources>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="CornerRadius" Value="10"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+        </StackPanel>
+    </Grid>
+</Window>

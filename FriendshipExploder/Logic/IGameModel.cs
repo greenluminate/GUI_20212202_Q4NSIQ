@@ -20,6 +20,7 @@ namespace FriendshipExploder.Logic
         public object _PlayersListLockObject { get; set; }
         public double PlayerHeightRate { get; set; }
         public double PlayerHeightRateHangsIn { get; set; }
-        public double playerWidthRate { get; set; }
+        public double PlayerWidthRate { get; set; }
+        public bool GamePaused { get; set; }
     }
 }

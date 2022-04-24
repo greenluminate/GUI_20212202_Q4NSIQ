@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using FriendshipExploder.Menu;
 using FriendshipExploder.Model;
 
 namespace FriendshipExploder.Logic
@@ -37,7 +38,8 @@ namespace FriendshipExploder.Logic
         public object _PlayersListLockObject { get; set; }
         public double PlayerHeightRate { get; set; }
         public double PlayerHeightRateHangsIn { get; set; }
-        public double playerWidthRate { get; set; }
+        public double PlayerWidthRate { get; set; }
+        public bool GamePaused { get; set; }
 
         public GameLogic()
         {
@@ -50,7 +52,7 @@ namespace FriendshipExploder.Logic
 
             PlayerHeightRate = 0.8;
             PlayerHeightRateHangsIn = 0.2;
-            playerWidthRate = 0.6;
+            PlayerWidthRate = 0.6;
 
             string[] ground = LoadPlayground("playground_1.txt");
 
@@ -125,10 +127,10 @@ namespace FriendshipExploder.Logic
                     bool leftPlayground = false;
 
                     if (x.Position.X + corrigSize < 0) { x.SetPos(0, x.Position.Y); leftPlayground = true; } //bal
-                    else if (x.Position.X + (playerWidthRate * GameRectSize) + corrigSize > (PlayGroundSize[0] - 1) * GameRectSize) { x.SetPos((int)(((PlayGroundSize[0] - 1) * GameRectSize) - (playerWidthRate * GameRectSize)), x.Position.Y); leftPlayground = true; } //jobb
+                    else if (x.Position.X + (PlayerWidthRate * GameRectSize) + corrigSize > (PlayGroundSize[0] - 1) * GameRectSize) { x.SetPos((int)(((PlayGroundSize[0] - 1) * GameRectSize) - (PlayerWidthRate * GameRectSize)), x.Position.Y); leftPlayground = true; } //jobb
 
                     if (x.Position.Y + corrigSize < 0) { x.SetPos(x.Position.X, 0); leftPlayground = true; } //fent
-                    else if (x.Position.Y + (PlayerHeightRate * gameRectSize) + corrigSize > (PlayGroundSize[1] - 1) * GameRectSize) { x.SetPos(x.Position.X, (int)(((PlayGroundSize[1] - 1) * GameRectSize) - (playerWidthRate * GameRectSize))); leftPlayground = true; } //lent
+                    else if (x.Position.Y + (PlayerHeightRate * gameRectSize) + corrigSize > (PlayGroundSize[1] - 1) * GameRectSize) { x.SetPos(x.Position.X, (int)(((PlayGroundSize[1] - 1) * GameRectSize) - (PlayerWidthRate * GameRectSize))); leftPlayground = true; } //lent
 
                     if (!leftPlayground)
                     {
@@ -209,8 +211,8 @@ namespace FriendshipExploder.Logic
         //Odaléphet-e a játékos
         private bool CanStepToPos(Player player, System.Windows.Vector direction)
         {
-            Rectangle playerPrevRect = new Rectangle(player.Position.X, player.Position.Y, (int)(playerWidthRate * GameRectSize), (int)((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize));
-            Rectangle playerRect = new Rectangle(player.Position.X + (int)direction.X, player.Position.Y + (int)direction.Y, (int)(playerWidthRate * GameRectSize), (int)((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize));
+            Rectangle playerPrevRect = new Rectangle(player.Position.X, player.Position.Y, (int)(PlayerWidthRate * GameRectSize), (int)((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize));
+            Rectangle playerRect = new Rectangle(player.Position.X + (int)direction.X, player.Position.Y + (int)direction.Y, (int)(PlayerWidthRate * GameRectSize), (int)((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize));
             
             int playerCurrentIndexX = (int)Math.Floor((decimal)(player.Position.X / GameRectSize));
             int playerCurrentIndexY = (int)Math.Floor((decimal)(player.Position.Y / GameRectSize));
@@ -282,6 +284,26 @@ namespace FriendshipExploder.Logic
                     break;
             }
             return pl;
+        }
+
+        public void Pause()
+        {
+            GamePaused = true;
+            PausedWindow pausedWindow = new PausedWindow();
+            if (pausedWindow.ShowDialog() == false)
+            {
+                //kilépés
+                System.Windows.Application.Current.Shutdown();
+            }
+            else if (pausedWindow.ActionMainMenu)
+            {
+                //kilépés a menübe
+
+            }
+            else if (pausedWindow.ActionResume)
+            {
+                GamePaused = false;
+            }
         }
 
         //A játékos mozgásának kezdete, a controller hívja meg
@@ -407,7 +429,7 @@ namespace FriendshipExploder.Logic
                     break;
                 case PlayerAction.right:
                 case PlayerAction.D:
-                    if (posX + (playerWidthRate * GameRectSize) + pl.Speed <= ((PlayGroundSize[0] - 1) * GameRectSize) && CanStepToPos(pl, new System.Windows.Vector(pl.Speed, 0)))
+                    if (posX + (PlayerWidthRate * GameRectSize) + pl.Speed <= ((PlayGroundSize[0] - 1) * GameRectSize) && CanStepToPos(pl, new System.Windows.Vector(pl.Speed, 0)))
                     {
                         pl.Move(pl.Speed, 0);
                         pl.HeadDirection = PlayerDirection.right;
@@ -422,7 +444,7 @@ namespace FriendshipExploder.Logic
                         //Itt beadható, ha scheduled, de még nem tudom, hogyan nézem meg, higy le van e nyomva az action is közben
                         Bomb newBomb = pl.Bomb.BombCopy(
                                         new Point(
-                                            (int)Math.Floor((decimal)((pl.Position.X + (playerWidthRate * GameRectSize) / 2) / GameRectSize)),
+                                            (int)Math.Floor((decimal)((pl.Position.X + (PlayerWidthRate * GameRectSize) / 2) / GameRectSize)),
                                             (int)Math.Floor((decimal)((pl.Position.Y + ((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize) / 2) / GameRectSize))),
                                         new ImageBrush(
                                             new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "Bombs", "bomb.png"),

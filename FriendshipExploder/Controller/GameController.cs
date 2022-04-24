@@ -64,6 +64,11 @@ namespace FriendshipExploder.Controller
                 case Key.LeftCtrl:
                     await control.StartAct(GameLogic.PlayerAction.actionwasd);
                     break;
+
+                //Játék megállítása
+                case Key.Escape:
+                    control.Pause();
+                    break;
             }
         }
 
