@@ -84,7 +84,7 @@ namespace FriendshipExploder.Renderer
                 brush = new ImageBrush(new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "Floors", "0_Floor.png"), UriKind.RelativeOrAbsolute)));
                 drawingContext.DrawRectangle(brush, new Pen(Brushes.Black, 0), new Rect(startX, startY, gameRectSize * (gameModel.PlayGroundSize[0] - 1), gameRectSize * (gameModel.PlayGroundSize[1] - 1))); //bal felső
 
-
+                
                 //kockaméret átadása a logic részére
                 gameModel.SetupSize(new System.Drawing.Point((int)size.Width, (int)(size.Height - size.Height * 0.05)), (int)gameRectSize);
 
@@ -144,6 +144,12 @@ namespace FriendshipExploder.Renderer
                 drawingContext.DrawRectangle(brush, new Pen(Brushes.Black, 0), new Rect(size.Width / 2 - (gameRectSize * 1.5), 0, gameRectSize * 3, size.Height * 0.05 + gameRectSize / 2));
                 drawingContext.DrawText(new FormattedText(gameModel.Timer, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Verdana"), 30, Brushes.White, VisualTreeHelper.GetDpi(this).PixelsPerDip), new Point(size.Width / 2 - (30 * 1.5), size.Height * 0.025));
                 //30-ast lecserélni responsive értékre.
+
+                //megállítva
+                if (gameModel.GamePaused)
+                {
+                    drawingContext.DrawRectangle(new SolidColorBrush(Color.FromArgb(200, 0, 0, 0)), null, new Rect(0, 0, size.Width, size.Height));
+                }
             }
         }
     }
