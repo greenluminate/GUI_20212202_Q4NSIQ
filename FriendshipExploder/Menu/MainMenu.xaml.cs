@@ -25,7 +25,7 @@ namespace FriendshipExploder.Menu
         private int activeColumn = 0;
         private int activePlayer = 0;
         private string[] keyBinding = { "[Disabled]", "[Up][Down][Left][Right]", "[W][S][A][D]", "[Ai]" };
-        private int[] playerKeyBinding = { 0, 0, 0};
+        private List<int> playerKeyBinding = Enumerable.Range(0, 3).Select(n => 0).ToList();
         private List<string> playGrounds = new List<string>();
         private int activePlayground = 0;
 
@@ -106,44 +106,43 @@ namespace FriendshipExploder.Menu
         {
             if (increase)
             {
-                if (playerKeyBinding[activePlayer] < 3)
+                if (playerKeyBinding[activePlayer] == keyBinding.Length - 1)
                 {
-                    if(playerKeyBinding.Any(bd => bd == playerKeyBinding[activePlayer] + 1) && (playerKeyBinding[activePlayer] + 1 != 0 || playerKeyBinding[activePlayer] + 1 != 3))
-                    {
-                        //már van
-                        playerKeyBinding[activePlayer] = playerKeyBinding[activePlayer] == 1 ? 2 : 3;
-                    }
-                    else
-                    {
-                        playerKeyBinding[activePlayer]++;
-                    }
+                    playerKeyBinding[activePlayer] = 0;
+                }
+                else if (playerKeyBinding.Any(bd => bd == playerKeyBinding[activePlayer] + 1) &&
+                        playerKeyBinding[activePlayer] + 1 != 0 &&
+                        playerKeyBinding[activePlayer] + 1 != 3)
+                {
+                    //Már ki van osztva az adott keybinding
+                    playerKeyBinding[activePlayer]++;
+                    ChangeKeyBinding(increase);
                 }
                 else
                 {
-                    playerKeyBinding[activePlayer] = 0;
+                    playerKeyBinding[activePlayer]++;
                 }
             }
             else
             {
-                if (playerKeyBinding[activePlayer] > 0)
+                if (playerKeyBinding[activePlayer] == 0)
                 {
-                    if (playerKeyBinding.Any(bd => bd == playerKeyBinding[activePlayer] - 1) && (playerKeyBinding[activePlayer] - 1 != 0 || playerKeyBinding[activePlayer] - 1 != 3))
-                    {
-                        //már van
-                        playerKeyBinding[activePlayer] = playerKeyBinding[activePlayer] == 2 ? 1 : 0;
-                    }
-                    else
-                    {
-                        playerKeyBinding[activePlayer]--;
-                    }
-
+                    playerKeyBinding[activePlayer] = keyBinding.Length - 1;
+                }
+                else if (playerKeyBinding.Any(bd => bd == playerKeyBinding[activePlayer] - 1) &&
+                        playerKeyBinding[activePlayer] - 1 != 0 &&
+                        playerKeyBinding[activePlayer] - 1 != 3)
+                {
+                    //Már ki van osztva az adott keybinding
+                    playerKeyBinding[activePlayer]--;
+                    ChangeKeyBinding(false);
                 }
                 else
                 {
-                    playerKeyBinding[activePlayer] = 3;
+                    playerKeyBinding[activePlayer]--;
                 }
             }
-            
+
             player0KeyBinding.Content = keyBinding[playerKeyBinding[0]];
             player1KeyBinding.Content = keyBinding[playerKeyBinding[1]];
             player2KeyBinding.Content = keyBinding[playerKeyBinding[2]];
@@ -183,7 +182,12 @@ namespace FriendshipExploder.Menu
             switch (e.Key)
             {
                 case Key.Up:
-                    if (activeColumn == 1 && activePlayer > 0)
+                    if (activeColumn == 1 && activePlayer == 0)
+                    {
+                        activePlayer = playerKeyBinding.Count() - 1;
+                        ChangeActivePlayer();
+                    }
+                    else if (activeColumn == 1 && activePlayer > 0)
                     {
                         activePlayer--;
                         ChangeActivePlayer();
@@ -195,9 +199,14 @@ namespace FriendshipExploder.Menu
                     }
                     break;
                 case Key.Down:
-                    if (activeColumn == 1 && activePlayer < 2)
+                    if (activeColumn == 1 && activePlayer < playerKeyBinding.Count() - 1)
                     {
                         activePlayer++;
+                        ChangeActivePlayer();
+                    }
+                    else if (activeColumn == 1)
+                    {
+                        activePlayer = 0;
                         ChangeActivePlayer();
                     }
                     else if (activeColumn == 2 && activePlayground < playGrounds.Count)
@@ -226,42 +235,18 @@ namespace FriendshipExploder.Menu
                     }
                     else if (activeColumn == 2)
                     {
-                        //játék betöltés
-                        if (playerKeyBinding[0] != 0)
-                        {
-                            GameModel.Players.Add(new Player(0, new System.Drawing.Point(0, 0), IntToEnum(playerKeyBinding[0])));
-                        }
-                        if (playerKeyBinding[1] != 0)
-                        {
-                            GameModel.Players.Add(new Player(1, new System.Drawing.Point(0, 20), IntToEnum(playerKeyBinding[1])));
-                        }
-                        if (playerKeyBinding[2] != 0)
-                        {
-                            GameModel.Players.Add(new Player(2, new System.Drawing.Point(0, 40), IntToEnum(playerKeyBinding[2])));
-                        }
+                        //Játékosok létrehozása
+                        playerKeyBinding.Where(bindnum => bindnum != 0)
+                            .ToList()
+                            .ForEach(bindnum => GameModel.Players.Add(
+                                new Player(playerKeyBinding.IndexOf(bindnum),
+                                new System.Drawing.Point(2, playerKeyBinding.IndexOf(bindnum) * 120),
+                                (Model.KeyBinding)bindnum - 1)));
 
+                        //Pálya betöltése
                         GameModel.LoadPlayground(playGrounds[playgrounds.SelectedIndex]);
                         this.DialogResult = true;
                     }
-                    break;
-            }
-        }
-
-        private Model.KeyBinding IntToEnum(int binding)
-        {
-            switch (binding)
-            {
-                case 1:
-                    return Model.KeyBinding.upDownLeftRight;
-                    break;
-                case 2:
-                    return Model.KeyBinding.WSAD;
-                    break;
-                case 3:
-                    return Model.KeyBinding.ai;
-                    break;
-                default:
-                    return Model.KeyBinding.upDownLeftRight;
                     break;
             }
         }
