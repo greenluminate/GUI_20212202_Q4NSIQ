@@ -11,11 +11,49 @@
         Loaded="menu_Loaded"
         KeyDown="menu_KeyDown"
         Title="MainMenu" Height="450" Width="800">
+    <Window.Resources>
+        <Style TargetType="Button" x:Key="roundedbtn">
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="10"/>
+                </Style>
+            </Style.Resources>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="20,20,20,20"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="DimGray"/>
+        </Style>
+        <Style TargetType="Border" x:Key="palyer_border">
+            <Setter Property="BorderBrush" Value="LightGray"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Margin" Value="10,10,10,10"/>
+        </Style>
+        <Style TargetType="Label" x:Key="palyer_lb">
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+        <Style TargetType="Label" x:Key="binding_lb">
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="Content" Value="[Disabled]"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*"></ColumnDefinition>
-            <ColumnDefinition Width="1*"></ColumnDefinition>
-            <ColumnDefinition Width="1*"></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Grid Grid.Column="0" x:Name="firstColumn">
             <Grid.RowDefinitions>
@@ -24,22 +62,8 @@
                 <RowDefinition Height="1*"></RowDefinition>
                 <RowDefinition Height="2*"></RowDefinition>
             </Grid.RowDefinitions>
-            <Button Grid.Row="1" x:Name="newGame" Content="New game" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                       FontSize="20" FontWeight="Bold" Margin="20,20,20,20" Click="NewGame" Foreground="White" Background="DimGray">
-                <Button.Resources>
-                    <Style TargetType="{x:Type Border}">
-                        <Setter Property="CornerRadius" Value="10"/>
-                    </Style>
-                </Button.Resources>
-            </Button>
-            <Button Grid.Row="2" x:Name="exitGame" Content="Exit" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                       FontSize="20" FontWeight="Bold" Margin="20,20,20,20" Click="Exit" Foreground="White" Background="DimGray">
-                <Button.Resources>
-                    <Style TargetType="{x:Type Border}">
-                        <Setter Property="CornerRadius" Value="10"/>
-                    </Style>
-                </Button.Resources>
-            </Button>
+            <Button Grid.Row="1" x:Name="newGame" Content="New game" Style="{StaticResource roundedbtn}" Click="NewGame"/>
+            <Button Grid.Row="2" x:Name="exitGame" Content="Exit" Style="{StaticResource roundedbtn}" Click="Exit"/>
         </Grid>
         <Grid Grid.Column="1" x:Name="secondColumn">
             <Grid.RowDefinitions>
@@ -49,25 +73,25 @@
                 <RowDefinition Height="1*"></RowDefinition>
                 <RowDefinition Height="2*"></RowDefinition>
             </Grid.RowDefinitions>
-            <Border Grid.Row="1" x:Name="player0" BorderBrush="LightGray" BorderThickness="2" Margin="10,10,10,10">
+            <Border Grid.Row="1" x:Name="player0" Style="{StaticResource palyer_border}">
                 <DockPanel>
-                    <Label Content="Player 1" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" FontSize="24" FontWeight="Bold" Foreground="White"/>
-                    <Label x:Name="player0KeyBinding" HorizontalAlignment="Right" Content="[Disabled]" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" FontSize="24" FontWeight="Bold" Foreground="White"/>
+                    <Label Content="Player 1" Style="{StaticResource palyer_lb}"/>
+                    <Label x:Name="player0KeyBinding" Style="{StaticResource binding_lb}"/>
                 </DockPanel>
             </Border>
-            <Border Grid.Row="2" x:Name="player1" BorderBrush="LightGray" BorderThickness="2" Margin="10,10,10,10">
+            <Border Grid.Row="2" x:Name="player1" Style="{StaticResource palyer_border}">
                 <DockPanel>
-                    <Label Content="Player 2" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" FontSize="24" FontWeight="Bold" Foreground="White"/>
-                    <Label x:Name="player1KeyBinding" HorizontalAlignment="Right" Content="[Disabled]" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" FontSize="24" FontWeight="Bold" Foreground="White"/>
+                    <Label Content="Player 2" Style="{StaticResource palyer_lb}"/>
+                    <Label x:Name="player1KeyBinding" Style="{StaticResource binding_lb}"/>
                 </DockPanel>
             </Border>
-            <Border Grid.Row="3" x:Name="player2" BorderBrush="LightGray" BorderThickness="2" Margin="10,10,10,10">
+            <Border Grid.Row="3" x:Name="player2" Style="{StaticResource palyer_border}">
                 <DockPanel>
-                    <Label Content="Player 3" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" FontSize="24" FontWeight="Bold" Foreground="White"/>
-                    <Label x:Name="player2KeyBinding" HorizontalAlignment="Right" Content="[Disabled]" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" FontSize="24" FontWeight="Bold" Foreground="White"/>
+                    <Label Content="Player 3" Style="{StaticResource palyer_lb}"/>
+                    <Label x:Name="player2KeyBinding" Style="{StaticResource binding_lb}"/>
                 </DockPanel>
             </Border>
-            
+
         </Grid>
         <Grid Grid.Column="2" x:Name="thirdColumn">
             <Grid.RowDefinitions>
