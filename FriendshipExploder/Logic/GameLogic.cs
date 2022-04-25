@@ -36,6 +36,7 @@ namespace FriendshipExploder.Logic
 
         public object _ElementsListLockObject { get; set; }
         public object _PlayersListLockObject { get; set; }
+        public object _TimerLockObject { get; set; }
         public double PlayerHeightRate { get; set; }
         public double PlayerHeightRateHangsIn { get; set; }
         public double PlayerWidthRate { get; set; }
@@ -45,6 +46,7 @@ namespace FriendshipExploder.Logic
         {
             _ElementsListLockObject = new object();
             _PlayersListLockObject = new object();
+            _TimerLockObject = new object();
             Players = new List<Player>();
 
             playgrounds = new Queue<string[]>();
@@ -135,7 +137,7 @@ namespace FriendshipExploder.Logic
                         case 'f':
                             lock (_ElementsListLockObject)
                             {
-                                Elements[i,j] = new FixWall(new Point(i, j), new ImageBrush(new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "FixWalls", "0_FixWall.png"), UriKind.RelativeOrAbsolute))));
+                                Elements[i, j] = new FixWall(new Point(i, j), new ImageBrush(new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "FixWalls", "0_FixWall.png"), UriKind.RelativeOrAbsolute))));
                             }
                             break;
                         case 'w':
@@ -159,13 +161,24 @@ namespace FriendshipExploder.Logic
             {
                 DateTime StartTime = new DateTime(1, 1, 1, 0, seconds / 60, seconds % 60);
                 this.Timer = StartTime.ToString(@"mm\:ss");
-                Thread.Sleep(2000);
+                Thread.Sleep(1000);
                 DateTime StartDate = DateTime.Now;
+
                 while (!this.Timer.Equals("00:00"))
                 {
                     if (!GamePaused)
                     {
-                        this.Timer = StartTime.AddSeconds(-(DateTime.Now.Second - StartDate.Second)).ToString(@"mm\:ss");
+                        this.Timer = StartTime.AddSeconds(StartDate.Second - DateTime.Now.Second).ToString(@"mm\:ss");
+                    }
+                    else
+                    {
+                        int stopDifference = StartDate.Second - DateTime.Now.Second;
+
+                        lock (_TimerLockObject)
+                        {
+                            Monitor.Wait(_TimerLockObject);
+                        }
+                        StartDate = DateTime.Now.AddSeconds(stopDifference);
                     }
                 }
             }, TaskCreationOptions.LongRunning);
@@ -185,7 +198,7 @@ namespace FriendshipExploder.Logic
         {
             Rectangle playerPrevRect = new Rectangle(player.Position.X, player.Position.Y, (int)(PlayerWidthRate * GameRectSize), (int)((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize));
             Rectangle playerRect = new Rectangle(player.Position.X + (int)direction.X, player.Position.Y + (int)direction.Y, (int)(PlayerWidthRate * GameRectSize), (int)((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize));
-            
+
             int playerCurrentIndexX = (int)Math.Floor((decimal)(player.Position.X / GameRectSize));
             int playerCurrentIndexY = (int)Math.Floor((decimal)(player.Position.Y / GameRectSize));
 
@@ -220,7 +233,7 @@ namespace FriendshipExploder.Logic
                                 {
                                     canStep = false;
                                 }
-                                
+
                                 //return false;
                             }
                         }
@@ -275,6 +288,10 @@ namespace FriendshipExploder.Logic
             else if (pausedWindow.ActionResume)
             {
                 GamePaused = false;
+                lock (_TimerLockObject)
+                {
+                    Monitor.Pulse(_TimerLockObject);
+                }
             }
         }
 
@@ -348,7 +365,7 @@ namespace FriendshipExploder.Logic
         public async Task StartAct(PlayerAction playerAction, Player ai = null)
         {
             Player pl = ai is null ? GetKeyBindingForPlayer(playerAction) : ai;
-
+            //ToDo: ne reagáljon, ha nincs is iylen keybindinggal rendelkező játékos, vagy nullchech mindenhová
             switch (playerAction)
             {
                 //Bomba lerakása
@@ -503,7 +520,7 @@ namespace FriendshipExploder.Logic
                 Player nearestPlayer = NearestPlayer(ai);
                 //ToDO: ha bomba van a közelében bújjon el.
                 //Az Elements lista = NotAvailablePoints;
-                if (PositionDifference(nearestPlayer, ai) <= 20)//ToDo: ai.Bomb.explosionSize vagy ami lesz
+                if (nearestPlayer != null && PositionDifference(nearestPlayer, ai) <= 20)//ToDo: ai.Bomb.explosionSize vagy ami lesz
                 {
                     //ToDo: Go and Install bomb
                     //ToDo: hide and wait until Explosion + x seconds
@@ -511,6 +528,7 @@ namespace FriendshipExploder.Logic
                 else
                 {
                     //ToDo: follow player
+                    //ToDO: AI javítása nullcheckekkel, ha egyedül lenne mit csináljon.
                     if (nearestPlayer.Position.X - ai.Position.X < 0 && CanStepToPos(ai, new System.Windows.Vector(-1 * ai.Speed, 0)))
                     {
                         StartMove(PlayerAction.left, ai);
@@ -552,8 +570,8 @@ namespace FriendshipExploder.Logic
 
         private Player NearestPlayer(Player ai)
         {
-            return Players.OrderBy(player => PositionDifference(player, ai))
-                          .Where(player => player.Id != ai.Id)
+            return Players.Where(player => player.Id != ai.Id)
+                          .OrderBy(player => PositionDifference(player, ai))
                           .FirstOrDefault();
         }
 
