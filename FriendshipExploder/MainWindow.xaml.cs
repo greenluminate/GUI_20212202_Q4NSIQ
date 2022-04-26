@@ -43,7 +43,10 @@ namespace FriendshipExploder
             display.SetupModel(mainMenuLogic, gameLogic);
 
             MainMenu menu = new MainMenu(gameLogic);
-            menu.ShowDialog();
+            if (menu.ShowDialog() == false)
+            {
+                Application.Current.Shutdown();
+            }
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)

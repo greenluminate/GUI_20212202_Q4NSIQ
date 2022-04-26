@@ -4,13 +4,17 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FriendshipExploder.Menu"
+        xmlns:vms="clr-namespace:FriendshipExploder.Menu"
         mc:Ignorable="d"
         WindowState="Maximized"
         WindowStyle="None"
+        Background="{Binding MenuBackground}"
         x:Name="menu"
-        Loaded="menu_Loaded"
         KeyDown="menu_KeyDown"
         Title="MainMenu" Height="450" Width="800">
+    <Window.DataContext>
+        <vms:MainMenuViewModel/>
+    </Window.DataContext>
     <Window.Resources>
         <Style TargetType="Button" x:Key="roundedbtn">
             <Style.Resources>
@@ -55,52 +59,69 @@
             <ColumnDefinition></ColumnDefinition>
             <ColumnDefinition></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <Grid Grid.Column="0" x:Name="firstColumn">
+        <Grid Grid.Column="0" Opacity="{Binding FirstColumnOpacity}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="2*"></RowDefinition>
                 <RowDefinition Height="1*"></RowDefinition>
                 <RowDefinition Height="1*"></RowDefinition>
                 <RowDefinition Height="2*"></RowDefinition>
             </Grid.RowDefinitions>
-            <Button Grid.Row="1" x:Name="newGame" Content="New game" Style="{StaticResource roundedbtn}" Click="NewGame"/>
-            <Button Grid.Row="2" x:Name="exitGame" Content="Exit" Style="{StaticResource roundedbtn}" Click="Exit"/>
+            <Button Grid.Row="1" IsEnabled="{Binding NewGameEnabled}" Command="{Binding NewGameCommand}" Content="New game" Style="{StaticResource roundedbtn}"/>
+            <Button Grid.Row="2" x:Name="exitGame" IsEnabled="{Binding ExitEnabled}" Content="Exit" Style="{StaticResource roundedbtn}" Click="Exit"/>
         </Grid>
-        <Grid Grid.Column="1" x:Name="secondColumn">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="2*"></RowDefinition>
-                <RowDefinition Height="1*"></RowDefinition>
-                <RowDefinition Height="1*"></RowDefinition>
-                <RowDefinition Height="1*"></RowDefinition>
-                <RowDefinition Height="2*"></RowDefinition>
-            </Grid.RowDefinitions>
-            <Border Grid.Row="1" x:Name="player0" Style="{StaticResource palyer_border}">
-                <DockPanel>
-                    <Label Content="Player 1" Style="{StaticResource palyer_lb}"/>
-                    <Label x:Name="player0KeyBinding" Style="{StaticResource binding_lb}"/>
-                </DockPanel>
-            </Border>
-            <Border Grid.Row="2" x:Name="player1" Style="{StaticResource palyer_border}">
-                <DockPanel>
-                    <Label Content="Player 2" Style="{StaticResource palyer_lb}"/>
-                    <Label x:Name="player1KeyBinding" Style="{StaticResource binding_lb}"/>
-                </DockPanel>
-            </Border>
-            <Border Grid.Row="3" x:Name="player2" Style="{StaticResource palyer_border}">
-                <DockPanel>
-                    <Label Content="Player 3" Style="{StaticResource palyer_lb}"/>
-                    <Label x:Name="player2KeyBinding" Style="{StaticResource binding_lb}"/>
-                </DockPanel>
-            </Border>
-
-        </Grid>
-        <Grid Grid.Column="2" x:Name="thirdColumn">
+        <Grid Grid.Column="1" Opacity="{Binding SecondColumnOpacity}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="1*"></RowDefinition>
                 <RowDefinition Height="2*"></RowDefinition>
+                <RowDefinition Height="0.5*"></RowDefinition>
                 <RowDefinition Height="1*"></RowDefinition>
             </Grid.RowDefinitions>
-            <ListBox x:Name="playgrounds" Grid.Row="1" Background="Transparent" HorizontalContentAlignment="Stretch">
+            <ListBox ItemsSource="{Binding Players}" SelectedItem="{Binding SelectedPlayer}" Grid.Row="1" Margin="10,10,10,10" Background="Transparent" HorizontalContentAlignment="Stretch">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border Style="{StaticResource palyer_border}">
+                            <DockPanel>
+                                <Label Content="{Binding}" Style="{StaticResource palyer_lb}"/>
+                                <ComboBox ItemsSource="{Binding KeyBindings}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Label Content="{Binding}" Style="{StaticResource binding_lb}"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </DockPanel>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
             </ListBox>
+            <Button Grid.Row="2" IsEnabled="{Binding NextEnabled}" Command="{Binding NextCommand}" Content="Next" Style="{StaticResource roundedbtn}"/>
+        </Grid>
+        <Grid Grid.Column="2" Opacity="{Binding ThirdColumnOpacity}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"></RowDefinition>
+                <RowDefinition Height="2*"></RowDefinition>
+                <RowDefinition Height="0.5*"></RowDefinition>
+                <RowDefinition Height="1*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <ListBox ItemsSource="{Binding Playgrounds}" SelectedItem="{Binding SelectedPlayground}" x:Name="playgrounds" Grid.Row="1" Margin="10,10,10,10" Background="Transparent" HorizontalContentAlignment="Stretch">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="LightGray" BorderThickness="2" Margin="10,10,10,10" HorizontalAlignment="Stretch">
+                            <Label Foreground="White" FontSize="24" FontWeight="Bold" Content="{Binding}">
+                            </Label>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <Border Grid.Row="2" BorderBrush="LightGray" BorderThickness="2" Margin="10,10,10,10" HorizontalAlignment="Stretch">
+                <DockPanel>
+                    <Label Foreground="White" FontSize="24" FontWeight="Bold" Content="Rounds:" VerticalAlignment="Center" />
+                    <ComboBox FontSize="24" Width="100" HorizontalAlignment="Right">
+                        <ComboBoxItem>1</ComboBoxItem>
+                        <ComboBoxItem>2</ComboBoxItem>
+                    </ComboBox>
+                </DockPanel>
+            </Border>
         </Grid>
     </Grid>
 </Window>

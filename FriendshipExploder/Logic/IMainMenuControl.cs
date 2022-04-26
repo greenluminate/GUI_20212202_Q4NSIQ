@@ -1,6 +1,6 @@
 ﻿namespace FriendshipExploder.Logic
 {
-    internal interface IMainMenuControl
+    public interface IMainMenuControl
     {
 
     }

@@ -33,56 +33,20 @@ namespace FriendshipExploder.Menu
 
         public MainMenu(IGameModel model)
         {
-            this.GameModel = model;
             InitializeComponent();
-            ChangeColumn();
-            LoadPlaygrounds();
+            (this.DataContext as MainMenuViewModel).SetupLogic(model);
         }
 
+        //Kilépés gomb
         private void Exit(object sender, RoutedEventArgs e)
         {
-            Application.Current.Shutdown();
+            DialogResult = false;
         }
 
-        private void NewGame(object sender, RoutedEventArgs e)
-        {
-            activeColumn = 1;
-            ChangeColumn();
-        }
-
-        private void menu_Loaded(object sender, RoutedEventArgs e)
-        {
-            menu.Background = new ImageBrush(new BitmapImage(new Uri($"pack://application:,,,/Images/GameBackground/0_GameBackground.jpg")));
-        }
-
-        private void ChangeColumn()
-        {
-            switch (activeColumn)
-            {
-                case 0:
-                    firstColumn.Opacity = 1;
-                    secondColumn.Opacity = 0.2;
-                    thirdColumn.Opacity = 0.2;
-                    break;
-                case 1:
-                    ChangeActivePlayer();
-                    firstColumn.Opacity = 0.2;
-                    secondColumn.Opacity = 1;
-                    thirdColumn.Opacity = 0.2;
-                    newGame.IsEnabled = false;
-                    exitGame.IsEnabled = false;
-                    break;
-                case 2:
-                    firstColumn.Opacity = 0.2;
-                    secondColumn.Opacity = 0.2;
-                    thirdColumn.Opacity = 1;
-                    break;
-            }
-        }
 
         private void ChangeActivePlayer()
         {
-            switch (activePlayer)
+            /*switch (activePlayer)
             {
                 case 0:
                     player0.Opacity = 1;
@@ -99,7 +63,7 @@ namespace FriendshipExploder.Menu
                     player1.Opacity = 0.2;
                     player2.Opacity = 1;
                     break;
-            }
+            }*/
         }
 
         private void ChangeKeyBinding(bool increase)
@@ -143,9 +107,9 @@ namespace FriendshipExploder.Menu
                 }
             }
 
-            player0KeyBinding.Content = keyBinding[playerKeyBinding[0]];
+            /*player0KeyBinding.Content = keyBinding[playerKeyBinding[0]];
             player1KeyBinding.Content = keyBinding[playerKeyBinding[1]];
-            player2KeyBinding.Content = keyBinding[playerKeyBinding[2]];
+            player2KeyBinding.Content = keyBinding[playerKeyBinding[2]];*/
         }
 
         private void ChangeActivePlayground()
@@ -153,29 +117,7 @@ namespace FriendshipExploder.Menu
             playgrounds.SelectedIndex = activePlayground;
         }
 
-        private void LoadPlaygrounds()
-        {
-            string[] files = Directory.GetFiles("Playgrounds", "*.txt");
-            foreach (var playground in files)
-            {
-                Border br = new Border();
-                br.BorderBrush = new SolidColorBrush(Colors.LightGray);
-                br.BorderThickness = new Thickness(2);
-                br.Margin = new Thickness(10);
-                br.HorizontalAlignment = HorizontalAlignment.Stretch;
-
-                Label pl = new Label();
-                pl.Foreground = new SolidColorBrush(Colors.White);
-                pl.FontSize = 24;
-                pl.FontWeight = FontWeights.Bold;
-                pl.Content = System.IO.Path.GetFileNameWithoutExtension(@"Playgrounds\" + playground);
-                br.Child = pl;
-
-                playgrounds.Items.Add(br);
-                playGrounds.Add(playground);
-            }
-            playgrounds.SelectedIndex = 0;
-        }
+        
 
         private void menu_KeyDown(object sender, KeyEventArgs e)
         {
@@ -231,7 +173,7 @@ namespace FriendshipExploder.Menu
                     if (activeColumn == 1)
                     {
                         activeColumn++;
-                        ChangeColumn();
+                        //ChangeColumn();
                     }
                     else if (activeColumn == 2)
                     {
