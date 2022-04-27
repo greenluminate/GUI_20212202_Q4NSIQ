@@ -635,20 +635,29 @@ namespace FriendshipExploder.Logic
                     }
 
                     Thread.Sleep(1400);
+
                     lock (_ElementsListLockObject)
                     {
                         Elements[row, col] = null;//Ide jön a logika, hogy melyi skill töltsön be. %-os esélyeket találunk ki.
 
-                        if (playersToKill.Count > 0)
+                    }
+
+                    if (playersToKill.Count > 0)
+                    {
+                        lock (_PlayersListLockObject)
                         {
                             playersToKill.ForEach(player =>
                                 {
-                                    Players.Remove(player);
-                                    pl.Kills++;
+                                    if (player != null)
+                                    {
+                                        Players.Remove(player);
+                                        pl.Kills++;
+                                    }
                                 }
                             );
                         }
                     }
+
                 }, TaskCreationOptions.LongRunning).Start();
             }
         }
