@@ -63,18 +63,18 @@ namespace FriendshipExploder.Logic
             //Későbbi feature lehet: random generált pálya design.
         }
 
-        public void LoadPlayground(string file)
+        public void LoadPlayground(string file, int rounds)
         {
-            if (Directory.Exists("Playgrounds") && File.Exists(file))
+            if (Directory.Exists("Playgrounds") && File.Exists(@$"Playgrounds\{file}.txt"))
             {
-                string[] rows = File.ReadAllLines(file);
+                string[] rows = File.ReadAllLines(@$"Playgrounds\{file}.txt");
 
                 PlayGroundSize[0] = rows[0].Length;
                 PlayGroundSize[1] = rows.Length;
 
                 Elements = new IElement[PlayGroundSize[0], PlayGroundSize[1]];
 
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < rounds; i++)
                 {
                     playgrounds.Enqueue(rows);
                 }

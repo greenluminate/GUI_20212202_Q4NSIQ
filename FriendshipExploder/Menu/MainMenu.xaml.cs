@@ -114,7 +114,7 @@ namespace FriendshipExploder.Menu
 
         private void ChangeActivePlayground()
         {
-            playgrounds.SelectedIndex = activePlayground;
+            //playgrounds.SelectedIndex = activePlayground;
         }
 
         
@@ -186,7 +186,7 @@ namespace FriendshipExploder.Menu
                                 (Model.KeyBinding)bindnum - 1)));
 
                         //Pálya betöltése
-                        GameModel.LoadPlayground(playGrounds[playgrounds.SelectedIndex]);
+                        //GameModel.LoadPlayground(playGrounds[playgrounds.SelectedIndex]);
                         this.DialogResult = true;
                     }
                     break;

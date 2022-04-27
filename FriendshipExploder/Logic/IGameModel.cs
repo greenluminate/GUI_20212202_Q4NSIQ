@@ -22,6 +22,6 @@ namespace FriendshipExploder.Logic
         public double PlayerHeightRateHangsIn { get; set; }
         public double PlayerWidthRate { get; set; }
         public bool GamePaused { get; set; }
-        public void LoadPlayground(string file);
+        public void LoadPlayground(string file, int rounds);
     }
 }
