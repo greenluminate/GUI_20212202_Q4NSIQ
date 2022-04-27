@@ -75,6 +75,7 @@ namespace FriendshipExploder
 
         private void Timer_Tick(object sender, EventArgs e)
         {
+            //ToDo: Monitorozni, hogy csak akkor fusson le, ha nincs másik ablak megnyitva, különben várjon.
             display.InvalidateVisual();
         }
     }

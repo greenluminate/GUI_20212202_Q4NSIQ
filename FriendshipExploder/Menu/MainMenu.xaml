@@ -42,7 +42,7 @@
         </Style>
         <Style TargetType="Label" x:Key="binding_lb">
             <Setter Property="HorizontalAlignment" Value="Right"/>
-            <Setter Property="Content" Value="{Binding Path=[0]}"/>
+            <!--<Setter Property="Content" Value="{Binding Path=[0]}"/>-->
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
             <Setter Property="FontSize" Value="24"/>
@@ -79,10 +79,10 @@
             <Border Grid.Row="1" Style="{StaticResource palyer_border}">
                 <DockPanel>
                     <Label Content="Player 1" Style="{StaticResource palyer_lb}"/>
-                    <ComboBox SelectedIndex="0" IsEnabled="{Binding Player1KeyBindingEnabled}" ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.KeyBindings}" SelectedItem="{Binding Player1SelectedKeyBinding, Mode=TwoWay}">
+                    <ComboBox SelectedIndex="0" IsEnabled="{Binding Player1KeyBindingEnabled}" ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.KeyBindings, Mode=TwoWay}" SelectedItem="{Binding Player1SelectedKeyBinding}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
-                                <Label Content="{Binding}" Style="{StaticResource binding_lb}"/>
+                                <Label Content="{Binding Path=., Mode=TwoWay}" Style="{StaticResource binding_lb}"/>
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
