@@ -90,10 +90,16 @@ namespace FriendshipExploder.Menu
         {
             get { return player1SelectedKeyBinding; }
             set {
-                SetProperty(ref player1SelectedKeyBinding, value);
                 if ((Player2SelectedKeyBinding == value && Player2SelectedKeyBinding != KeyBindings[0]) || (Player3SelectedKeyBinding == value && Player3SelectedKeyBinding != KeyBindings[0]))
                 {
-                    Player1SelectedKeyBinding = KeyBindings[KeyBindings.IndexOf(value) + 1];
+                    SetProperty(ref player1SelectedKeyBinding, "[Ai]");
+
+                    //Player1SelectedKeyBinding = "[Ai]";//KeyBindings[KeyBindings.IndexOf(value) + 1];
+                }
+                else
+                {
+                    
+                    SetProperty(ref player1SelectedKeyBinding, value);
                 }
             }
         }
@@ -203,7 +209,6 @@ namespace FriendshipExploder.Menu
             {
                 BuildPlayers();
                 logic.LoadPlayground(SelectedPlayground, int.Parse(RoundsSelected) + 1);
-                //itt kéne dialogresult = yes-t visszaadni
             }, () => SelectedPlayground != null);
         }
 
