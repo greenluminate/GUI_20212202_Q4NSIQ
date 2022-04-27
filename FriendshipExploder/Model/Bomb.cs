@@ -19,11 +19,14 @@ namespace FriendshipExploder.Model
         public bool IsBouncey { get; set; }//Akadályt érve elindul az ellenkező irányba, amíg fel nem robban. Permanens tulajdonság.
         public int ExplosionRange { get; set; }//1-7 tile long.
 
+        public bool Explode { get; set; }
+
         public Bomb(Player player, BombType type = BombType.Normal)
         {
             this.Type = type;
             this.Player = player;
             this.ExplosionRange = 3;
+            Explode = false;
         }
 
         public Bomb BombCopy(Point position, ImageBrush image, BombType type = BombType.Normal)
@@ -40,7 +43,8 @@ namespace FriendshipExploder.Model
 
         public override bool Equals(object obj)
         {
-            return this.Position.X == (obj as Bomb).Position.X && this.Position.Y == (obj as Bomb).Position.Y;
+            Bomb bomb = (obj as Bomb);
+            return this.Position.X == bomb.Position.X && this.Position.Y == bomb.Position.Y && this.Player == bomb.Player;
         }
     }
 }
