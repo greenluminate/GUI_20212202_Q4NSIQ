@@ -13,12 +13,13 @@ namespace FriendshipExploder.Model
         public int Id { get; set; }
         public Point Position { get; set; }
         public ImageBrush Image { get; set; }
+        public bool Explode { get; set; }
 
         public FixWall(Point position, ImageBrush image)
         {
             Position = position;
             Image = image;
+            Explode = false;
         }
-
     }
 }

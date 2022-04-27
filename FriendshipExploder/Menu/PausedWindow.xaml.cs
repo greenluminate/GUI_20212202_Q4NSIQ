@@ -29,7 +29,7 @@ namespace FriendshipExploder.Menu
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            pausedWindow.Background = new ImageBrush(new BitmapImage(new Uri($"pack://application:,,,/Images/GameBackground/pausedBackground.png")));
+            pausedWindow.Background = new ImageBrush(new BitmapImage(new Uri(System.IO.Path.Combine("..", "..", "..", "Images", "GameBackground", "pausedBackground.png"),UriKind.RelativeOrAbsolute)));
         }
 
         private void Exit(object sender, RoutedEventArgs e)

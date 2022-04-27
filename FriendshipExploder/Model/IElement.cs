@@ -7,5 +7,7 @@ namespace FriendshipExploder.Model
     {
         ImageBrush Image { get; set; }
         public Point Position { get; set; }
+        public bool Explode { get; set; }
+
     }
 }

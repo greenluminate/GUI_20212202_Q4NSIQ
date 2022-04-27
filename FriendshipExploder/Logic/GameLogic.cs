@@ -16,6 +16,8 @@ namespace FriendshipExploder.Logic
 {
     public class GameLogic : IGameModel, IGameControl
     {
+        public enum ElementType { Bomb, FixWall, Floor, Player, Wall }
+
         private Queue<string[]> playgrounds; //path-okat tartalmaz, előre generált pálxák? //Mert vagy beletesszük ak iválaszott pályát választott meccs számszor, vagy előre legeneráljuk a random pélykat, csak beletesszük, hogy melyik fix és melyik, mely random. VAgy kuka az egész és mindig más laapján generálunk random.
         //Lehet ide kéne betenn ia köztes képernyőket is pl.: MainMenu, playground, who win image, curren leaderboard image, next playground és így körbe.
 
@@ -98,30 +100,33 @@ namespace FriendshipExploder.Logic
             if (GameRectSize != 0)
             {
                 int corrigSize = gameRectSize - this.GameRectSize;
-                Players.ForEach(x =>
+                lock (_PlayersListLockObject)
                 {
-                    bool leftPlayground = false;
-
-                    if (x.Position.X + corrigSize < 0) { x.SetPos(0, x.Position.Y); leftPlayground = true; } //bal
-                    else if (x.Position.X + (PlayerWidthRate * GameRectSize) + corrigSize > (PlayGroundSize[0] - 1) * GameRectSize) { x.SetPos((int)(((PlayGroundSize[0] - 1) * GameRectSize) - (PlayerWidthRate * GameRectSize)), x.Position.Y); leftPlayground = true; } //jobb
-
-                    if (x.Position.Y + corrigSize < 0) { x.SetPos(x.Position.X, 0); leftPlayground = true; } //fent
-                    else if (x.Position.Y + (PlayerHeightRate * gameRectSize) + corrigSize > (PlayGroundSize[1] - 1) * GameRectSize) { x.SetPos(x.Position.X, (int)(((PlayGroundSize[1] - 1) * GameRectSize) - (PlayerWidthRate * GameRectSize))); leftPlayground = true; } //lent
-
-                    if (!leftPlayground)
+                    Players.ForEach(x =>
                     {
-                        if (CanStepToPos(x, new System.Windows.Vector(corrigSize, corrigSize)))
+                        bool leftPlayground = false;
+
+                        if (x.Position.X + corrigSize < 0) { x.SetPos(0, x.Position.Y); leftPlayground = true; } //bal
+                        else if (x.Position.X + (PlayerWidthRate * GameRectSize) + corrigSize > (PlayGroundSize[0] - 1) * GameRectSize) { x.SetPos((int)(((PlayGroundSize[0] - 1) * GameRectSize) - (PlayerWidthRate * GameRectSize)), x.Position.Y); leftPlayground = true; } //jobb
+
+                        if (x.Position.Y + corrigSize < 0) { x.SetPos(x.Position.X, 0); leftPlayground = true; } //fent
+                        else if (x.Position.Y + (PlayerHeightRate * gameRectSize) + corrigSize > (PlayGroundSize[1] - 1) * GameRectSize) { x.SetPos(x.Position.X, (int)(((PlayGroundSize[1] - 1) * GameRectSize) - (PlayerWidthRate * GameRectSize))); leftPlayground = true; } //lent
+
+                        if (!leftPlayground)
                         {
-                            x.Move(corrigSize, corrigSize);
+                            if (CanStepToPos(x, new System.Windows.Vector(corrigSize, corrigSize)))
+                            {
+                                x.Move(corrigSize, corrigSize);
+                            }
+                            else
+                            {
+                                int cellX = x.Position.X / GameRectSize;
+                                int cellY = x.Position.Y / GameRectSize;
+                                x.SetPos(cellX * gameRectSize + (gameRectSize / 2), cellY * gameRectSize + (gameRectSize / 2));
+                            }
                         }
-                        else
-                        {
-                            int cellX = x.Position.X / GameRectSize;
-                            int cellY = x.Position.Y / GameRectSize;
-                            x.SetPos(cellX * gameRectSize + (gameRectSize / 2), cellY * gameRectSize + (gameRectSize / 2));
-                        }
-                    }
-                });
+                    });
+                }
             }
         }
 
@@ -428,7 +433,7 @@ namespace FriendshipExploder.Logic
                 //Bomba lerakása
                 case PlayerAction.bombudlr:
                 case PlayerAction.bombwasd:
-                    ExplosionStarter(pl);
+                    BombThreadStarter(pl);
                     break;
 
                 //Action
@@ -438,7 +443,7 @@ namespace FriendshipExploder.Logic
             }
         }
 
-        private async void ExplosionStarter(Player pl)
+        private void BombThreadStarter(Player pl)
         {
             if (pl.BombList.Count < pl.BombAmount)
             {
@@ -464,7 +469,7 @@ namespace FriendshipExploder.Logic
                     Elements[i, j] = newBomb;
                 }
 
-                new Task(() =>
+                new Task(async () =>
                 {
                     Thread.Sleep(3000);//x másodperc múlva robban a bomba
                     Bomb bomb = null;
@@ -475,16 +480,17 @@ namespace FriendshipExploder.Logic
                         //bomb = (Bomb)Array.Find(Elements, bomb => bomb.Equals(newBomb));
                     }
 
-                    ImageBrush explosionImg = new ImageBrush(
-                                        new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "FireParts", "explosion.png"),
-                                        UriKind.RelativeOrAbsolute)));
+                    //ImageBrush explosionImg = new ImageBrush(
+                    //                    new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "FireParts", "explosion.png"),
+                    //                    UriKind.RelativeOrAbsolute)));
 
                     if (bomb != null)
                     {
-                        bomb.Image = explosionImg;
+                        //bomb.Image = explosionImg;
+                        bomb.Explode = true;
                     }
 
-                    newBomb.Image.Freeze();
+                    //newBomb.Image.Freeze();
                     //ToDO: ha a karakter rajtamard, akkro is haljon meg. IDe.
                     int explsoionRange = pl.Bomb.ExplosionRange;
 
@@ -496,7 +502,8 @@ namespace FriendshipExploder.Logic
                         {
                             if (row < Elements.GetLength(0))
                             {
-                                ExplosionEffects(row, j, bomb, explosionImg);
+                                ExplosionEffects(row, j, bomb, pl);
+                                //ExplosionEffects(row, j, bomb, explosionImg, pl);
                                 if (BombStopper(row, j))
                                 {
                                     break;
@@ -510,7 +517,8 @@ namespace FriendshipExploder.Logic
                         {
                             if (row >= 0)
                             {
-                                ExplosionEffects(row, j, bomb, explosionImg);
+                                //ExplosionEffects(row, j, bomb, explosionImg, pl);
+                                ExplosionEffects(row, j, bomb, pl);
                                 if (BombStopper(row, j))
                                 {
                                     break;
@@ -525,7 +533,8 @@ namespace FriendshipExploder.Logic
                         {
                             if (col < Elements.GetLength(1))
                             {
-                                ExplosionEffects(i, col, bomb, explosionImg);
+                                //ExplosionEffects(i, col, bomb, explosionImg, pl);
+                                ExplosionEffects(i, col, bomb, pl);
                                 if (BombStopper(i, col))
                                 {
                                     break;
@@ -540,7 +549,8 @@ namespace FriendshipExploder.Logic
                         {
                             if (col >= 0)
                             {
-                                ExplosionEffects(i, col, bomb, explosionImg);
+                                //ExplosionEffects(i, col, bomb, explosionImg, pl);
+                                ExplosionEffects(i, col, bomb, pl);
 
                                 if (BombStopper(i, col))
                                 {
@@ -551,25 +561,35 @@ namespace FriendshipExploder.Logic
                     }));
 
                     Parallel.ForEach(explosionTasks, t => t.Start());
-
-                    Thread.Sleep(1500);
-
-                    lock (pl._bombListLockObject)
-                    {
-                        pl.BombList.Remove(newBomb);
-                    }
-
-                    lock (_ElementsListLockObject)
-                    {
-                        Elements[i, j] = null;
-                        //Elements.Remove(bomb);
-                    }
+                    await Task.Delay(1);//Ez nem megoldás.
+                    Trigger(pl, newBomb, i, j, 1500);
 
                 }, TaskCreationOptions.LongRunning).Start();
             }
         }
 
-        private void ExplosionEffects(int row, int col, Bomb bomb, ImageBrush image)
+        private void Trigger(Player pl, Bomb newBomb, int i, int j, int millisec)
+        {
+            Thread.Sleep(millisec);
+
+            lock (pl._bombListLockObject)
+            {
+                if (pl.BombList.Contains(newBomb))
+                {
+                    pl.BombList.Remove(newBomb);
+                }
+            }
+
+            lock (_ElementsListLockObject)
+            {
+                if (Elements[i, j] != null && (Elements[i, j] as Bomb).Equals(newBomb))
+                {
+                    Elements[i, j] = null;
+                }
+            }
+        }
+
+        private void ExplosionEffects(int row, int col, Bomb bomb, Player pl)//ImageBrush image,
         {
             if (!(Elements[row, col] is FixWall))
             {
@@ -585,9 +605,10 @@ namespace FriendshipExploder.Logic
                                 (int)Math.Floor((decimal)(player.Position.Y / GameRectSize)) == col)
                                 .ToList();
 
-                        if (playersToKill.Count == 0)
+                        if (playersToKill.Count == 0 && bomb != null)
                         {
-                            Elements[row, col] = bomb.BombCopy(new Point(row, col), bomb.Image);
+                            bomb.Explode = true;
+                            Elements[row, col] = bomb;
                         }
 
                         playersToKill.ForEach(player =>
@@ -603,28 +624,40 @@ namespace FriendshipExploder.Logic
                     else if (Elements[row, col] is Bomb t)
                     {
                         //Mivel másik bombát is ért a robbanás ezért az is felrobban.
-                        ExplosionStarter(t.Player);
+                        //ToDo: ez így nem jó, triggerelni kell a robbanását, nem újrakezdeni. Ami miatt kétszer akarna felrobbanni.
+                        Trigger(t.Player, t, row, col, 1);
                     }
                     else if (Elements[row, col] is Wall)//ToDo: || Elements[row, col] is Skill/Booster   ami lesz a neve
                     {
-                        Elements[row, col].Image = image;
-                        Elements[row, col].Image.Freeze();
+                        //Elements[row, col].Image = image;
+                        //Elements[row, col].Image.Freeze();
+                        //Elements[row, col].Image.Freeze();
                     }
 
                     Thread.Sleep(1400);
+
                     lock (_ElementsListLockObject)
                     {
-                        Elements[row, col] = null;//Ide jön a logika, hogy melyi skill töltsön be. 100%-os esélyeket találunk ki.
+                        Elements[row, col] = null;//Ide jön a logika, hogy melyi skill töltsön be. %-os esélyeket találunk ki.
 
-                        if (playersToKill.Count > 0)
+                    }
+
+                    if (playersToKill.Count > 0)
+                    {
+                        lock (_PlayersListLockObject)
                         {
                             playersToKill.ForEach(player =>
                                 {
-                                    Players.Remove(player);
+                                    if (player != null)
+                                    {
+                                        Players.Remove(player);
+                                        pl.Kills++;
+                                    }
                                 }
                             );
                         }
                     }
+
                 }, TaskCreationOptions.LongRunning).Start();
             }
         }

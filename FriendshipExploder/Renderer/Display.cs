@@ -84,7 +84,7 @@ namespace FriendshipExploder.Renderer
                 brush = new ImageBrush(new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "Floors", "0_Floor.png"), UriKind.RelativeOrAbsolute)));
                 drawingContext.DrawRectangle(brush, new Pen(Brushes.Black, 0), new Rect(startX, startY, gameRectSize * (gameModel.PlayGroundSize[0] - 1), gameRectSize * (gameModel.PlayGroundSize[1] - 1))); //bal felső
 
-                
+
                 //kockaméret átadása a logic részére
                 gameModel.SetupSize(new System.Drawing.Point((int)size.Width, (int)(size.Height - size.Height * 0.05)), (int)gameRectSize);
 
@@ -100,55 +100,81 @@ namespace FriendshipExploder.Renderer
                             {
                                 double x = startX + i * gameRectSize;
                                 double y = startY + j * gameRectSize;
+                                if (gameModel.Elements[i, j].GetType().Name == "Bomb")
+                                {
+                                    if (gameModel.Elements[i, j].Explode)
+                                    {
+                                        drawingContext.DrawRectangle(
+                                            new ImageBrush(
+                                            new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "FireParts", "explosion.png"),
+                                            UriKind.RelativeOrAbsolute))),
+                                            new Pen(Brushes.Black, 0),
+                                            new Rect(x, y, gameRectSize, gameRectSize)
+                                        );
+                                    }
+                                    else
+                                    {
+                                        drawingContext.DrawRectangle(
+                                            new ImageBrush(
+                                            new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "Bombs", "bomb.png"),
+                                            UriKind.RelativeOrAbsolute))),
+                                            new Pen(Brushes.Black, 0),
+                                            new Rect(x, y, gameRectSize, gameRectSize)
+                                        );
+                                    }
+                                }
+                                else
+                                {
+                                    drawingContext.DrawRectangle(
+                                        gameModel.Elements[i, j].Image,//ToDo: Nem szabad így tárolni és használni, mert nem jó a többszálas futásnál.
+                                        new Pen(Brushes.Black, 0),
+                                        new Rect(x, y, gameRectSize, gameRectSize)
+                                    );
+                                }
+
+                            }
+                            /*foreach (var element in gameModel.Elements)
+                            {
+                                double x = startX + element.Position.X * gameRectSize;
+                                double y = startY + element.Position.Y * gameRectSize;
 
                                 drawingContext.DrawRectangle(
-                                    gameModel.Elements[i, j].Image,
+                                    element.Image,
                                     new Pen(Brushes.Black, 0),
                                     new Rect(x, y, gameRectSize, gameRectSize)
                                 );
+                            }*/
+                        }
+                        //játékosok kirajzolása
+                        lock (gameModel._PlayersListLockObject)
+                        {
+                            foreach (var player in gameModel.Players)
+                            {
+                                double x = startX + player.Position.X;
+                                double y = startY + player.Position.Y;
+
+                                string dir = player.HeadDirection.ToString();
+                                ImageBrush playerImage = new ImageBrush(new BitmapImage(new Uri(System.IO.Path.Combine("..", "..", "..", "Images", "Players", $"{player.Id}_player_{dir}.png"), UriKind.RelativeOrAbsolute)));
+
+                                drawingContext.DrawRectangle(
+                                    playerImage,
+                                    new Pen(Brushes.Black, 0),
+                                    new Rect(x, y - (gameRectSize * gameModel.PlayerHeightRateHangsIn), gameModel.PlayerWidthRate * gameRectSize, gameModel.PlayerHeightRate * gameRectSize)
+                                //new Rect(x - gameRectSize * playerHeightRate / 4, y - gameRectSize * playerHeightRate / 4, gameRectSize * playerWidthRate, gameRectSize * playerHeightRate)
+                                );
                             }
                         }
+                        brush = new ImageBrush(new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "GameBackground", "0_timerbg.png"), UriKind.RelativeOrAbsolute)));
+                        drawingContext.DrawRectangle(brush, new Pen(Brushes.Black, 0), new Rect(size.Width / 2 - (gameRectSize * 1.5), 0, gameRectSize * 3, size.Height * 0.05 + gameRectSize / 2));
+                        drawingContext.DrawText(new FormattedText(gameModel.Timer, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Verdana"), 30, Brushes.White, VisualTreeHelper.GetDpi(this).PixelsPerDip), new Point(size.Width / 2 - (30 * 1.5), size.Height * 0.025));
+                        //30-ast lecserélni responsive értékre.
+
+                        //megállítva
+                        if (gameModel.GamePaused)
+                        {
+                            drawingContext.DrawRectangle(new SolidColorBrush(Color.FromArgb(200, 0, 0, 0)), null, new Rect(0, 0, size.Width, size.Height));
+                        }
                     }
-                    /*foreach (var element in gameModel.Elements)
-                    {
-                        double x = startX + element.Position.X * gameRectSize;
-                        double y = startY + element.Position.Y * gameRectSize;
-
-                        drawingContext.DrawRectangle(
-                            element.Image,
-                            new Pen(Brushes.Black, 0),
-                            new Rect(x, y, gameRectSize, gameRectSize)
-                        );
-                    }*/
-                }
-                //játékosok kirajzolása
-                lock (gameModel._PlayersListLockObject)
-                {
-                    foreach (var player in gameModel.Players)
-                    {
-                        double x = startX + player.Position.X;
-                        double y = startY + player.Position.Y;
-
-                        string dir = player.HeadDirection.ToString();
-                        ImageBrush playerImage = new ImageBrush(new BitmapImage(new Uri($"pack://application:,,,/Images/Players/{player.Id}_player_{dir}.png")));
-
-                        drawingContext.DrawRectangle(
-                            playerImage,
-                            new Pen(Brushes.Black, 0),
-                            new Rect(x, y - (gameRectSize * gameModel.PlayerHeightRateHangsIn), gameModel.PlayerWidthRate * gameRectSize, gameModel.PlayerHeightRate * gameRectSize)
-                        //new Rect(x - gameRectSize * playerHeightRate / 4, y - gameRectSize * playerHeightRate / 4, gameRectSize * playerWidthRate, gameRectSize * playerHeightRate)
-                        );
-                    }
-                }
-                brush = new ImageBrush(new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "GameBackground", "0_timerbg.png"), UriKind.RelativeOrAbsolute)));
-                drawingContext.DrawRectangle(brush, new Pen(Brushes.Black, 0), new Rect(size.Width / 2 - (gameRectSize * 1.5), 0, gameRectSize * 3, size.Height * 0.05 + gameRectSize / 2));
-                drawingContext.DrawText(new FormattedText(gameModel.Timer, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Verdana"), 30, Brushes.White, VisualTreeHelper.GetDpi(this).PixelsPerDip), new Point(size.Width / 2 - (30 * 1.5), size.Height * 0.025));
-                //30-ast lecserélni responsive értékre.
-
-                //megállítva
-                if (gameModel.GamePaused)
-                {
-                    drawingContext.DrawRectangle(new SolidColorBrush(Color.FromArgb(200, 0, 0, 0)), null, new Rect(0, 0, size.Width, size.Height));
                 }
             }
         }

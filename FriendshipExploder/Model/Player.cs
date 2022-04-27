@@ -31,7 +31,9 @@ namespace FriendshipExploder.Model
         public List<Bomb> BombList { get; set; }//Időzített robbantáskor innen kikeresve robban fel az összes időzítetten lerakott bomba.
         public int BombAmount { get; set; } //1-5 db bombája lehet a játékosnak a pályán egyszerre.
         public bool CanKick { get; set; } //Amikor a játékos megnyom egy adott gombot a bomba felé fordulva, előtte állva, a bomba addig halad, amíg akadályt nem ér.
-        public bool CanSchedule { get; private set; } //Csak akkor tehet le gomb kombinációval időzített bombát, ha képes ilyenre.
+        public bool CanSchedule { get; set; } //Csak akkor tehet le gomb kombinációval időzített bombát, ha képes ilyenre.
+        public int Kills { get; set; }
+
         public object _bombListLockObject;
 
         public Player(int id, Point position, KeyBinding keyBinding)
@@ -46,6 +48,7 @@ namespace FriendshipExploder.Model
             BombList = new List<Bomb>();
             _bombListLockObject = new object();
             BombAmount = 1;
+            Kills = 0;//Lehet azelőző körös killszámot át kéne adni, de nem feltélen, sőt külön fájlba is menthetnénk a körök között az addigi killeket, vagy mindegy hová.
         }
 
         public void SetupKeyBinding(int binding)
