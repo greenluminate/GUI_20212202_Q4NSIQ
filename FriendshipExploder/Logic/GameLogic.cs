@@ -433,7 +433,7 @@ namespace FriendshipExploder.Logic
                 //Bomba lerakása
                 case PlayerAction.bombudlr:
                 case PlayerAction.bombwasd:
-                    ExplosionStarter(pl);
+                    BombThreadStarter(pl);
                     break;
 
                 //Action
@@ -443,7 +443,7 @@ namespace FriendshipExploder.Logic
             }
         }
 
-        private async void ExplosionStarter(Player pl)
+        private void BombThreadStarter(Player pl)
         {
             if (pl.BombList.Count < pl.BombAmount)
             {
@@ -469,7 +469,7 @@ namespace FriendshipExploder.Logic
                     Elements[i, j] = newBomb;
                 }
 
-                new Task(() =>
+                new Task(async () =>
                 {
                     Thread.Sleep(3000);//x másodperc múlva robban a bomba
                     Bomb bomb = null;
@@ -561,22 +561,31 @@ namespace FriendshipExploder.Logic
                     }));
 
                     Parallel.ForEach(explosionTasks, t => t.Start());
-
-                    Thread.Sleep(1500);
-
-                    lock (pl._bombListLockObject)
-                    {
-                        pl.BombList.Remove(newBomb);
-                    }
-
-                    lock (_ElementsListLockObject)
-                    {
-                        //Elements[i, j].Image = null;
-                        Elements[i, j] = null;
-                        //Elements.Remove(bomb);
-                    }
+                    await Task.Delay(1);//Ez nem megoldás.
+                    Trigger(pl, newBomb, i, j, 1500);
 
                 }, TaskCreationOptions.LongRunning).Start();
+            }
+        }
+
+        private void Trigger(Player pl, Bomb newBomb, int i, int j, int millisec)
+        {
+            Thread.Sleep(millisec);
+
+            lock (pl._bombListLockObject)
+            {
+                if (pl.BombList.Contains(newBomb))
+                {
+                    pl.BombList.Remove(newBomb);
+                }
+            }
+
+            lock (_ElementsListLockObject)
+            {
+                if (Elements[i, j] != null && (Elements[i, j] as Bomb).Equals(newBomb))
+                {
+                    Elements[i, j] = null;
+                }
             }
         }
 
@@ -596,7 +605,7 @@ namespace FriendshipExploder.Logic
                                 (int)Math.Floor((decimal)(player.Position.Y / GameRectSize)) == col)
                                 .ToList();
 
-                        if (playersToKill.Count == 0)
+                        if (playersToKill.Count == 0 && bomb != null)
                         {
                             bomb.Explode = true;
                             Elements[row, col] = bomb;
@@ -616,7 +625,7 @@ namespace FriendshipExploder.Logic
                     {
                         //Mivel másik bombát is ért a robbanás ezért az is felrobban.
                         //ToDo: ez így nem jó, triggerelni kell a robbanását, nem újrakezdeni. Ami miatt kétszer akarna felrobbanni.
-                        ExplosionStarter(t.Player);
+                        Trigger(t.Player, t, row, col, 1);
                     }
                     else if (Elements[row, col] is Wall)//ToDo: || Elements[row, col] is Skill/Booster   ami lesz a neve
                     {
@@ -628,7 +637,7 @@ namespace FriendshipExploder.Logic
                     Thread.Sleep(1400);
                     lock (_ElementsListLockObject)
                     {
-                        Elements[row, col] = null;//Ide jön a logika, hogy melyi skill töltsön be. 100%-os esélyeket találunk ki.
+                        Elements[row, col] = null;//Ide jön a logika, hogy melyi skill töltsön be. %-os esélyeket találunk ki.
 
                         if (playersToKill.Count > 0)
                         {
