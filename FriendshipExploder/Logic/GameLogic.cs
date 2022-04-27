@@ -496,7 +496,7 @@ namespace FriendshipExploder.Logic
                         {
                             if (row < Elements.GetLength(0))
                             {
-                                ExplosionEffects(row, j, bomb, explosionImg);
+                                ExplosionEffects(row, j, bomb, explosionImg, pl);
                                 if (BombStopper(row, j))
                                 {
                                     break;
@@ -510,7 +510,7 @@ namespace FriendshipExploder.Logic
                         {
                             if (row >= 0)
                             {
-                                ExplosionEffects(row, j, bomb, explosionImg);
+                                ExplosionEffects(row, j, bomb, explosionImg, pl);
                                 if (BombStopper(row, j))
                                 {
                                     break;
@@ -525,7 +525,7 @@ namespace FriendshipExploder.Logic
                         {
                             if (col < Elements.GetLength(1))
                             {
-                                ExplosionEffects(i, col, bomb, explosionImg);
+                                ExplosionEffects(i, col, bomb, explosionImg, pl);
                                 if (BombStopper(i, col))
                                 {
                                     break;
@@ -540,7 +540,7 @@ namespace FriendshipExploder.Logic
                         {
                             if (col >= 0)
                             {
-                                ExplosionEffects(i, col, bomb, explosionImg);
+                                ExplosionEffects(i, col, bomb, explosionImg, pl);
 
                                 if (BombStopper(i, col))
                                 {
@@ -569,7 +569,7 @@ namespace FriendshipExploder.Logic
             }
         }
 
-        private void ExplosionEffects(int row, int col, Bomb bomb, ImageBrush image)
+        private void ExplosionEffects(int row, int col, Bomb bomb, ImageBrush image, Player pl)
         {
             if (!(Elements[row, col] is FixWall))
             {
@@ -603,6 +603,7 @@ namespace FriendshipExploder.Logic
                     else if (Elements[row, col] is Bomb t)
                     {
                         //Mivel másik bombát is ért a robbanás ezért az is felrobban.
+                        //ToDo: ez így nem jó, triggerelni kell a robbanását, nem újrakezdeni. Ami miatt kétszer akarna felrobbanni.
                         ExplosionStarter(t.Player);
                     }
                     else if (Elements[row, col] is Wall)//ToDo: || Elements[row, col] is Skill/Booster   ami lesz a neve
@@ -621,6 +622,7 @@ namespace FriendshipExploder.Logic
                             playersToKill.ForEach(player =>
                                 {
                                     Players.Remove(player);
+                                    pl.Kills++;
                                 }
                             );
                         }
