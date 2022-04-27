@@ -154,7 +154,7 @@ namespace FriendshipExploder.Renderer
                                 double y = startY + player.Position.Y;
 
                                 string dir = player.HeadDirection.ToString();
-                                ImageBrush playerImage = new ImageBrush(new BitmapImage(new Uri($"pack://application:,,,/Images/Players/{player.Id}_player_{dir}.png")));
+                                ImageBrush playerImage = new ImageBrush(new BitmapImage(new Uri(System.IO.Path.Combine("..", "..", "..", "Images", "Players", $"{player.Id}_player_{dir}.png"), UriKind.RelativeOrAbsolute)));
 
                                 drawingContext.DrawRectangle(
                                     playerImage,
