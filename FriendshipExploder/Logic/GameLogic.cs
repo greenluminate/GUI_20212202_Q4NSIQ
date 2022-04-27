@@ -428,65 +428,7 @@ namespace FriendshipExploder.Logic
                 //Bomba lerakása
                 case PlayerAction.bombudlr:
                 case PlayerAction.bombwasd:
-                    if (pl.BombList.Count < pl.BombAmount)
-                    {
-                        //Itt beadható, ha scheduled, de még nem tudom, hogyan nézem meg, higy le van e nyomva az action is közben
-                        Bomb newBomb = pl.Bomb.BombCopy(
-                                        new Point(
-                                            (int)Math.Floor((decimal)((pl.Position.X + (PlayerWidthRate * GameRectSize) / 2) / GameRectSize)),
-                                            (int)Math.Floor((decimal)((pl.Position.Y + ((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize) / 2) / GameRectSize))),
-                                        new ImageBrush(
-                                            new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "Bombs", "bomb.png"),
-                                            UriKind.RelativeOrAbsolute))));
-                        lock (pl._bombListLockObject)
-                        {
-                            pl.BombList.Add(newBomb);
-                        }
-
-                        int i = (int)Math.Floor((decimal)(pl.Position.X / GameRectSize));
-                        int j = (int)Math.Floor((decimal)(pl.Position.Y / GameRectSize));
-
-
-                        lock (_ElementsListLockObject)
-                        {
-                            Elements[i, j] = newBomb;
-                        }
-
-                        new Task(() =>
-                        {
-                            Thread.Sleep(3000);//x másodperc múlva robba na bomba
-                            Bomb bomb = null;
-
-                            lock (_ElementsListLockObject)
-                            {
-                                bomb = (Bomb)Elements[i, j];
-                                //bomb = (Bomb)Array.Find(Elements, bomb => bomb.Equals(newBomb));
-                            }
-
-                            if (bomb != null)
-                            {
-                                bomb.Image = new ImageBrush(
-                                                new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "FireParts", "explosion.png"),
-                                                UriKind.RelativeOrAbsolute)));
-                            }
-
-                            newBomb.Image.Freeze();
-                            Thread.Sleep(500);
-
-                            lock (pl._bombListLockObject)
-                            {
-                                pl.BombList.Remove(newBomb);
-                            }
-
-                            lock (_ElementsListLockObject)
-                            {
-                                Elements[i, j] = null;
-                                //Elements.Remove(bomb);
-                            }
-
-                        }, TaskCreationOptions.LongRunning).Start();
-                    }
-                    //Rövid taskkal felrobbantani.
+                    ExplosionStarter(pl);
                     break;
 
                 //Action
@@ -496,6 +438,204 @@ namespace FriendshipExploder.Logic
             }
         }
 
+        private async void ExplosionStarter(Player pl)
+        {
+            if (pl.BombList.Count < pl.BombAmount)
+            {
+                //Itt beadható, ha scheduled, de még nem tudom, hogyan nézem meg, higy le van e nyomva az action is közben
+                Bomb newBomb = pl.Bomb.BombCopy(
+                                new Point(
+                                    (int)Math.Floor((decimal)((pl.Position.X + (PlayerWidthRate * GameRectSize) / 2) / GameRectSize)),
+                                    (int)Math.Floor((decimal)((pl.Position.Y + ((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize) / 2) / GameRectSize))),
+                                new ImageBrush(
+                                    new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "Bombs", "bomb.png"),
+                                    UriKind.RelativeOrAbsolute))));
+                lock (pl._bombListLockObject)
+                {
+                    pl.BombList.Add(newBomb);
+                }
+
+                int i = (int)Math.Floor((decimal)(pl.Position.X / GameRectSize));
+                int j = (int)Math.Floor((decimal)(pl.Position.Y / GameRectSize));
+
+
+                lock (_ElementsListLockObject)
+                {
+                    Elements[i, j] = newBomb;
+                }
+
+                new Task(() =>
+                {
+                    Thread.Sleep(3000);//x másodperc múlva robban a bomba
+                    Bomb bomb = null;
+
+                    lock (_ElementsListLockObject)
+                    {
+                        bomb = (Bomb)Elements[i, j];
+                        //bomb = (Bomb)Array.Find(Elements, bomb => bomb.Equals(newBomb));
+                    }
+
+                    ImageBrush explosionImg = new ImageBrush(
+                                        new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "FireParts", "explosion.png"),
+                                        UriKind.RelativeOrAbsolute)));
+
+                    if (bomb != null)
+                    {
+                        bomb.Image = explosionImg;
+                    }
+
+                    newBomb.Image.Freeze();
+                    //ToDO: ha a karakter rajtamard, akkro is haljon meg. IDe.
+                    int explsoionRange = pl.Bomb.ExplosionRange;
+
+                    List<Task> explosionTasks = new List<Task>();
+
+                    explosionTasks.Add(new Task(() =>
+                    {
+                        for (int row = i + 1; row <= i + explsoionRange; row++)
+                        {
+                            if (row < Elements.GetLength(0))
+                            {
+                                ExplosionEffects(row, j, bomb, explosionImg);
+                                if (BombStopper(row, j))
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                    }));
+                    explosionTasks.Add(new Task(() =>
+                    {
+                        for (int row = i - 1; row >= i - explsoionRange; row--)
+                        {
+                            if (row >= 0)
+                            {
+                                ExplosionEffects(row, j, bomb, explosionImg);
+                                if (BombStopper(row, j))
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                    }));
+
+                    explosionTasks.Add(new Task(() =>
+                    {
+                        for (int col = j + 1; col <= j + explsoionRange; col++)
+                        {
+                            if (col < Elements.GetLength(1))
+                            {
+                                ExplosionEffects(i, col, bomb, explosionImg);
+                                if (BombStopper(i, col))
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                    }));
+
+                    explosionTasks.Add(new Task(() =>
+                    {
+                        for (int col = j - 1; col >= j - explsoionRange; col--)
+                        {
+                            if (col >= 0)
+                            {
+                                ExplosionEffects(i, col, bomb, explosionImg);
+
+                                if (BombStopper(i, col))
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                    }));
+
+                    Parallel.ForEach(explosionTasks, t => t.Start());
+
+                    Thread.Sleep(1500);
+
+                    lock (pl._bombListLockObject)
+                    {
+                        pl.BombList.Remove(newBomb);
+                    }
+
+                    lock (_ElementsListLockObject)
+                    {
+                        Elements[i, j] = null;
+                        //Elements.Remove(bomb);
+                    }
+
+                }, TaskCreationOptions.LongRunning).Start();
+            }
+        }
+
+        private void ExplosionEffects(int row, int col, Bomb bomb, ImageBrush image)
+        {
+            if (!(Elements[row, col] is FixWall))
+            {
+                new Task(() =>
+                {
+                    List<Player> playersToKill = new List<Player>();//Players mert egy mezőn több player is lehet
+
+                    if (Elements[row, col] is null)
+                    {
+                        //Mivel az elementsben nincsenek bene a playerek.
+                        playersToKill = Players.Where(player =>
+                                (int)Math.Floor((decimal)(player.Position.X / GameRectSize)) == row &&
+                                (int)Math.Floor((decimal)(player.Position.Y / GameRectSize)) == col)
+                                .ToList();
+
+                        if (playersToKill.Count == 0)
+                        {
+                            Elements[row, col] = bomb.BombCopy(new Point(row, col), bomb.Image);
+                        }
+
+                        playersToKill.ForEach(player =>
+                            {
+                                int x = (int)Math.Floor((decimal)(player.Position.X / GameRectSize));
+                                int y = (int)Math.Floor((decimal)(player.Position.Y / GameRectSize));
+                                //player.Image = Halál image helye;
+                                //player.Image.Freeze();
+                                //ToDo: vagy a playerbe tárolnia ssaját képének elérését, vagy máshogy megoldani.
+                                //ToDo: Player image cserélhetősége a haláluk miatt is fontos.
+                            });
+                    }
+                    else if (Elements[row, col] is Bomb t)
+                    {
+                        //Mivel másik bombát is ért a robbanás ezért az is felrobban.
+                        ExplosionStarter(t.Player);
+                    }
+                    else if (Elements[row, col] is Wall)//ToDo: || Elements[row, col] is Skill/Booster   ami lesz a neve
+                    {
+                        Elements[row, col].Image = image;
+                        Elements[row, col].Image.Freeze();
+                    }
+
+                    Thread.Sleep(1400);
+                    lock (_ElementsListLockObject)
+                    {
+                        Elements[row, col] = null;//Ide jön a logika, hogy melyi skill töltsön be. 100%-os esélyeket találunk ki.
+
+                        if (playersToKill.Count > 0)
+                        {
+                            playersToKill.ForEach(player =>
+                                {
+                                    Players.Remove(player);
+                                }
+                            );
+                        }
+                    }
+                }, TaskCreationOptions.LongRunning).Start();
+            }
+        }
+
+        private bool BombStopper(int row, int col)
+        {
+            return Elements[row, col] != null ||
+                   Players.Any(player =>
+                       (int)Math.Floor((decimal)(player.Position.X / GameRectSize)) == row &&
+                       (int)Math.Floor((decimal)(player.Position.Y / GameRectSize)) == col);
+        }
         private void AITaskCreator()
         {
             List<Player> ais = new List<Player>();

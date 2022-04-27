@@ -23,6 +23,7 @@ namespace FriendshipExploder.Model
         {
             this.Type = type;
             this.Player = player;
+            this.ExplosionRange = 3;
         }
 
         public Bomb BombCopy(Point position, ImageBrush image, BombType type = BombType.Normal)
