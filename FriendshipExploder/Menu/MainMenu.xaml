@@ -44,7 +44,7 @@
         </Style>
         <Style TargetType="Label" x:Key="binding_lb">
             <Setter Property="HorizontalAlignment" Value="Right"/>
-            <Setter Property="Content" Value="[Disabled]"/>
+            <Setter Property="Content" Value="{Binding Path=[0]}"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
             <Setter Property="FontSize" Value="24"/>
@@ -146,7 +146,7 @@
                     </ComboBox>
                 </DockPanel>
             </Border>
-            <Button Grid.Row="3" Command="{Binding StartCommand}" Content="Start game" Style="{StaticResource roundedbtn}"/>
+            <Button Grid.Row="3" Command="{Binding StartCommand}" Content="Start game" Style="{StaticResource roundedbtn}" Click="Button_Click"/>
         </Grid>
     </Grid>
 </Window>

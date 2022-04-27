@@ -192,5 +192,10 @@ namespace FriendshipExploder.Menu
                     break;
             }
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            this.DialogResult = true;
+        }
     }
 }
