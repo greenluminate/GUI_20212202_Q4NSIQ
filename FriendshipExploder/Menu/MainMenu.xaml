@@ -82,7 +82,7 @@
                         <Border Style="{StaticResource palyer_border}">
                             <DockPanel>
                                 <Label Content="{Binding}" Style="{StaticResource palyer_lb}"/>
-                                <ComboBox ItemsSource="{Binding KeyBindings}">
+                                <ComboBox ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.KeyBindings}">
                                     <ComboBox.ItemTemplate>
                                         <DataTemplate>
                                             <Label Content="{Binding}" Style="{StaticResource binding_lb}"/>
