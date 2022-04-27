@@ -22,15 +22,6 @@ namespace FriendshipExploder.Menu
     /// </summary>
     public partial class MainMenu : Window
     {
-        private int activeColumn = 0;
-        private int activePlayer = 0;
-        private string[] keyBinding = { "[Disabled]", "[Up][Down][Left][Right]", "[W][S][A][D]", "[Ai]" };
-        private List<int> playerKeyBinding = Enumerable.Range(0, 3).Select(n => 0).ToList();
-        private List<string> playGrounds = new List<string>();
-        private int activePlayground = 0;
-
-        private IGameModel GameModel { get; set; }
-
         public MainMenu(IGameModel model)
         {
             InitializeComponent();
