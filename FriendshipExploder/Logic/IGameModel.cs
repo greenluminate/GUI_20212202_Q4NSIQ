@@ -24,5 +24,6 @@ namespace FriendshipExploder.Logic
         public bool GamePaused { get; set; }
         public void LoadPlayground(string file, int rounds);
         public bool RoundOver { get; set; }
+        public bool RoundScore { get; set; }
     }
 }

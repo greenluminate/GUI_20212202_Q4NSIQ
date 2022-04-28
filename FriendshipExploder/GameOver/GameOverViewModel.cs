@@ -17,7 +17,6 @@ namespace FriendshipExploder.GameOver
         IGameModel logic;
 
         public Brush GameOverBackground { get; set; }
-        public ICommand BackCommand { get; set; }
 
         public string FirstName { get; set; }
         public BitmapImage FirstImage { get; set; }
@@ -35,16 +34,29 @@ namespace FriendshipExploder.GameOver
         public GameOverViewModel()
         {
             GameOverBackground = new ImageBrush(new BitmapImage(new Uri($"pack://application:,,,/Images/GameBackground/0_GameBackground.jpg")));
-            FirstImage = new BitmapImage(new Uri($"pack://application:,,,/Images/Players/0_player_down.png"));
-            SecondImage = new BitmapImage(new Uri($"pack://application:,,,/Images/Players/2_player_down.png"));
-            ThirdImage = new BitmapImage(new Uri($"pack://application:,,,/Images/Players/1_player_down.png"));
 
-            FirstKill = "10";
+            var players = logic.Players.OrderByDescending(pl => pl.Kills).ToList();
 
-            BackCommand = new RelayCommand(() =>
+            if (players.Count > 0)
             {
-                
-            });
+                FirstName = $"Player {players[0].Id + 1}";
+                FirstImage = new BitmapImage(new Uri($"pack://application:,,,/Images/Players/{players[0].Id}_player_down.png"));
+                FirstKill = players[0].Kills.ToString();
+            }
+
+            if (players.Count > 1)
+            {
+                SecondName = $"Player {players[1].Id + 1}";
+                SecondImage = new BitmapImage(new Uri($"pack://application:,,,/Images/Players/{players[1].Id}_player_down.png"));
+                SecondKill = players[1].Kills.ToString();
+            }
+
+            if (players.Count > 2)
+            {
+                ThirdName = $"Player {players[2].Id + 1}";
+                ThirdImage = new BitmapImage(new Uri($"pack://application:,,,/Images/Players/{players[2].Id}_player_down.png"));
+                ThirdKill = players[2].Kills.ToString();
+            }
         }
 
         public void SetupLogic(IGameModel model)

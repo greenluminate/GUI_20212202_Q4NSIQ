@@ -44,6 +44,7 @@ namespace FriendshipExploder.Logic
         public double PlayerWidthRate { get; set; }
         public bool GamePaused { get; set; }
         public bool RoundOver { get; set; }
+        public bool RoundScore { get; set; }
 
         public GameLogic()
         {

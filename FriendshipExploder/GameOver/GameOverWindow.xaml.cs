@@ -25,5 +25,10 @@ namespace FriendshipExploder.GameOver
             InitializeComponent();
             (this.DataContext as GameOverViewModel).SetupLogic(model);
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            this.DialogResult = true;
+        }
     }
 }
