@@ -76,10 +76,19 @@ namespace FriendshipExploder.Model
             Position = new Point(x, y);
         }
 
-        public void NullKills()
+        public void ResetPlayer()
         {
             SumOfKills += Kills;
             Kills = 0;
+
+            Position = new System.Drawing.Point(2, Id * 120);
+            MovingHorizontal = false;
+            MovingVertical = false;
+            HeadDirection = PlayerDirection.right;
+            Bomb = new Bomb(this);
+            BombList = new List<Bomb>();
+            _bombListLockObject = new object();
+            BombAmount = 1;
         }
 
     }

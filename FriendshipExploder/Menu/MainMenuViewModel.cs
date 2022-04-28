@@ -203,13 +203,19 @@ namespace FriendshipExploder.Menu
                 NextEnabled = false;
                 RoundsEnabled = true;
                 PlaygroundsEnabled = true;
-            });
+            }, () => CheckNextCanExecute());
 
             StartCommand = new RelayCommand(() =>
             {
                 BuildPlayers();
                 logic.LoadPlayground(SelectedPlayground, int.Parse(RoundsSelected) + 1);
             }, () => SelectedPlayground != null);
+        }
+
+        private bool CheckNextCanExecute()
+        {
+
+            return true;
         }
 
         private void BuildPlayers()
