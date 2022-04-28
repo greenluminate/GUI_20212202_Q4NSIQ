@@ -4,8 +4,14 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FriendshipExploder.GameOver"
+        xmlns:vms="clr-namespace:FriendshipExploder.GameOver"
         mc:Ignorable="d"
-        Title="GameOver" Height="450" Width="800">
+        Title="GameOver" Height="450" Width="800"
+        WindowState="Maximized"
+        WindowStyle="None">
+    <Window.DataContext>
+        <vms:GameOverViewModel/>
+    </Window.DataContext>
     <Grid>
         
     </Grid>

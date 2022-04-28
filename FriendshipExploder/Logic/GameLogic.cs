@@ -43,6 +43,7 @@ namespace FriendshipExploder.Logic
         public double PlayerHeightRateHangsIn { get; set; }
         public double PlayerWidthRate { get; set; }
         public bool GamePaused { get; set; }
+        public bool RoundOver { get; set; }
 
         public GameLogic()
         {
@@ -57,6 +58,8 @@ namespace FriendshipExploder.Logic
             PlayerHeightRate = 0.8;
             PlayerHeightRateHangsIn = 0.2;
             PlayerWidthRate = 0.6;
+
+            RoundOver = false;
 
             //Ha választott pálya design, akkor betöltjük azt válaszott mennyiségszer a queue-ba, ha randomizáltat választotak a fixek közül, akkor random tötljülk be a fixeket
 

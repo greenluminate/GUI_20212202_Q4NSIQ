@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FriendshipExploder.Logic;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,9 +20,10 @@ namespace FriendshipExploder.GameOver
     /// </summary>
     public partial class GameOver : Window
     {
-        public GameOver()
+        public GameOver(IGameModel model)
         {
             InitializeComponent();
+            (this.DataContext as GameOverViewModel).SetupLogic(model);
         }
     }
 }
