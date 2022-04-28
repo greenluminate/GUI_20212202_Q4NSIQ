@@ -176,6 +176,34 @@ namespace FriendshipExploder.Renderer
                             drawingContext.DrawText(text, textLocation);
                         }
 
+                        //futam eredmény
+                        if (gameModel.RoundScore)
+                        {
+                            Typeface typeface = new Typeface(new FontFamily(new Uri("pack://application:,,,/"), "./Fonts/#Bomberman"), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
+
+                            ImageBrush backgr = new ImageBrush(new BitmapImage(new Uri($"pack://application:,,,/Images/GameBackground/scboard.png")));
+
+                            drawingContext.DrawRectangle(backgr, new Pen(Brushes.Black, 0), new Rect((size.Width / 2) - (size.Width / 4), (size.Height / 2) - (size.Height / 10), size.Width / 2, size.Height / 5));
+                            FormattedText scoreText = new FormattedText("Score", CultureInfo.GetCultureInfo("hu-hu"), FlowDirection.LeftToRight, typeface, size.Width / 40, Brushes.White, VisualTreeHelper.GetDpi(this).PixelsPerDip);
+                            Point textLocation = new Point((size.Width / 2) - (scoreText.WidthIncludingTrailingWhitespace / 2), (size.Height / 2) - (size.Height / 10) + 10);
+                            drawingContext.DrawText(scoreText, textLocation);
+
+                            //Pl 1
+                            FormattedText player1Text = new FormattedText("Player 1: 10 kill", CultureInfo.GetCultureInfo("hu-hu"), FlowDirection.LeftToRight, typeface, size.Width / 65, Brushes.White, VisualTreeHelper.GetDpi(this).PixelsPerDip);
+                            textLocation = new Point((size.Width / 2) - (size.Width / 4) + 20, (size.Height / 2) - (size.Height / 10) + scoreText.Height + 10);
+                            drawingContext.DrawText(player1Text, textLocation);
+
+                            //Pl 2
+                            FormattedText player2Text = new FormattedText("Player 2: 8 kill", CultureInfo.GetCultureInfo("hu-hu"), FlowDirection.LeftToRight, typeface, size.Width / 65, Brushes.White, VisualTreeHelper.GetDpi(this).PixelsPerDip);
+                            textLocation = new Point((size.Width / 2) - (size.Width / 4) + 20, (size.Height / 2) - (size.Height / 10) + scoreText.Height + player1Text.Height + 20);
+                            drawingContext.DrawText(player2Text, textLocation);
+
+                            //Pl 3
+                            FormattedText player3Text = new FormattedText("Player 3: 6 kill", CultureInfo.GetCultureInfo("hu-hu"), FlowDirection.LeftToRight, typeface, size.Width / 65, Brushes.White, VisualTreeHelper.GetDpi(this).PixelsPerDip);
+                            textLocation = new Point((size.Width / 2) - (size.Width / 4) + 20, (size.Height / 2) - (size.Height / 10) + scoreText.Height + player1Text.Height + player2Text.Height + 30);
+                            drawingContext.DrawText(player3Text, textLocation);
+                        }
+
 
                         //megállítva
                         if (gameModel.GamePaused)

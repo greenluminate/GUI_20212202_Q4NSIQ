@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Fonts\bomberman.TTF" />
     <None Remove="Images\Bombs\bomb.jpg" />
     <None Remove="Images\Bombs\bomb.png" />
     <None Remove="Images\FireParts\explosion.png" />
@@ -15,6 +16,7 @@
     <None Remove="Images\GameBackground\0_GameBackground.jpg" />
     <None Remove="Images\GameBackground\0_timerbg.png" />
     <None Remove="Images\GameBackground\pausedBackground.png" />
+    <None Remove="Images\GameBackground\scboard.png" />
     <None Remove="Images\ModderFloors\0_ModderFloor.png" />
     <None Remove="Images\Players\0_player_down.png" />
     <None Remove="Images\Players\0_player_left.png" />
@@ -36,6 +38,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Fonts\bomberman.TTF">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Images\Bombs\bomb.png" />
     <Resource Include="Images\FireParts\explosion.png" />
     <Resource Include="Images\FixWalls\0_FixWall.png" />
@@ -43,6 +48,7 @@
     <Resource Include="Images\GameBackground\0_GameBackground.jpg" />
     <Resource Include="Images\GameBackground\0_timerbg.png" />
     <Resource Include="Images\GameBackground\pausedBackground.png" />
+    <Resource Include="Images\GameBackground\scboard.png" />
     <Resource Include="Images\ModderFloors\0_ModderFloor.png" />
     <Resource Include="Images\Players\0_player_down.png" />
     <Resource Include="Images\Players\0_player_left.png" />
