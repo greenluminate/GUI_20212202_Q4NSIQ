@@ -14,6 +14,7 @@
         <vms:GameOverViewModel/>
     </Window.DataContext>
     <Window.Resources>
+        <FontFamily x:Key="font" >/Fonts/#Bomberman</FontFamily>
         <Style TargetType="Button" x:Key="roundedbtn">
             <Style.Resources>
                 <Style TargetType="Border">
@@ -27,6 +28,31 @@
             <Setter Property="Margin" Value="20,20,20,20"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="Background" Value="DimGray"/>
+            <Setter Property="FontFamily" Value="{StaticResource font}"/>
+        </Style>
+        <Style TargetType="Label" x:Key="nameLabel">
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Top"/>
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontFamily" Value="{StaticResource font}"/>
+        </Style>
+        <Style TargetType="Label" x:Key="placeLabel">
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="60"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontFamily" Value="{StaticResource font}"/>
+        </Style>
+        <Style TargetType="Label" x:Key="killLabel">
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Top"/>
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontFamily" Value="{StaticResource font}"/>
+            <Setter Property="ContentStringFormat" Value="Kill: {0}"/>
         </Style>
     </Window.Resources>
     <Grid>
@@ -48,28 +74,28 @@
             <RowDefinition Height="1*" />
         </Grid.RowDefinitions>
 
-        <Label Grid.Column="2" Grid.Row="1" Content="{Binding FirstName}" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" Foreground="White"/>
+        <Label Grid.Column="2" Grid.Row="1" Content="{Binding FirstName}" Style="{StaticResource nameLabel}" />
         <Image Grid.Column="2" Grid.Row="1" Source="{Binding FirstImage}" Width="80" Height="120" VerticalAlignment="Bottom"/>
         <Border Grid.Column="2" Grid.Row="2" BorderThickness="2" BorderBrush="White" Background="Wheat" Grid.RowSpan="3">
-            <Label Content="1." FontSize="48" FontWeight="Bold" Foreground="Red" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Label Content="1" Style="{StaticResource placeLabel}" Foreground="red"/>
         </Border>
-        <Label Grid.Column="2" Grid.Row="5" Content="{Binding FirstKill}" ContentStringFormat="Kill: {0}" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" Foreground="White"/>
+        <Label Grid.Column="2" Grid.Row="5" Content="{Binding FirstKill}" Style="{StaticResource killLabel}"/>
 
 
-        <Label Grid.Column="1" Grid.Row="2" Content="{Binding SecondName}" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" Foreground="White"/>
+        <Label Grid.Column="1" Grid.Row="2" Content="{Binding SecondName}" Style="{StaticResource nameLabel}" />
         <Image Grid.Column="1" Grid.Row="2" Source="{Binding SecondImage}" Width="80" Height="120" VerticalAlignment="Bottom"/>
         <Border Grid.Column="1" Grid.Row="3" BorderThickness="2" BorderBrush="White" Background="Wheat" Grid.RowSpan="2">
-            <Label Content="2." FontSize="48" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Label Content="2" Style="{StaticResource placeLabel}" Foreground="White" />
         </Border>
-        <Label Grid.Column="1" Grid.Row="5" Content="{Binding SecondKill}" ContentStringFormat="Kill: {0}" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" Foreground="White"/>
+        <Label Grid.Column="1" Grid.Row="5" Content="{Binding SecondKill}" ContentStringFormat="Kill: {0}" FontFamily="{StaticResource font}" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" Foreground="White"/>
 
 
-        <Label Grid.Column="3" Grid.Row="3" Content="{Binding ThirdName}" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" Foreground="White"/>
+        <Label Grid.Column="3" Grid.Row="3" Content="{Binding ThirdName}" Style="{StaticResource nameLabel}" />
         <Image Grid.Column="3" Grid.Row="3" Source="{Binding ThirdImage}" Width="80" Height="120" VerticalAlignment="Bottom"/>
         <Border Grid.Column="3" Grid.Row="4" BorderThickness="2" BorderBrush="White" Background="Wheat">
-            <Label Content="3." FontSize="48" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Label Content="3" Style="{StaticResource placeLabel}" Foreground="White" />
         </Border>
-        <Label Grid.Column="3" Grid.Row="5" Content="{Binding ThirdKill}" ContentStringFormat="Kill: {0}" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" Foreground="White"/>
+        <Label Grid.Column="3" Grid.Row="5" Content="{Binding ThirdKill}" ContentStringFormat="Kill: {0}" FontFamily="{StaticResource font}" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" Foreground="White"/>
 
         <Button Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="3" Content="Back to main menu" Click="Button_Click"  Style="{StaticResource roundedbtn}"/>
 

@@ -33,6 +33,7 @@ namespace FriendshipExploder.Model
         public bool CanKick { get; set; } //Amikor a játékos megnyom egy adott gombot a bomba felé fordulva, előtte állva, a bomba addig halad, amíg akadályt nem ér.
         public bool CanSchedule { get; set; } //Csak akkor tehet le gomb kombinációval időzített bombát, ha képes ilyenre.
         public int Kills { get; set; }
+        public int SumOfKills { get; set; }
 
         public object _bombListLockObject;
 
@@ -49,6 +50,7 @@ namespace FriendshipExploder.Model
             _bombListLockObject = new object();
             BombAmount = 1;
             Kills = 0;//Lehet azelőző körös killszámot át kéne adni, de nem feltélen, sőt külön fájlba is menthetnénk a körök között az addigi killeket, vagy mindegy hová.
+            SumOfKills = 0;
         }
 
         public void SetupKeyBinding(int binding)
@@ -72,6 +74,12 @@ namespace FriendshipExploder.Model
         public void SetPos(int x, int y)
         {
             Position = new Point(x, y);
+        }
+
+        public void NullKills()
+        {
+            SumOfKills += Kills;
+            Kills = 0;
         }
 
     }

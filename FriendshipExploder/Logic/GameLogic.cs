@@ -61,7 +61,7 @@ namespace FriendshipExploder.Logic
             PlayerWidthRate = 0.6;
 
             RoundOver = false;
-            RoundScore = true;
+            RoundScore = false;
 
             //Ha választott pálya design, akkor betöltjük azt válaszott mennyiségszer a queue-ba, ha randomizáltat választotak a fixek közül, akkor random tötljülk be a fixeket
 

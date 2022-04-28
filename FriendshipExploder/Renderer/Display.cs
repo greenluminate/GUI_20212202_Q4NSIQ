@@ -85,6 +85,9 @@ namespace FriendshipExploder.Renderer
                 //kockaméret átadása a logic részére
                 gameModel.SetupSize(new System.Drawing.Point((int)size.Width, (int)(size.Height - size.Height * 0.05)), (int)gameRectSize);
 
+                //saját betütípus
+                Typeface typeface = new Typeface(new FontFamily(new Uri("pack://application:,,,/"), "./Fonts/#Bomberman"), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
+
 
                 //elemek kirajzolása
                 lock (gameModel._ElementsListLockObject)
@@ -163,7 +166,7 @@ namespace FriendshipExploder.Renderer
                         }
                         brush = new ImageBrush(new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "GameBackground", "0_timerbg.png"), UriKind.RelativeOrAbsolute)));
                         drawingContext.DrawRectangle(brush, new Pen(Brushes.Black, 0), new Rect(size.Width / 2 - (gameRectSize * 1.5), 0, gameRectSize * 3, size.Height * 0.05 + gameRectSize / 2));
-                        drawingContext.DrawText(new FormattedText(gameModel.Timer, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Verdana"), 30, Brushes.White, VisualTreeHelper.GetDpi(this).PixelsPerDip), new Point(size.Width / 2 - (30 * 1.5), size.Height * 0.025));
+                        drawingContext.DrawText(new FormattedText(gameModel.Timer, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, 30, Brushes.White, VisualTreeHelper.GetDpi(this).PixelsPerDip), new Point(size.Width / 2 - (30 * 1.5), size.Height * 0.025));
                         //30-ast lecserélni responsive értékre.
 
 
@@ -171,7 +174,7 @@ namespace FriendshipExploder.Renderer
                         if (gameModel.RoundOver)
                         {
                             drawingContext.DrawRectangle(Brushes.LightGray, new Pen(Brushes.Red, 4), new Rect((size.Width / 2)- (size.Width / 4), (size.Height / 2) - (size.Height / 12), size.Width / 2, size.Height / 6));
-                            FormattedText text = new FormattedText("Round over!", CultureInfo.GetCultureInfo("hu-hu"), FlowDirection.LeftToRight, new Typeface("Calibri"), size.Width / 24, Brushes.Red, VisualTreeHelper.GetDpi(this).PixelsPerDip);
+                            FormattedText text = new FormattedText("Round over!", CultureInfo.GetCultureInfo("hu-hu"), FlowDirection.LeftToRight, typeface, size.Width / 24, Brushes.Red, VisualTreeHelper.GetDpi(this).PixelsPerDip);
                             Point textLocation = new Point((size.Width / 2) - (text.WidthIncludingTrailingWhitespace / 2), (size.Height / 2) - (text.Height / 2));
                             drawingContext.DrawText(text, textLocation);
                         }
@@ -179,8 +182,6 @@ namespace FriendshipExploder.Renderer
                         //futam eredmény
                         if (gameModel.RoundScore)
                         {
-                            Typeface typeface = new Typeface(new FontFamily(new Uri("pack://application:,,,/"), "./Fonts/#Bomberman"), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
-
                             ImageBrush backgr = new ImageBrush(new BitmapImage(new Uri($"pack://application:,,,/Images/GameBackground/scboard.png")));
 
                             drawingContext.DrawRectangle(backgr, new Pen(Brushes.Black, 0), new Rect((size.Width / 2) - (size.Width / 4), (size.Height / 2) - (size.Height / 10), size.Width / 2, size.Height / 5));
@@ -188,20 +189,36 @@ namespace FriendshipExploder.Renderer
                             Point textLocation = new Point((size.Width / 2) - (scoreText.WidthIncludingTrailingWhitespace / 2), (size.Height / 2) - (size.Height / 10) + 10);
                             drawingContext.DrawText(scoreText, textLocation);
 
-                            //Pl 1
-                            FormattedText player1Text = new FormattedText("Player 1: 10 kill", CultureInfo.GetCultureInfo("hu-hu"), FlowDirection.LeftToRight, typeface, size.Width / 65, Brushes.White, VisualTreeHelper.GetDpi(this).PixelsPerDip);
-                            textLocation = new Point((size.Width / 2) - (size.Width / 4) + 20, (size.Height / 2) - (size.Height / 10) + scoreText.Height + 10);
-                            drawingContext.DrawText(player1Text, textLocation);
+                            double startHeight = scoreText.Height + 10;
 
-                            //Pl 2
-                            FormattedText player2Text = new FormattedText("Player 2: 8 kill", CultureInfo.GetCultureInfo("hu-hu"), FlowDirection.LeftToRight, typeface, size.Width / 65, Brushes.White, VisualTreeHelper.GetDpi(this).PixelsPerDip);
-                            textLocation = new Point((size.Width / 2) - (size.Width / 4) + 20, (size.Height / 2) - (size.Height / 10) + scoreText.Height + player1Text.Height + 20);
-                            drawingContext.DrawText(player2Text, textLocation);
+                            var pl = gameModel.Players.Where(pl => pl.Id == 0).FirstOrDefault();
+                            if (pl != null)
+                            {
+                                //Pl 1
+                                FormattedText player1Text = new FormattedText($"Player 1: {pl.Kills} kill", CultureInfo.GetCultureInfo("hu-hu"), FlowDirection.LeftToRight, typeface, size.Width / 65, Brushes.White, VisualTreeHelper.GetDpi(this).PixelsPerDip);
+                                textLocation = new Point((size.Width / 2) - (size.Width / 4) + 20, (size.Height / 2) - (size.Height / 10) + startHeight);
+                                drawingContext.DrawText(player1Text, textLocation);
+                                startHeight += player1Text.Height + 10;
+                            }
 
-                            //Pl 3
-                            FormattedText player3Text = new FormattedText("Player 3: 6 kill", CultureInfo.GetCultureInfo("hu-hu"), FlowDirection.LeftToRight, typeface, size.Width / 65, Brushes.White, VisualTreeHelper.GetDpi(this).PixelsPerDip);
-                            textLocation = new Point((size.Width / 2) - (size.Width / 4) + 20, (size.Height / 2) - (size.Height / 10) + scoreText.Height + player1Text.Height + player2Text.Height + 30);
-                            drawingContext.DrawText(player3Text, textLocation);
+                            pl = gameModel.Players.Where(pl => pl.Id == 1).FirstOrDefault();
+                            if (pl != null)
+                            {
+                                //Pl 2
+                                FormattedText player2Text = new FormattedText($"Player 2: {pl.Kills} kill", CultureInfo.GetCultureInfo("hu-hu"), FlowDirection.LeftToRight, typeface, size.Width / 65, Brushes.White, VisualTreeHelper.GetDpi(this).PixelsPerDip);
+                                textLocation = new Point((size.Width / 2) - (size.Width / 4) + 20, (size.Height / 2) - (size.Height / 10) + startHeight);
+                                drawingContext.DrawText(player2Text, textLocation);
+                                startHeight += player2Text.Height + 10;
+                            }
+
+                            pl = gameModel.Players.Where(pl => pl.Id == 2).FirstOrDefault();
+                            if (pl != null)
+                            {
+                                //Pl 3
+                                FormattedText player3Text = new FormattedText($"Player 3: {pl.Kills} kill", CultureInfo.GetCultureInfo("hu-hu"), FlowDirection.LeftToRight, typeface, size.Width / 65, Brushes.White, VisualTreeHelper.GetDpi(this).PixelsPerDip);
+                                textLocation = new Point((size.Width / 2) - (size.Width / 4) + 20, (size.Height / 2) - (size.Height / 10) + startHeight);
+                                drawingContext.DrawText(player3Text, textLocation);
+                            }
                         }
 
 

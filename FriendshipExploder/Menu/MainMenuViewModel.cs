@@ -216,14 +216,15 @@ namespace FriendshipExploder.Menu
         {
             string[] selectedKeys = { Player1SelectedKeyBinding, Player2SelectedKeyBinding , Player3SelectedKeyBinding };
 
-            foreach (var pl in selectedKeys)
+            for (int i = 0; i < selectedKeys.Length; i++)
             {
+                string pl = selectedKeys[i];
                 if (pl != "[Disabled]")
                 {
                     int bindingNum = KeyBindings.IndexOf(pl);
                     logic.Players.Add(
-                                    new Player(bindingNum - 1,
-                                    new System.Drawing.Point(2, bindingNum * 120),
+                                    new Player(i,
+                                    new System.Drawing.Point(2, i * 120),
                                     (Model.KeyBinding)bindingNum - 1)
                                     );
                 }
