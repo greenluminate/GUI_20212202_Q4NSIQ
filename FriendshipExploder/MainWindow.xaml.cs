@@ -1,6 +1,7 @@
 ﻿using FriendshipExploder.Controller;
 using FriendshipExploder.Logic;
 using FriendshipExploder.Menu;
+using FriendshipExploder.GameOver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,11 +43,15 @@ namespace FriendshipExploder
 
             display.SetupModel(mainMenuLogic, gameLogic);
 
-            MainMenu menu = new MainMenu(gameLogic);
+            GameOverWindow go = new GameOverWindow(gameLogic);
+            go.ShowDialog();
+            
+
+            /*MainMenu menu = new MainMenu(gameLogic);
             if (menu.ShowDialog() == false)
             {
                 Application.Current.Shutdown();
-            }
+            }*/
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)

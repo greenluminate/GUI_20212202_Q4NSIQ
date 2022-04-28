@@ -18,9 +18,9 @@ namespace FriendshipExploder.GameOver
     /// <summary>
     /// Interaction logic for GameOver.xaml
     /// </summary>
-    public partial class GameOver : Window
+    public partial class GameOverWindow : Window
     {
-        public GameOver(IGameModel model)
+        public GameOverWindow(IGameModel model)
         {
             InitializeComponent();
             (this.DataContext as GameOverViewModel).SetupLogic(model);

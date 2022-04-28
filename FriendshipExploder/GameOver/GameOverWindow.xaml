@@ -1,0 +1,77 @@
+﻿<Window x:Class="FriendshipExploder.GameOver.GameOverWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FriendshipExploder.GameOver"
+        xmlns:vms="clr-namespace:FriendshipExploder.GameOver"
+        mc:Ignorable="d"
+        Title="GameOver" Height="450" Width="800"
+        WindowState="Maximized"
+        WindowStyle="None"
+        Background="{Binding GameOverBackground}">
+    <Window.DataContext>
+        <vms:GameOverViewModel/>
+    </Window.DataContext>
+    <Window.Resources>
+        <Style TargetType="Button" x:Key="roundedbtn">
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="10"/>
+                </Style>
+            </Style.Resources>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="20,20,20,20"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="DimGray"/>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="1*" />
+        </Grid.RowDefinitions>
+
+        <Label Grid.Column="2" Grid.Row="1" Content="Player 1" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" Foreground="White"/>
+        <Image Grid.Column="2" Grid.Row="1" Source="{Binding FirstImage}" Width="80" Height="120" VerticalAlignment="Bottom"/>
+        <Border Grid.Column="2" Grid.Row="2" BorderThickness="2" BorderBrush="White" Background="Wheat" Grid.RowSpan="3">
+            <Label Content="1." FontSize="48" FontWeight="Bold" Foreground="Red" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Border>
+        <Label Grid.Column="2" Grid.Row="5" Content="Kill: 10" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" Foreground="White"/>
+
+
+        <Label Grid.Column="1" Grid.Row="2" Content="Player 3" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" Foreground="White"/>
+        <Image Grid.Column="1" Grid.Row="2" Source="{Binding SecondImage}" Width="80" Height="120" VerticalAlignment="Bottom"/>
+        <Border Grid.Column="1" Grid.Row="3" BorderThickness="2" BorderBrush="White" Background="Wheat" Grid.RowSpan="2">
+            <Label Content="2." FontSize="48" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Border>
+        <Label Grid.Column="1" Grid.Row="5" Content="Kill: 8" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" Foreground="White"/>
+
+        
+        <Label Grid.Column="3" Grid.Row="3" Content="Player 2" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" Foreground="White"/>
+        <Image Grid.Column="3" Grid.Row="3" Source="{Binding ThirdImage}" Width="80" Height="120" VerticalAlignment="Bottom"/>
+        <Border Grid.Column="3" Grid.Row="4" BorderThickness="2" BorderBrush="White" Background="Wheat">
+            <Label Content="3." FontSize="48" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Border>
+        <Label Grid.Column="3" Grid.Row="5" Content="Kill: 12" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" Foreground="White"/>
+
+        <Button Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="3" Content="Back to main menu" Style="{StaticResource roundedbtn}"/>
+
+    </Grid>
+</Window>
