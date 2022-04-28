@@ -48,30 +48,30 @@
             <RowDefinition Height="1*" />
         </Grid.RowDefinitions>
 
-        <Label Grid.Column="2" Grid.Row="1" Content="Player 1" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" Foreground="White"/>
+        <Label Grid.Column="2" Grid.Row="1" Content="{Binding FirstName}" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" Foreground="White"/>
         <Image Grid.Column="2" Grid.Row="1" Source="{Binding FirstImage}" Width="80" Height="120" VerticalAlignment="Bottom"/>
         <Border Grid.Column="2" Grid.Row="2" BorderThickness="2" BorderBrush="White" Background="Wheat" Grid.RowSpan="3">
             <Label Content="1." FontSize="48" FontWeight="Bold" Foreground="Red" HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Border>
-        <Label Grid.Column="2" Grid.Row="5" Content="Kill: 10" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" Foreground="White"/>
+        <Label Grid.Column="2" Grid.Row="5" Content="{Binding FirstKill}" ContentStringFormat="Kill: {0}" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" Foreground="White"/>
 
 
-        <Label Grid.Column="1" Grid.Row="2" Content="Player 3" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" Foreground="White"/>
+        <Label Grid.Column="1" Grid.Row="2" Content="{Binding SecondName}" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" Foreground="White"/>
         <Image Grid.Column="1" Grid.Row="2" Source="{Binding SecondImage}" Width="80" Height="120" VerticalAlignment="Bottom"/>
         <Border Grid.Column="1" Grid.Row="3" BorderThickness="2" BorderBrush="White" Background="Wheat" Grid.RowSpan="2">
             <Label Content="2." FontSize="48" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Border>
-        <Label Grid.Column="1" Grid.Row="5" Content="Kill: 8" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" Foreground="White"/>
+        <Label Grid.Column="1" Grid.Row="5" Content="{Binding SecondKill}" ContentStringFormat="Kill: {0}" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" Foreground="White"/>
 
-        
-        <Label Grid.Column="3" Grid.Row="3" Content="Player 2" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" Foreground="White"/>
+
+        <Label Grid.Column="3" Grid.Row="3" Content="{Binding ThirdName}" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" Foreground="White"/>
         <Image Grid.Column="3" Grid.Row="3" Source="{Binding ThirdImage}" Width="80" Height="120" VerticalAlignment="Bottom"/>
         <Border Grid.Column="3" Grid.Row="4" BorderThickness="2" BorderBrush="White" Background="Wheat">
             <Label Content="3." FontSize="48" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Border>
-        <Label Grid.Column="3" Grid.Row="5" Content="Kill: 12" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" Foreground="White"/>
+        <Label Grid.Column="3" Grid.Row="5" Content="{Binding ThirdKill}" ContentStringFormat="Kill: {0}" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" Foreground="White"/>
 
-        <Button Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="3" Content="Back to main menu" Style="{StaticResource roundedbtn}"/>
+        <Button Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="3" Command="{Binding BackCommand}" Content="Back to main menu" Style="{StaticResource roundedbtn}"/>
 
     </Grid>
 </Window>
