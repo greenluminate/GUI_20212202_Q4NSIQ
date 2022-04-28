@@ -90,17 +90,8 @@ namespace FriendshipExploder.Menu
         {
             get { return player1SelectedKeyBinding; }
             set {
-                if ((Player2SelectedKeyBinding == value && Player2SelectedKeyBinding != KeyBindings[0]) || (Player3SelectedKeyBinding == value && Player3SelectedKeyBinding != KeyBindings[0]))
-                {
-                    SetProperty(ref player1SelectedKeyBinding, "[Ai]");
-
-                    //Player1SelectedKeyBinding = "[Ai]";//KeyBindings[KeyBindings.IndexOf(value) + 1];
-                }
-                else
-                {
-                    
-                    SetProperty(ref player1SelectedKeyBinding, value);
-                }
+                SetProperty(ref player1SelectedKeyBinding, value);
+                (NextCommand as RelayCommand).NotifyCanExecuteChanged();
             }
         }
 
@@ -109,7 +100,8 @@ namespace FriendshipExploder.Menu
         {
             get { return player2SelectedKeyBinding; }
             set {
-                SetProperty(ref player2SelectedKeyBinding, value); 
+                SetProperty(ref player2SelectedKeyBinding, value);
+                (NextCommand as RelayCommand).NotifyCanExecuteChanged();
             }
         }
 
@@ -118,7 +110,8 @@ namespace FriendshipExploder.Menu
         {
             get { return player3SelectedKeyBinding; }
             set { 
-                SetProperty(ref player3SelectedKeyBinding, value); 
+                SetProperty(ref player3SelectedKeyBinding, value);
+                (NextCommand as RelayCommand).NotifyCanExecuteChanged();
             }
         }
 
@@ -214,8 +207,51 @@ namespace FriendshipExploder.Menu
 
         private bool CheckNextCanExecute()
         {
+            bool canExec = true;
 
-            return true;
+            if (Player1SelectedKeyBinding == KeyBindings[0] && Player2SelectedKeyBinding == KeyBindings[0] && Player3SelectedKeyBinding == KeyBindings[0])
+            {
+                //minden player Disabled
+                canExec = false;
+            }
+            else
+            {
+                if ((Player1SelectedKeyBinding == KeyBindings[0] && Player2SelectedKeyBinding == KeyBindings[0]) || 
+                    (Player1SelectedKeyBinding == KeyBindings[0] && Player3SelectedKeyBinding == KeyBindings[0]) || 
+                    (Player2SelectedKeyBinding == KeyBindings[0] && Player3SelectedKeyBinding == KeyBindings[0]) ||
+                    (Player1SelectedKeyBinding == KeyBindings[3] && Player2SelectedKeyBinding == KeyBindings[0] && Player3SelectedKeyBinding == KeyBindings[0]) ||
+                    (Player1SelectedKeyBinding == KeyBindings[0] && Player2SelectedKeyBinding == KeyBindings[3] && Player3SelectedKeyBinding == KeyBindings[0]) ||
+                    (Player1SelectedKeyBinding == KeyBindings[0] && Player2SelectedKeyBinding == KeyBindings[0] && Player3SelectedKeyBinding == KeyBindings[3]))
+                {
+                    //csak 1 player van
+                    canExec = false;
+                }
+                else
+                {
+                    if ((Player1SelectedKeyBinding != KeyBindings[0]) && (Player1SelectedKeyBinding != KeyBindings[3]))
+                    {
+                        if (Player1SelectedKeyBinding == Player2SelectedKeyBinding || Player1SelectedKeyBinding == player3SelectedKeyBinding)
+                        {
+                            //ugyan az
+                            canExec = false;
+                        }
+                    }
+                    else
+                    {
+                        //Disabled vagy Ai
+                        if ((Player2SelectedKeyBinding != KeyBindings[0]) && (Player2SelectedKeyBinding != KeyBindings[3]))
+                        {
+                            if (Player2SelectedKeyBinding == Player3SelectedKeyBinding)
+                            {
+                                //ugyan az
+                                canExec = false;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            return canExec;
         }
 
         private void BuildPlayers()
