@@ -689,6 +689,7 @@ namespace FriendshipExploder.Logic
             Thread.Sleep(1000);//1 másodperc előny a valódi játékosoknak
             while (true)//ToDo: Majd amgí nem igaz, hogy vége
             {
+                int[] closestElementIndex = FindNearestDestructible(ai.Position);
                 //IElement[,] elements = new IElement[GameSize.X - 1, GameSize.Y - 1];
                 /*lock (_ElementsListLockObject)
                 {
@@ -718,6 +719,7 @@ namespace FriendshipExploder.Logic
                         int aiNextPosX = ai.Position.X + (-1 * ai.Speed);//Kiszervezni az egészet külön metódusba.
                         int aiNextPosY = ai.Position.Y;
                         //IElement blockingElement = elements[aiNextPosX, aiNextPosY];
+                        
                         List<Point> availablePath = FindAvailablePath(ai, aiNextPosX, aiNextPosY);
                         List<PlayerAction> availableRoundaboutActions = FindAvailableRoundaboutActions(ai, aiNextPosX, aiNextPosY);
                         //availableRoundaboutActions.ForEach(Action => Action.Pop);
@@ -775,6 +777,55 @@ namespace FriendshipExploder.Logic
             return availablePath;
         }
 
+        private int[] FindNearestDestructible(Point aiPosition)
+        {
+            int aiCurrentIndexX = (int)Math.Floor((decimal)(aiPosition.X / GameRectSize));
+            int aiCurrentIndexY = (int)Math.Floor((decimal)(aiPosition.Y / GameRectSize));
+            bool [,]vis = new bool[PlayGroundSize[0], PlayGroundSize[1]]; //Bool tömb, azt nézi, hogy mely elemek vannak feldolgozva
+            int[] dRow = new int[] {-1,0,1,0}; // Csak arra kell, hogy végig tudjon iterálni a szomszédokon
+            int[] dCol = new int[] { 0, 1, 0, -1 };
+            Queue<int[]> indexQueue = new Queue<int[]>(); //A queue amibe kigyűjti az elemeket
+            indexQueue.Enqueue(new int[] {aiCurrentIndexX,aiCurrentIndexY});
+            vis[aiCurrentIndexX, aiCurrentIndexY] = true;
+            while (indexQueue.Count != 0)
+            {
+                int[] cell = indexQueue.Peek(); //Megnézi a queue tetején lévő elemet
+                int x = cell[0];
+                int y = cell[1];
+                if (Elements[x,y] is Wall) 
+                {
+                    return cell;
+                    break;
+                }
+                else
+                {
+                    indexQueue.Dequeue(); //Ha nem fal dequeueoljuk
+                }
+                for (int i = 0; i < 4; i++) //Végig iterálunk a négy környező elemen
+                {
+                    int adjx = x + dRow[i];
+                    int adjy = y  + dCol[i];
+                    if (isValid(vis, adjx, adjy))
+                    {
+                        indexQueue.Enqueue(new int[] { adjx, adjy });
+                        vis[adjx,adjy] = true;
+                    }
+                }
+            }
+            return new int[] {-1,-1};
+        }
+        private bool isValid(bool[,] vis, int row, int col)
+        {
+            if (row < 0 || col < 0 || row >= PlayGroundSize[0] || col >= PlayGroundSize[1]) //Ha kint van a pályán nem valid
+            {
+                return false;
+            }
+            if (vis[row,col]) //Ha már látogattuk, nem valid
+            {
+                return false;
+            }
+            return true;
+        }
         private List<PlayerAction> FindAvailableRoundaboutActions(Player ai, int aiNextPosX, int aiNextPosY)
         {
             List<PlayerAction> availableActions = new List<PlayerAction>();
