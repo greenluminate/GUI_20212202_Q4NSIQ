@@ -168,8 +168,7 @@ namespace FriendshipExploder.Logic
                                 switch (powerupRndNum)
                                 {
                                     case < 20:
-                                        //Powerups[i, j] = new Powerup(ElementType.BomUp);
-                                        Powerups[i, j] = null;
+                                        Powerups[i, j] = new Powerup(ElementType.BomUp);
                                         break;
                                     case < 40:
                                         Powerups[i, j] = new Powerup(ElementType.BlastUp);

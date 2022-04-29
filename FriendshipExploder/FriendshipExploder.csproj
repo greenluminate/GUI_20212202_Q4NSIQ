@@ -34,6 +34,7 @@
     <None Remove="Images\Players\3_player_right.png" />
     <None Remove="Images\Players\3_player_up.png" />
     <None Remove="Images\Powerups\BlastUp.png" />
+    <None Remove="Images\Powerups\BomUp.png" />
     <None Remove="Images\Powerups\Desease.png" />
     <None Remove="Images\Powerups\Kick.png" />
     <None Remove="Images\Powerups\Schedule.png" />
@@ -72,6 +73,7 @@
     <Resource Include="Images\Players\3_player_right.png" />
     <Resource Include="Images\Players\3_player_up.png" />
     <Resource Include="Images\Powerups\BlastUp.png" />
+    <Resource Include="Images\Powerups\BomUp.png" />
     <Resource Include="Images\Powerups\Desease.png" />
     <Resource Include="Images\Powerups\Kick.png" />
     <Resource Include="Images\Powerups\Schedule.png" />
