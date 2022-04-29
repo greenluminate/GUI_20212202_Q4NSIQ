@@ -10,7 +10,6 @@
     <None Remove="Fonts\bomberman.TTF" />
     <None Remove="Images\Bombs\bomb.jpg" />
     <None Remove="Images\Bombs\bomb.png" />
-    <None Remove="Images\FireParts\explosion.png" />
     <None Remove="Images\FixWalls\0_FixWall.png" />
     <None Remove="Images\Floors\0_Floor.png" />
     <None Remove="Images\GameBackground\0_GameBackground.jpg" />
@@ -41,8 +40,8 @@
     <Resource Include="Fonts\bomberman.TTF">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Images\Bombs\bomb.png" />
-    <Resource Include="Images\FireParts\explosion.png" />
+    <Resource Include="Images\Bombs\Bomb.png" />
+    <Resource Include="Images\Bombs\BombExplode.png" />
     <Resource Include="Images\FixWalls\0_FixWall.png" />
     <Resource Include="Images\Floors\0_Floor.png" />
     <Resource Include="Images\GameBackground\0_GameBackground.jpg" />
