@@ -777,6 +777,13 @@ namespace FriendshipExploder.Logic
             return availablePath;
         }
 
+        private List<Point> FindPathToDestructible(int[] elementIndex, Player ai)
+        {
+            List<Point> pt = new List<Point>();
+            return pt;
+        }
+
+
         private int[] FindNearestDestructible(Point aiPosition)
         {
             int aiCurrentIndexX = (int)Math.Floor((decimal)(aiPosition.X / GameRectSize));
@@ -826,6 +833,9 @@ namespace FriendshipExploder.Logic
             }
             return true;
         }
+
+
+
         private List<PlayerAction> FindAvailableRoundaboutActions(Player ai, int aiNextPosX, int aiNextPosY)
         {
             List<PlayerAction> availableActions = new List<PlayerAction>();
