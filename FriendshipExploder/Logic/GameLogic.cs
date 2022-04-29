@@ -690,6 +690,8 @@ namespace FriendshipExploder.Logic
             while (true)//ToDo: Majd amgí nem igaz, hogy vége
             {
                 int[] closestElementIndex = FindNearestDestructible(ai.Position);
+                
+                List<IElement> pathToDestructible = FindPathToDestructible( closestElementIndex,ai.Position);
                 //IElement[,] elements = new IElement[GameSize.X - 1, GameSize.Y - 1];
                 /*lock (_ElementsListLockObject)
                 {
@@ -777,10 +779,96 @@ namespace FriendshipExploder.Logic
             return availablePath;
         }
 
-        private List<Point> FindPathToDestructible(int[] elementIndex, Player ai)
+        private List<IElement> FindPathToDestructible(int[] targetElementIndex, Point startingPosition)
         {
-            List<Point> pt = new List<Point>();
-            return pt;
+            int aiCurrentIndexX = (int)Math.Floor((decimal)(startingPosition.X / GameRectSize));
+            int aiCurrentIndexY = (int)Math.Floor((decimal)(startingPosition.Y / GameRectSize));
+            IElement target = Elements[targetElementIndex[0], targetElementIndex[1]];
+            List<IElement> openSet = new List<IElement>();
+            HashSet<IElement> closedSet = new HashSet<IElement>();
+            openSet.Add(Elements[startingPosition.X,startingPosition.Y]);
+            int[] dRow = new int[] { -1, 0, 1, 0 }; // Csak arra kell, hogy végig tudjon iterálni a szomszédokon
+            int[] dCol = new int[] { 0, 1, 0, -1 };
+
+            while (openSet.Count > 0)
+            {
+                IElement currentElement = openSet[0];
+                for (int i = 1; i < openSet.Count; i++) //i = 1 mivel már 0 a currentpointnál megvan
+                {
+                    if (openSet[i].fCost < currentElement.fCost || openSet[i].fCost == currentElement.fCost &&openSet[i].hCost < currentElement.hCost)
+                    {
+                        currentElement  = openSet[i];
+                    }
+                }
+                openSet.Remove(currentElement);
+                closedSet.Add(currentElement);
+                if (currentElement.Position == target.Position)
+                {
+                    
+                    return PathRetrace(Elements[startingPosition.X, startingPosition.Y], target);
+                }
+                for (int i = 0; i < 4; i++) 
+                {
+                    int adjx = currentElement.Position.X + dRow[i];
+                    int adjy = currentElement.Position.Y + dCol[i];
+                    IElement neighBor = Elements[adjx, adjy];
+                    if (Elements[adjx,adjy] is null && ValidPath(adjx,adjy))
+                    {
+                        continue;
+                    }
+                    int newMovementCostToNeighbour = currentElement.gCost + GetDistance(currentElement.Position, neighBor.Position);
+                    if (newMovementCostToNeighbour < neighBor.gCost || !openSet.Contains(neighBor))
+                    {
+                        neighBor.gCost = newMovementCostToNeighbour;
+                        neighBor.hCost = GetDistance(neighBor.Position, target.Position);
+                        neighBor.Parent = currentElement;
+
+                        if (!openSet.Contains(neighBor))
+                        {
+                            openSet.Add(neighBor);
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        List<IElement> PathRetrace(IElement startElement, IElement targetElement)
+        {
+            List<IElement> path = new List<IElement>();
+            IElement currentElement = targetElement;
+            while (currentElement != startElement)
+            {
+                path.Add(currentElement);
+                currentElement = currentElement.Parent;
+                
+                
+            }
+            path.Reverse();
+            return path;
+
+        }
+
+        int GetDistance(Point pointA, Point pointB)
+        {
+            int distX = Math.Abs(pointA.X - pointB.X);
+            int distY = Math.Abs(pointA.Y - pointB.Y);
+            if (distX > distY)
+            {
+                return 14 + distY + 10*(distX - distY);
+                return 14 + distX + 10 * (distY - distX);
+
+            }
+            return -1;
+        }
+
+        public bool ValidPath(int row, int col)
+        {
+            if (row < 0 || col < 0 || row >= PlayGroundSize[0] || col >= PlayGroundSize[1]) //Ha kint van a pályán nem valid
+            {
+                return false;
+            }
+            return true;
         }
 
 
