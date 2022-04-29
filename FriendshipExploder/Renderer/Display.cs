@@ -107,7 +107,7 @@ namespace FriendshipExploder.Renderer
                                 {
                                     drawingContext.DrawRectangle(
                                             new ImageBrush(
-                                            new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", $"{gameModel.Elements[i, j].ElementType}s", $"{gameModel.Elements[i, j].ElementType}.png"),
+                                            new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", $"{gameModel.Elements[i, j].ElementType}s", $"0_{gameModel.Elements[i, j].ElementType}.png"),
                                             UriKind.RelativeOrAbsolute))),
                                             new Pen(Brushes.Black, 0),
                                             new Rect(x, y, gameRectSize, gameRectSize)
@@ -118,7 +118,7 @@ namespace FriendshipExploder.Renderer
                                     //Felrobbanás állapota
                                     drawingContext.DrawRectangle(
                                         new ImageBrush(
-                                        new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", $"{gameModel.Elements[i, j].ElementType}s", $"{gameModel.Elements[i, j].ElementType}Explode.png"),
+                                        new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", $"{gameModel.Elements[i, j].ElementType}s", $"0_{gameModel.Elements[i, j].ElementType}Explode.png"),
                                         UriKind.RelativeOrAbsolute))),
                                         new Pen(Brushes.Black, 0),
                                         new Rect(x, y, gameRectSize, gameRectSize)

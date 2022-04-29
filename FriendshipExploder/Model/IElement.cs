@@ -6,7 +6,7 @@ namespace FriendshipExploder.Model
     public enum ElementType
     {
         Bomb, FixWall, Floor, Player, Wall,
-        Kick, Jelly, Desease, BomUp, FireUp, SpeedUp, Schedule,//Powerups
+        Kick, Jelly, Desease, BomUp, BlastUp, SpeedUp, SpeedDown, Schedule,//Powerups
         Teleport, TravelatorRight, TravelatorLeft, TravelatorUp, TravelatorDown//Active grounds
     }
 

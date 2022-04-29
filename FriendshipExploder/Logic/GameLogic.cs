@@ -16,6 +16,7 @@ namespace FriendshipExploder.Logic
 {
     public class GameLogic : IGameModel, IGameControl
     {
+        public Random rnd { get; set; }
         private Queue<string[]> playgrounds; //path-okat tartalmaz, előre generált pálxák? //Mert vagy beletesszük ak iválaszott pályát választott meccs számszor, vagy előre legeneráljuk a random pélykat, csak beletesszük, hogy melyik fix és melyik, mely random. VAgy kuka az egész és mindig más laapján generálunk random.
         //Lehet ide kéne betenn ia köztes képernyőket is pl.: MainMenu, playground, who win image, curren leaderboard image, next playground és így körbe.
 
@@ -36,6 +37,7 @@ namespace FriendshipExploder.Logic
         public string Timer { get; set; }
 
         public object _ElementsListLockObject { get; set; }
+        public object _PowerupsListLockObject { get; set; }
         public object _PlayersListLockObject { get; set; }
         public object _TimerLockObject { get; set; }
         public double PlayerHeightRate { get; set; }
@@ -48,8 +50,12 @@ namespace FriendshipExploder.Logic
         public GameLogic()
         {
             _ElementsListLockObject = new object();
+            _PowerupsListLockObject = new object();
             _PlayersListLockObject = new object();
             _TimerLockObject = new object();
+
+            rnd = new Random();
+
             Players = new List<Player>();
 
             playgrounds = new Queue<string[]>();
@@ -79,6 +85,7 @@ namespace FriendshipExploder.Logic
                 PlayGroundSize[1] = rows.Length;
 
                 Elements = new IElement[PlayGroundSize[0], PlayGroundSize[1]];
+                Powerups = new IElement[PlayGroundSize[0], PlayGroundSize[1]];
 
                 for (int i = 0; i < rounds; i++)
                 {
@@ -154,6 +161,39 @@ namespace FriendshipExploder.Logic
                             {
                                 Elements[i, j] = new Wall(new Point(i, j), ElementType.Wall);
                             }
+                            lock (_PowerupsListLockObject)
+                            {
+                                int powerupRndNum = rnd.Next(0, 100);
+
+                                switch (powerupRndNum)
+                                {
+                                    case < 20:
+                                        //Powerups[i, j] = new Powerup(ElementType.BomUp);
+                                        Powerups[i, j] = null;
+                                        break;
+                                    case < 40:
+                                        Powerups[i, j] = new Powerup(ElementType.BlastUp);
+                                        break;
+                                    case < 60:
+                                        Powerups[i, j] = new Powerup(ElementType.SpeedUp);
+                                        break;
+                                    case < 70:
+                                        Powerups[i, j] = new Powerup(ElementType.Kick);
+                                        break;
+                                    case < 80:
+                                        Powerups[i, j] = new Powerup(ElementType.Schedule);
+                                        break;
+                                    case < 88:
+                                        Powerups[i, j] = new Powerup(ElementType.Desease);
+                                        break;
+                                    case < 95:
+                                        Powerups[i, j] = new Powerup(ElementType.SpeedDown);
+                                        break;
+                                    default:
+                                        Powerups[i, j] = null;
+                                        break;
+                                }
+                            }
                             break;
                     }
                 }
@@ -177,11 +217,11 @@ namespace FriendshipExploder.Logic
                 {
                     if (!GamePaused)
                     {
-                        this.Timer = StartTime.AddSeconds(StartDate.Second - DateTime.Now.Second).ToString(@"mm\:ss");
+                        this.Timer = StartTime.AddTicks(StartDate.Ticks - DateTime.Now.Ticks).ToString(@"mm\:ss");
                     }
                     else
                     {
-                        int stopDifference = StartDate.Second - DateTime.Now.Second;
+                        int stopDifference = new DateTime(StartDate.Ticks - DateTime.Now.Ticks).Second;
 
                         lock (_TimerLockObject)
                         {
@@ -191,6 +231,7 @@ namespace FriendshipExploder.Logic
                     }
                 }
             }, TaskCreationOptions.LongRunning);
+            //Task contonuation Elkezdenek a fix falak betölteni.
             countDownTask.Start();
         }
 
