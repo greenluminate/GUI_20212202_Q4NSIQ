@@ -8,16 +8,16 @@ using System.Windows.Media;
 
 namespace FriendshipExploder.Model
 {
-    public class Floor : IElement
+    public class Powerup : IElement
     {
-        public Point Position { get; set; }
         public ImageBrush Image { get; set; }
+        public Point Position { get; set; }
         public bool Explode { get; set; }
         public ElementType ElementType { get; set; }
-        public Floor(Point position, ElementType ElementType)
+
+        public Powerup(ElementType ElementType)
         {
-            Position = position;
-            Explode = false;
+            this.Explode = false;
             this.ElementType = ElementType;
         }
     }

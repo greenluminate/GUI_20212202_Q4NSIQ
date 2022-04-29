@@ -51,7 +51,7 @@ namespace FriendshipExploder.Renderer
 
                 double startX = ((size.Width - (gameRectSize * (gameModel.PlayGroundSize[0]))) / 2);
 
-                
+
                 //keret renderelése
                 ImageBrush brush = new ImageBrush(new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "FixWalls", "0_FixWall.png"), UriKind.RelativeOrAbsolute)));
 
@@ -90,16 +90,19 @@ namespace FriendshipExploder.Renderer
 
 
                 //elemek kirajzolása
+                //new ImageBrush(new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "FixWalls", "0_FixWall.png"), UriKind.RelativeOrAbsolute)))
+                //new ImageBrush(new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "Walls", "0_Wall.png"), UriKind.RelativeOrAbsolute)))
+                //new ImageBrush(new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "Bombs", "bomb.png"),UriKind.RelativeOrAbsolute)))
                 lock (gameModel._ElementsListLockObject)
                 {
                     for (int i = 0; i < gameModel.Elements.GetLength(0); i++)
                     {
                         for (int j = 0; j < gameModel.Elements.GetLength(1); j++)
                         {
+                            double x = startX + i * gameRectSize;
+                            double y = startY + j * gameRectSize;
                             if (gameModel.Elements[i, j] != null)
                             {
-                                double x = startX + i * gameRectSize;
-                                double y = startY + j * gameRectSize;
                                 if (gameModel.Elements[i, j].GetType().Name == "Bomb")
                                 {
                                     if (gameModel.Elements[i, j].Explode)
@@ -133,17 +136,15 @@ namespace FriendshipExploder.Renderer
                                 }
 
                             }
-                            /*foreach (var element in gameModel.Elements)
+                            else if(gameModel.Powerups[i, j] != null)
                             {
-                                double x = startX + element.Position.X * gameRectSize;
-                                double y = startY + element.Position.Y * gameRectSize;
-
+                                //Powerups
                                 drawingContext.DrawRectangle(
-                                    element.Image,
-                                    new Pen(Brushes.Black, 0),
-                                    new Rect(x, y, gameRectSize, gameRectSize)
-                                );
-                            }*/
+                                        gameModel.Elements[i, j].Image,
+                                        new Pen(Brushes.Black, 0),
+                                        new Rect(x, y, gameRectSize, gameRectSize)
+                                    );
+                            }
                         }
                         //játékosok kirajzolása
                         lock (gameModel._PlayersListLockObject)
@@ -173,7 +174,7 @@ namespace FriendshipExploder.Renderer
                         //futam vége
                         if (gameModel.RoundOver)
                         {
-                            drawingContext.DrawRectangle(Brushes.LightGray, new Pen(Brushes.Red, 4), new Rect((size.Width / 2)- (size.Width / 4), (size.Height / 2) - (size.Height / 12), size.Width / 2, size.Height / 6));
+                            drawingContext.DrawRectangle(Brushes.LightGray, new Pen(Brushes.Red, 4), new Rect((size.Width / 2) - (size.Width / 4), (size.Height / 2) - (size.Height / 12), size.Width / 2, size.Height / 6));
                             FormattedText text = new FormattedText("Round over!", CultureInfo.GetCultureInfo("hu-hu"), FlowDirection.LeftToRight, typeface, size.Width / 24, Brushes.Red, VisualTreeHelper.GetDpi(this).PixelsPerDip);
                             Point textLocation = new Point((size.Width / 2) - (text.WidthIncludingTrailingWhitespace / 2), (size.Height / 2) - (text.Height / 2));
                             drawingContext.DrawText(text, textLocation);

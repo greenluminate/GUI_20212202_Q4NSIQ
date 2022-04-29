@@ -45,7 +45,7 @@ namespace FriendshipExploder.Model
             MovingVertical = false;
             HeadDirection = PlayerDirection.right;
             KeyBinding = keyBinding;
-            Bomb = new Bomb(this);
+            Bomb = new Bomb(this, ElementType.Bomb);
             BombList = new List<Bomb>();
             _bombListLockObject = new object();
             BombAmount = 1;
@@ -85,7 +85,7 @@ namespace FriendshipExploder.Model
             MovingHorizontal = false;
             MovingVertical = false;
             HeadDirection = PlayerDirection.right;
-            Bomb = new Bomb(this);
+            Bomb = new Bomb(this, ElementType.Bomb);
             BombList = new List<Bomb>();
             _bombListLockObject = new object();
             BombAmount = 1;

@@ -86,6 +86,7 @@
 
   <ItemGroup>
     <Folder Include="Images\Boosters\" />
+    <Folder Include="Images\Powerups\" />
   </ItemGroup>
 
   <ItemGroup>

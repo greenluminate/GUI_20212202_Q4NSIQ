@@ -12,6 +12,7 @@ namespace FriendshipExploder.Logic
     public interface IGameModel
     {
         public IElement[,] Elements { get; set; }
+        public IElement[,] Powerups { get; set; }
         int[] PlayGroundSize { get; set; }
         public List<Player> Players { get; set; }
         public void SetupSize(Point gameSize, int gameRectSize);

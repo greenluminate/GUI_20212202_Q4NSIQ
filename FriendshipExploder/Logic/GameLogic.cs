@@ -16,13 +16,12 @@ namespace FriendshipExploder.Logic
 {
     public class GameLogic : IGameModel, IGameControl
     {
-        public enum ElementType { Bomb, FixWall, Floor, Player, Wall }
-
         private Queue<string[]> playgrounds; //path-okat tartalmaz, előre generált pálxák? //Mert vagy beletesszük ak iválaszott pályát választott meccs számszor, vagy előre legeneráljuk a random pélykat, csak beletesszük, hogy melyik fix és melyik, mely random. VAgy kuka az egész és mindig más laapján generálunk random.
         //Lehet ide kéne betenn ia köztes képernyőket is pl.: MainMenu, playground, who win image, curren leaderboard image, next playground és így körbe.
 
         //pályán lévő elemek (játékos, fal, stb.)
         public IElement[,] Elements { get; set; }
+        public IElement[,] Powerups { get; set; }
 
         public List<Player> Players { get; set; }
 
@@ -147,13 +146,13 @@ namespace FriendshipExploder.Logic
                         case 'f':
                             lock (_ElementsListLockObject)
                             {
-                                Elements[i, j] = new FixWall(new Point(i, j), new ImageBrush(new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "FixWalls", "0_FixWall.png"), UriKind.RelativeOrAbsolute))));
+                                Elements[i, j] = new FixWall(new Point(i, j), ElementType.FixWall);
                             }
                             break;
                         case 'w':
                             lock (_ElementsListLockObject)
                             {
-                                Elements[i, j] = new Wall(new Point(i, j), new ImageBrush(new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "Walls", "0_Wall.png"), UriKind.RelativeOrAbsolute))));
+                                Elements[i, j] = new Wall(new Point(i, j), ElementType.Wall);
                             }
                             break;
                     }
@@ -456,10 +455,7 @@ namespace FriendshipExploder.Logic
                 Bomb newBomb = pl.Bomb.BombCopy(
                                 new Point(
                                     (int)Math.Floor((decimal)((pl.Position.X + (PlayerWidthRate * GameRectSize) / 2) / GameRectSize)),
-                                    (int)Math.Floor((decimal)((pl.Position.Y + ((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize) / 2) / GameRectSize))),
-                                new ImageBrush(
-                                    new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "Bombs", "bomb.png"),
-                                    UriKind.RelativeOrAbsolute))));
+                                    (int)Math.Floor((decimal)((pl.Position.Y + ((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize) / 2) / GameRectSize))));
                 lock (pl._bombListLockObject)
                 {
                     pl.BombList.Add(newBomb);

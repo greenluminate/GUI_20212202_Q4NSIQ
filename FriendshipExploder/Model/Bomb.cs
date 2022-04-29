@@ -18,27 +18,26 @@ namespace FriendshipExploder.Model
         //public bool IsScheduled { get; set; }//Akkor robban fel, ha lenyom egy adott gombot a játékos.
         public bool IsBouncey { get; set; }//Akadályt érve elindul az ellenkező irányba, amíg fel nem robban. Permanens tulajdonság.
         public int ExplosionRange { get; set; }//1-7 tile long.
-
         public bool Explode { get; set; }
+        public ElementType ElementType { get; set; }
 
-        public Bomb(Player player, BombType type = BombType.Normal)
+        public Bomb(Player player, ElementType ElementType, BombType type = BombType.Normal)
         {
             this.Type = type;
             this.Player = player;
-            this.ExplosionRange = 3;
+            this.ExplosionRange = 1;
             Explode = false;
+            this.ElementType = ElementType;
         }
 
-        public Bomb BombCopy(Point position, ImageBrush image, BombType type = BombType.Normal)
+        public Bomb BombCopy(Point position, BombType type = BombType.Normal)
         {
-            Bomb newBomb = new Bomb(this.Player, type);
+            Bomb newBomb = new Bomb(this.Player, this.ElementType, type);
             newBomb.IsBouncey = this.IsBouncey;
             newBomb.ExplosionRange = this.ExplosionRange;
             newBomb.Position = position;
-            newBomb.Image = image;
 
             return newBomb;
-
         }
 
         public override bool Equals(object obj)
