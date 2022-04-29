@@ -8,9 +8,8 @@
 
   <ItemGroup>
     <None Remove="Fonts\bomberman.TTF" />
+    <None Remove="Images\Bombs\0_Bomb.png" />
     <None Remove="Images\Bombs\bomb.jpg" />
-    <None Remove="Images\Bombs\bomb.png" />
-    <None Remove="Images\FireParts\explosion.png" />
     <None Remove="Images\FixWalls\0_FixWall.png" />
     <None Remove="Images\Floors\0_Floor.png" />
     <None Remove="Images\GameBackground\0_GameBackground.jpg" />
@@ -34,6 +33,12 @@
     <None Remove="Images\Players\3_player_left.png" />
     <None Remove="Images\Players\3_player_right.png" />
     <None Remove="Images\Players\3_player_up.png" />
+    <None Remove="Images\Powerups\BlastUp.png" />
+    <None Remove="Images\Powerups\Desease.png" />
+    <None Remove="Images\Powerups\Kick.png" />
+    <None Remove="Images\Powerups\Schedule.png" />
+    <None Remove="Images\Powerups\SpeedDown.png" />
+    <None Remove="Images\Powerups\SpeedUp.png" />
     <None Remove="Images\Walls\0_Wall.png" />
   </ItemGroup>
 
@@ -41,8 +46,8 @@
     <Resource Include="Fonts\bomberman.TTF">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Images\Bombs\bomb.png" />
-    <Resource Include="Images\FireParts\explosion.png" />
+    <Resource Include="Images\Bombs\0_Bomb.png" />
+    <Resource Include="Images\Bombs\0_BombExplode.png" />
     <Resource Include="Images\FixWalls\0_FixWall.png" />
     <Resource Include="Images\Floors\0_Floor.png" />
     <Resource Include="Images\GameBackground\0_GameBackground.jpg" />
@@ -66,6 +71,12 @@
     <Resource Include="Images\Players\3_player_left.png" />
     <Resource Include="Images\Players\3_player_right.png" />
     <Resource Include="Images\Players\3_player_up.png" />
+    <Resource Include="Images\Powerups\BlastUp.png" />
+    <Resource Include="Images\Powerups\Desease.png" />
+    <Resource Include="Images\Powerups\Kick.png" />
+    <Resource Include="Images\Powerups\Schedule.png" />
+    <Resource Include="Images\Powerups\SpeedDown.png" />
+    <Resource Include="Images\Powerups\SpeedUp.png" />
     <Resource Include="Images\Walls\0_Wall.png" />
   </ItemGroup>
 
@@ -86,7 +97,6 @@
 
   <ItemGroup>
     <Folder Include="Images\Boosters\" />
-    <Folder Include="Images\Powerups\" />
   </ItemGroup>
 
   <ItemGroup>
