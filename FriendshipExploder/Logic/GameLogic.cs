@@ -215,19 +215,20 @@ namespace FriendshipExploder.Logic
 
                 while (!this.Timer.Equals("00:00"))
                 {
+                    Thread.Sleep(50);
                     if (!GamePaused)
                     {
                         this.Timer = StartTime.AddTicks(StartDate.Ticks - DateTime.Now.Ticks).ToString(@"mm\:ss");
                     }
                     else
                     {
-                        int stopDifference = new DateTime(StartDate.Ticks - DateTime.Now.Ticks).Second;
+                        long stopDifference = StartDate.Ticks - DateTime.Now.Ticks;
 
                         lock (_TimerLockObject)
                         {
                             Monitor.Wait(_TimerLockObject);
                         }
-                        StartDate = DateTime.Now.AddSeconds(stopDifference);
+                        StartDate = DateTime.Now.AddTicks(stopDifference);
                     }
                 }
             }, TaskCreationOptions.LongRunning);
