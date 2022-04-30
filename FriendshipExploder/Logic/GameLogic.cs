@@ -906,7 +906,7 @@ namespace FriendshipExploder.Logic
                     {
                         for (int row = i + 1; row <= i + explsoionRange; row++)
                         {
-                            if (row < Elements.GetLength(0))
+                            if (row < Elements.GetLength(0) - 1)
                             {
                                 ExplosionEffects(row, j, bomb, pl);
                                 //ExplosionEffects(row, j, bomb, explosionImg, pl);
@@ -937,7 +937,7 @@ namespace FriendshipExploder.Logic
                     {
                         for (int col = j + 1; col <= j + explsoionRange; col++)
                         {
-                            if (col < Elements.GetLength(1))
+                            if (col < Elements.GetLength(1) - 1)
                             {
                                 //ExplosionEffects(i, col, bomb, explosionImg, pl);
                                 ExplosionEffects(i, col, bomb, pl);
