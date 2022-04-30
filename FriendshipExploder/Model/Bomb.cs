@@ -12,6 +12,7 @@ namespace FriendshipExploder.Model
     public class Bomb : IElement
     {
         public Point Position { get; set; }
+        public Point PositionPixel { get; set; }//Centerként kell megkapja
         public ImageBrush Image { get; set; }
         public BombType Type { get; set; }
         public Player Player { get; private set; }
@@ -25,18 +26,19 @@ namespace FriendshipExploder.Model
         {
             this.Type = type;
             this.Player = player;
-            this.ExplosionRange = 1;
+            this.ExplosionRange = 3;
             Explode = false;
             this.ElementType = ElementType;
+            PositionPixel = new Point();
         }
 
-        public Bomb BombCopy(Point position, BombType type = BombType.Normal)
+        public Bomb BombCopy(Point position, BombType type = BombType.Normal, Point point = new Point())
         {
             Bomb newBomb = new Bomb(this.Player, this.ElementType, type);
             newBomb.IsBouncey = this.IsBouncey;
             newBomb.ExplosionRange = this.ExplosionRange;
             newBomb.Position = position;
-
+            PositionPixel = point;
             return newBomb;
         }
 

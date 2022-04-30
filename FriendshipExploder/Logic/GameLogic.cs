@@ -249,76 +249,171 @@ namespace FriendshipExploder.Logic
             actionudlr, actionwasd
         }
 
-        private Point PlayerIndexes(Point position)//Itt kell hozzáadni a két %-át az Yhoz, hogy a hitboxát nézzük ak rakternek és a render nagyságát.
+        private Point PlayerPixelToMatrixCoordinate(Point position)//Itt kell hozzáadni a két %-át az Yhoz, hogy a hitboxát nézzük ak rakternek és a render nagyságát.
         {
-            int playerCurrentIndexX = (int)Math.Floor((decimal)(position.X / GameRectSize));
-            int playerCurrentIndexY = (int)Math.Floor((decimal)((position.Y + (GameRectSize * PlayerHeightRateHangsIn)) / GameRectSize * PlayerHeightRate));//Étírni az y-t + 2%ára
+            int playerIndexX = (int)Math.Floor((decimal)((position.X + (GameRectSize * PlayerWidthRate) / 2) / GameRectSize));
+            int playerIndexY = (int)Math.Floor((decimal)((position.Y + (GameRectSize * PlayerHeightRate) / 2) / GameRectSize));
 
-            return new Point(playerCurrentIndexX, playerCurrentIndexY);
+            return new Point(playerIndexX, playerIndexY);
+        }
+
+        private Point PixelToMatrixCoordinate(Point position)
+        {
+            int playerCornerIndexX = (int)Math.Floor((decimal)(position.X / GameRectSize));
+            int playerCornerIndexY = (int)Math.Floor((decimal)(position.Y / GameRectSize));
+
+            return new Point(playerCornerIndexX, playerCornerIndexY);
         }
 
         //Odaléphet-e a játékos
         private bool CanStepToPos(Player player, System.Windows.Vector direction)
         {
-            Rectangle playerPrevRect = new Rectangle(player.Position.X, player.Position.Y, (int)(PlayerWidthRate * GameRectSize), (int)((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize));
-            Rectangle playerRect = new Rectangle(player.Position.X + (int)direction.X, player.Position.Y + (int)direction.Y, (int)(PlayerWidthRate * GameRectSize), (int)((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize));
+            //Rectangle playerCurrentRect = new Rectangle(player.Position.X, player.Position.Y, (int)(PlayerWidthRate * GameRectSize), (int)((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize));
+            //Rectangle playerNextRect = new Rectangle(player.Position.X + (int)direction.X, player.Position.Y + (int)direction.Y, (int)(PlayerWidthRate * GameRectSize), (int)((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize));
 
-            //Point playerCurrentIndexes = PlayerIndexes(player.Position);
-            //Point playerNextIndexes = PlayerIndexes(player.Position = new Point(player.Position.X + (int)direction.X, player.Position.Y + (int)direction.Y));
+            Point playerCurrentIndexes = PlayerPixelToMatrixCoordinate(player.Position);
+            Point playerNextIndexes = PlayerPixelToMatrixCoordinate(new Point(player.Position.X + (int)direction.X, player.Position.Y + (int)direction.Y));
 
-            int playerCurrentIndexX = (int)Math.Floor((decimal)(player.Position.X / GameRectSize));
-            int playerCurrentIndexY = (int)Math.Floor((decimal)(player.Position.Y / GameRectSize));
-
-            //if (playerNextIndexes.X < 0 || playerNextIndexes.Y < 0)
-            //{
-            //    return false;
-            //}
-
-            //lock (_ElementsListLockObject)
-            //{
-            //    //IElement BombUnderPlayer = null;
-            //    //if (Elements[playerCurrentIndexes.X, playerCurrentIndexes.Y] is Bomb)
-            //    //{
-            //    //    BombUnderPlayer = Elements[playerCurrentIndexes.X, playerCurrentIndexes.Y];
-            //    //}
-
-            //    if (Elements[playerNextIndexes.X, playerNextIndexes.Y] != null)
-            //    {
-            //        Rectangle elementRect = new Rectangle(playerNextIndexes.X * GameRectSize, playerNextIndexes.Y * GameRectSize, GameRectSize, GameRectSize);
-            //        if (playerRect.IntersectsWith(elementRect) && !(Elements[playerNextIndexes.X, playerNextIndexes.Y] is Bomb && playerPrevRect.IntersectsWith(elementRect)))
-            //        {
-            //            return false;//Lejöhet arról a bombáról, ami alá került lerakásra.
-            //        }
-            //        else if (Elements[playerNextIndexes.X, playerNextIndexes.Y] is Bomb b && b.Explode)
-            //        {
-            //            return true;//Odaléphet a robbanásba, de belehal.
-            //        }
-            //    }
-
-            //    return true;
-            //}
+            Bomb currentBomb = null;
+            if (Elements[playerCurrentIndexes.X, playerCurrentIndexes.Y] is Bomb b)
+            {
+                currentBomb = b;
+            }
 
             lock (_ElementsListLockObject)
             {
-                for (int i = 0; i < Elements.GetLength(0); i++)
+                Point playerCurrentCenterPixel = new Point((int)(player.Position.X + GameRectSize * PlayerWidthRate / 2), (int)(player.Position.Y + GameRectSize * PlayerHeightRate / 2));
+                Point playerCurrentUpperRightCornerPixel = new Point((int)(playerCurrentCenterPixel.X + GameRectSize * PlayerWidthRate / 2), (int)(playerCurrentCenterPixel.Y - GameRectSize * PlayerHeightRate / 2 * 0.8));
+                Point playerCurrentBottomRightCornerPixel = new Point((int)(playerCurrentCenterPixel.X + GameRectSize * PlayerWidthRate / 2), (int)(playerCurrentCenterPixel.Y + GameRectSize * PlayerHeightRate / 2 * 0.3));
+                Point playerCurrentUpperLeftCornerPixel = new Point((int)(playerCurrentCenterPixel.X - GameRectSize * PlayerWidthRate / 2), (int)(playerCurrentCenterPixel.Y - GameRectSize * PlayerHeightRate / 2 * 0.8));
+                Point playerCurrentBottomLeftCornerPixel = new Point((int)(playerCurrentCenterPixel.X - GameRectSize * PlayerWidthRate / 2), (int)(playerCurrentCenterPixel.Y + GameRectSize * PlayerHeightRate / 2 * 0.3));
+
+                Point playerNextCenterPixel = new Point((int)(playerCurrentCenterPixel.X + direction.X), (int)(playerCurrentCenterPixel.Y + direction.Y));
+                Point playerNextUpperRightCornerPixel = new Point((int)(playerCurrentUpperRightCornerPixel.X + direction.X), (int)(playerCurrentUpperRightCornerPixel.Y + direction.Y));
+                Point playerNextBottomRightCornerPixel = new Point((int)(playerCurrentBottomRightCornerPixel.X + direction.X), (int)(playerCurrentBottomRightCornerPixel.Y + direction.Y));
+                Point playerNextUpperLeftCornerPixel = new Point((int)(playerCurrentUpperLeftCornerPixel.X + direction.X), (int)(playerCurrentUpperLeftCornerPixel.Y + direction.Y));
+                Point playerNextBottomLeftCornerPixel = new Point((int)(playerCurrentBottomLeftCornerPixel.X + direction.X), (int)(playerCurrentBottomLeftCornerPixel.Y + direction.Y));
+
+                Point playerNextUpperRightCornerIndexes = PixelToMatrixCoordinate(playerNextUpperRightCornerPixel);
+                Point playerNextBottomRightCornerIndexes = PixelToMatrixCoordinate(playerNextBottomRightCornerPixel);
+                Point playerNextUpperLeftCornerIndexes = PixelToMatrixCoordinate(playerNextUpperLeftCornerPixel);
+                Point playerNextBottomLeftCornerIndexes = PixelToMatrixCoordinate(playerNextBottomLeftCornerPixel);
+
+                if (direction.X < 0)//Left
                 {
-                    for (int j = 0; j < Elements.GetLength(1); j++)
+                    if ((Elements[playerNextUpperRightCornerIndexes.X, playerNextUpperRightCornerIndexes.Y] != null && !(Elements[playerNextUpperRightCornerIndexes.X, playerNextUpperRightCornerIndexes.Y] is Bomb)) ||
+                    (Elements[playerNextBottomRightCornerIndexes.X, playerNextBottomRightCornerIndexes.Y] != null && !(Elements[playerNextBottomRightCornerIndexes.X, playerNextBottomRightCornerIndexes.Y] is Bomb)) ||
+                    Elements[playerNextUpperLeftCornerIndexes.X, playerNextUpperLeftCornerIndexes.Y] != null ||
+                    Elements[playerNextBottomLeftCornerIndexes.X, playerNextBottomLeftCornerIndexes.Y] != null)
                     {
-                        if (Elements[i, j] != null)
+                        if ((Elements[playerNextIndexes.X, playerNextIndexes.Y] is Bomb nextBomb) && currentBomb != null && nextBomb.Equals(currentBomb))
                         {
-                            Rectangle elementRect = new Rectangle(i * GameRectSize, j * GameRectSize, GameRectSize, GameRectSize);
-                            if (playerRect.IntersectsWith(elementRect))
-                            {
-                                if (!(Elements[i, j] is Bomb && playerPrevRect.IntersectsWith(elementRect)))
-                                {
-                                    return false;
-                                }
-                            }
+                            return true;//Lejöhet arról a bombáról, ami alá került lerakásra.
                         }
+                        else if (Elements[playerNextIndexes.X, playerNextIndexes.Y] is Bomb c && c.Explode)
+                        {
+                            return true;//Odaléphet a robbanásba, de belehal.
+                        }
+                        return false;
                     }
+                    return true;
                 }
-                return true;
+                else if (direction.X > 0)
+                {
+                    if (Elements[playerNextUpperRightCornerIndexes.X, playerNextUpperRightCornerIndexes.Y] != null ||
+                        Elements[playerNextBottomRightCornerIndexes.X, playerNextBottomRightCornerIndexes.Y] != null ||
+                        (Elements[playerNextUpperLeftCornerIndexes.X, playerNextUpperLeftCornerIndexes.Y] != null && !(Elements[playerNextUpperLeftCornerIndexes.X, playerNextUpperLeftCornerIndexes.Y] is Bomb)) ||
+                        (Elements[playerNextBottomLeftCornerIndexes.X, playerNextBottomLeftCornerIndexes.Y] != null && !(Elements[playerNextBottomLeftCornerIndexes.X, playerNextBottomLeftCornerIndexes.Y] is Bomb)))
+                    {
+                        if ((Elements[playerNextIndexes.X, playerNextIndexes.Y] is Bomb nextBomb) && currentBomb != null && nextBomb.Equals(currentBomb))
+                        {
+                            return true;//Lejöhet arról a bombáról, ami alá került lerakásra.
+                        }
+                        else if (Elements[playerNextIndexes.X, playerNextIndexes.Y] is Bomb c && c.Explode)
+                        {
+                            return true;//Odaléphet a robbanásba, de belehal.
+                        }
+                        return false;
+                    }
+                    return true;
+                }
+                else if (direction.Y < 0)//Up
+                {
+                    if (Elements[playerNextUpperRightCornerIndexes.X, playerNextUpperRightCornerIndexes.Y] != null ||
+                    (Elements[playerNextBottomRightCornerIndexes.X, playerNextBottomRightCornerIndexes.Y] != null && !(Elements[playerNextBottomRightCornerIndexes.X, playerNextBottomRightCornerIndexes.Y] is Bomb)) ||
+                    Elements[playerNextUpperLeftCornerIndexes.X, playerNextUpperLeftCornerIndexes.Y] != null ||
+                    (Elements[playerNextBottomLeftCornerIndexes.X, playerNextBottomLeftCornerIndexes.Y] != null && !(Elements[playerNextBottomLeftCornerIndexes.X, playerNextBottomLeftCornerIndexes.Y] is Bomb)))
+                    {
+                        if ((Elements[playerNextIndexes.X, playerNextIndexes.Y] is Bomb nextBomb) && currentBomb != null && nextBomb.Equals(currentBomb))
+                        {
+                            return true;//Lejöhet arról a bombáról, ami alá került lerakásra.
+                        }
+                        else if (Elements[playerNextIndexes.X, playerNextIndexes.Y] is Bomb c && c.Explode)
+                        {
+                            return true;//Odaléphet a robbanásba, de belehal.
+                        }
+                        return false;
+                    }
+                    return true;
+                }
+                else
+                {
+                    if ((Elements[playerNextUpperRightCornerIndexes.X, playerNextUpperRightCornerIndexes.Y] != null && !(Elements[playerNextUpperRightCornerIndexes.X, playerNextUpperRightCornerIndexes.Y] is Bomb) ||
+                        Elements[playerNextBottomRightCornerIndexes.X, playerNextBottomRightCornerIndexes.Y] != null ||
+                        (Elements[playerNextUpperLeftCornerIndexes.X, playerNextUpperLeftCornerIndexes.Y] != null && !(Elements[playerNextUpperLeftCornerIndexes.X, playerNextUpperLeftCornerIndexes.Y] is Bomb)) ||
+                        Elements[playerNextBottomLeftCornerIndexes.X, playerNextBottomLeftCornerIndexes.Y] != null))
+                    {
+                        if ((Elements[playerNextIndexes.X, playerNextIndexes.Y] is Bomb nextBomb) && currentBomb != null && nextBomb.Equals(currentBomb))
+                        {
+                            return true;//Lejöhet arról a bombáról, ami alá került lerakásra.
+                        }
+                        else if (Elements[playerNextIndexes.X, playerNextIndexes.Y] is Bomb c && c.Explode)
+                        {
+                            return true;//Odaléphet a robbanásba, de belehal.
+                        }
+                        return false;
+                    }
+                    return true;
+                }
+                //if (Elements[playerNextUpperRightCornerIndexes.X, playerNextUpperRightCornerIndexes.Y] != null ||
+                //    Elements[playerNextBottomRightCornerIndexes.X, playerNextBottomRightCornerIndexes.Y] != null ||
+                //    Elements[playerNextUpperLeftCornerIndexes.X, playerNextUpperLeftCornerIndexes.Y] != null ||
+                //    Elements[playerNextBottomLeftCornerIndexes.X, playerNextBottomLeftCornerIndexes.Y] != null)
+                //{
+                //    if ((Elements[playerNextIndexes.X, playerNextIndexes.Y] is Bomb nextBomb) && currentBomb != null && nextBomb.Equals(currentBomb))
+                //    {
+                //        return true;//Lejöhet arról a bombáról, ami alá került lerakásra.
+                //    }
+                //    else if (Elements[playerNextIndexes.X, playerNextIndexes.Y] is Bomb c && c.Explode)
+                //    {
+                //        return true;//Odaléphet a robbanásba, de belehal.
+                //    }
+                //    return false;
+                //}
+                //return true;
             }
+
+            //lock (_ElementsListLockObject)
+            //{
+            //    for (int i = 0; i < Elements.GetLength(0); i++)
+            //    {
+            //        for (int j = 0; j < Elements.GetLength(1); j++)
+            //        {
+            //            if (Elements[i, j] != null)
+            //            {
+            //                Rectangle elementRect = new Rectangle(i * GameRectSize, j * GameRectSize, GameRectSize, GameRectSize);
+            //                if (playerRect.IntersectsWith(elementRect))
+            //                {
+            //                    if (!(Elements[i, j] is Bomb && playerPrevRect.IntersectsWith(elementRect)))
+            //                    {
+            //                        return false;
+            //                    }
+            //                }
+            //            }
+            //        }
+            //    }
+            //    return true;
+            //}
         }
 
         private Player GetKeyBindingForPlayer(PlayerAction playerAction)
@@ -515,18 +610,204 @@ namespace FriendshipExploder.Logic
                     //Action
                     case PlayerAction.actionudlr:
                     case PlayerAction.actionwasd:
+                        BombKickStarter(pl);
                         break;
                 }
                 EnvironmentInteractionsOnStep(pl);
             }
         }
 
+        private void BombKickStarter(Player player)
+        {
+            new Task(() =>
+            {
+                Point playerCenter = new Point((int)(player.Position.X + (GameRectSize * PlayerWidthRate) / 2), (int)(player.Position.Y + (GameRectSize * PlayerHeightRate) / 2));
+                Point playerIndexes = PlayerPixelToMatrixCoordinate(player.Position);
+                switch (player.HeadDirection)
+                {
+                    case PlayerDirection.up:
+                        if (Elements[playerIndexes.X, playerIndexes.Y - 1] is Bomb b && playerCenter.Y - b.PositionPixel.Y < player.Position.Y * PlayerHeightRateHangsIn - 2)
+                        {
+                            while (Elements[b.Position.X, b.Position.Y - 1] == null)
+                            {
+                                Thread.Sleep(1);
+                                lock (_TimerLockObject)
+                                {
+                                    Monitor.Wait(_TimerLockObject);
+                                }
+                                b.PositionPixel = new Point(b.PositionPixel.X, b.PositionPixel.Y - (int)GameRectSize / 8);
+                                b.Position = PlayerPixelToMatrixCoordinate(b.PositionPixel);
+                            }
+                        }
+                        break;
+                    case PlayerDirection.down:
+                        break;
+                    case PlayerDirection.left:
+                        break;
+                    case PlayerDirection.right:
+                        break;
+                    default:
+                        break;
+                }
+            }, TaskCreationOptions.LongRunning);
+        }
+
         private void EnvironmentInteractionsOnStep(Player player)
         {
-            //Point playerIndexes = PlayerIndexes(player.Position);
-            Rectangle playerRect = new Rectangle(player.Position.X, player.Position.Y, (int)(PlayerWidthRate * GameRectSize), (int)((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize));
-            Rectangle elementRect = new Rectangle(player.Position.X * GameRectSize, player.Position.Y * GameRectSize, GameRectSize, GameRectSize);
+            Point playerIndexes = PlayerPixelToMatrixCoordinate(player.Position);
+            //Rectangle playerRect = new Rectangle(player.Position.X, player.Position.Y, (int)(PlayerWidthRate * GameRectSize), (int)((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize));
+            //Rectangle elementRect = new Rectangle(player.Position.X * GameRectSize, player.Position.Y * GameRectSize, GameRectSize, GameRectSize);
 
+            int i = playerIndexes.X;
+            int j = playerIndexes.Y;
+            lock (_PowerupsListLockObject)
+            {
+                if (Powerups[i, j] != null)
+                {
+                    switch (Powerups[i, j].ElementType)
+                    {
+                        case ElementType.Kick:
+                            player.CanKick = true;//ToDo: implement kick for alt?
+                            break;
+                        //case ElementType.Jelly:
+                        //    break;
+                        case ElementType.Desease:
+                            player.HasDesease = true;
+                            switch (rnd.Next(0, 3))
+                            {
+                                case 0:
+                                    new Task(() =>
+                                    {
+                                        int originalBombAmount = player.BombAmount;
+                                        player.BombAmount = 1;
+                                        for (int i = 0; i < 3000; i++)
+                                        {
+                                            if (!GamePaused)
+                                            {
+                                                lock (_TimerLockObject)
+                                                {
+                                                    Monitor.Wait(_TimerLockObject);
+                                                }
+                                            }
+                                            Thread.Sleep(1);
+                                        }
+                                        player.HasDesease = false;
+                                        player.BombAmount = originalBombAmount;
+                                    }, TaskCreationOptions.LongRunning);
+                                    break;
+                                case 1:
+                                    new Task(() =>
+                                    {
+                                        int originalSpeed = player.Speed;
+                                        player.Speed = (int)GameSize.X / 360;
+                                        for (int i = 0; i < 3000; i++)
+                                        {
+                                            if (!GamePaused)
+                                            {
+                                                lock (_TimerLockObject)
+                                                {
+                                                    Monitor.Wait(_TimerLockObject);
+                                                }
+                                            }
+                                            Thread.Sleep(1);
+                                        }
+                                        player.HasDesease = false;
+                                        player.Speed = originalSpeed;
+                                    }, TaskCreationOptions.LongRunning);
+                                    break;
+                                case 2:
+                                    new Task(() =>
+                                    {
+                                        int originalBombExplosionRange = player.Bomb.ExplosionRange;
+                                        player.Bomb.ExplosionRange = 1;
+                                        for (int i = 0; i < 3000; i++)
+                                        {
+                                            if (!GamePaused)
+                                            {
+                                                lock (_TimerLockObject)
+                                                {
+                                                    Monitor.Wait(_TimerLockObject);
+                                                }
+                                            }
+                                            Thread.Sleep(1);
+                                        }
+                                        player.HasDesease = false;
+                                        player.Bomb.ExplosionRange = originalBombExplosionRange;
+                                    }, TaskCreationOptions.LongRunning);
+                                    break;
+                                default://ToDo: Inverse control
+                                    break;
+                            }
+                            break;
+                        case ElementType.BomUp:
+                            if (player.BombAmount < 6)
+                            {
+                                player.BombAmount++;
+                            }
+                            break;
+                        case ElementType.BlastUp:
+                            if (player.Bomb.ExplosionRange < 8)
+                            {
+                                player.Bomb.ExplosionRange++;
+                            }
+                            break;
+                        case ElementType.SpeedUp:
+                            if (player.Speed < (int)GameSize.X / 200)
+                            {
+                                player.Speed += (int)GameSize.X / 20;
+                            }
+                            break;
+                        case ElementType.SpeedDown:
+                            if (player.Speed > (int)GameSize.X / 300)
+                            {
+                                player.Speed -= (int)GameSize.X / 20;
+                            }
+                            break;
+                        case ElementType.Schedule:
+                            player.CanSchedule = true;
+                            break;
+                        default:
+                            break;
+                    }
+                    Powerups[i, j] = null;
+                }
+            }
+
+            lock (_ElementsListLockObject)
+            {
+                if (Elements[i, j] != null)
+                {
+                    switch (Elements[i, j].ElementType)
+                    {
+                        case ElementType.Bomb://Ha belesétálunk egy robbanásba, szintén meghalunk
+                            lock (_PlayersListLockObject)
+                            {
+                                if (Elements[i, j].Explode)
+                                {
+                                    (Elements[i, j] as Bomb).Player.Kills++;
+                                    Players.Remove(player);
+                                }
+                            }
+                            break;
+                        //case ElementType.Player://Betegség átpasszolása :3 KÜlön listában.
+                        //    break;
+                        case ElementType.Teleport:
+                            break;
+                        case ElementType.TravelatorRight:
+                            break;
+                        case ElementType.TravelatorLeft:
+                            break;
+                        case ElementType.TravelatorUp:
+                            break;
+                        case ElementType.TravelatorDown:
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+            //    }
+            //}
             //if (Powerups[playerIndexes.X, playerIndexes.Y] != null)
             //{
             //    switch (Powerups[playerIndexes.X, playerIndexes.Y].ElementType)
@@ -583,7 +864,9 @@ namespace FriendshipExploder.Logic
                 Bomb newBomb = pl.Bomb.BombCopy(
                                 new Point(
                                     (int)Math.Floor((decimal)((pl.Position.X + (PlayerWidthRate * GameRectSize) / 2) / GameRectSize)),
-                                    (int)Math.Floor((decimal)((pl.Position.Y + ((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize) / 2) / GameRectSize))));
+                                    (int)Math.Floor((decimal)((pl.Position.Y + ((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize) / 2) / GameRectSize))),
+                                BombType.Normal,
+                                new Point((int)(pl.Position.X + (GameRectSize * PlayerWidthRate) / 2), (int)(pl.Position.Y + (GameRectSize * (PlayerHeightRate - PlayerHeightRateHangsIn)) / 2)));
                 lock (pl._bombListLockObject)
                 {
                     pl.BombList.Add(newBomb);

@@ -3,7 +3,7 @@
 00fwfwfwfwfwfwf0w
 0wwwwwwwwwwwwwwww
 00fwfwfwfwfwfwfww
-w0wwwwwwwwwwwwwww
+00000000000000000
 00fwfwfwfwfwfwfww
 0wwwwwwwwwwwwwwww
 0wfwfwfwfwfwfwfww

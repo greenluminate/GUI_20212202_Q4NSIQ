@@ -41,6 +41,7 @@
     <None Remove="Images\Powerups\SpeedDown.png" />
     <None Remove="Images\Powerups\SpeedUp.png" />
     <None Remove="Images\Walls\0_Wall.png" />
+    <None Remove="Playgrounds\playground_1.txt" />
   </ItemGroup>
 
   <ItemGroup>
@@ -80,6 +81,9 @@
     <Resource Include="Images\Powerups\SpeedDown.png" />
     <Resource Include="Images\Powerups\SpeedUp.png" />
     <Resource Include="Images\Walls\0_Wall.png" />
+    <Content Include="Playgrounds\playground_1.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
