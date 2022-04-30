@@ -781,6 +781,7 @@ namespace FriendshipExploder.Logic
             return availablePath;
         }
 
+
         Node[,] ReconstructToNodes()
         {
             Node[,] lvlMatrix = new Node[PlayGroundSize[0],PlayGroundSize[1]];
@@ -810,7 +811,6 @@ namespace FriendshipExploder.Logic
             return lvlMatrix;
         }
 
-        
         private List<Node> FindPathToDestructible(int[] targetElementIndex, Point startingPosition)
         {
             Node[,] lvlMatrix = ReconstructToNodes();
