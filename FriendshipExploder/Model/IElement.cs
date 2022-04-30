@@ -9,18 +9,6 @@ namespace FriendshipExploder.Model
         public Point Position { get; set; }
         public bool Explode { get; set; }
 
-        
-        //Útkereséshez kell, súlyokat tárolni
-        public int gCost { get; set; }
-        public int hCost { get; set; }  
 
-        public int fCost
-        {
-            get
-            {
-                return gCost + hCost;
-            }
-        }
-        public IElement Parent { get; set; }
     }
 }

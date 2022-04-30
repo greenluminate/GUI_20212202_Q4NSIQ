@@ -13,9 +13,7 @@ namespace FriendshipExploder.Model
         public Point Position { get; set; }
         public ImageBrush Image { get; set; }
         public bool Explode { get; set; }
-        public int gCost { get; set; }
-        public int hCost { get; set; }
-        public IElement Parent { get; set; }
+
 
         public Wall(Point position, ImageBrush image)
         {

@@ -20,9 +20,6 @@ namespace FriendshipExploder.Model
         public int ExplosionRange { get; set; }//1-7 tile long.
 
         public bool Explode { get; set; }
-        public int gCost { get; set; }
-        public int hCost { get; set; }
-        public IElement Parent { get; set; }
 
         public Bomb(Player player, BombType type = BombType.Normal)
         {
