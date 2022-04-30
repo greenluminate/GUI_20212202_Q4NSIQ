@@ -28,7 +28,7 @@ namespace FriendshipExploder
         GameController gameCtrontroller;
         MainMenuLogic mainMenuLogic;
         GameLogic gameLogic;
-        
+
         public MainWindow()
         {
             InitializeComponent();
@@ -52,13 +52,17 @@ namespace FriendshipExploder
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            display.Resize(new Size(grid.ActualWidth, grid.ActualHeight));
+            Size size = new Size(grid.ActualWidth, grid.ActualHeight);
+            display.Resize(size);
+            gameLogic.SetupSize(new System.Drawing.Point((int)size.Width, (int)(size.Height - size.Height * 0.05)));
             display.InvalidateVisual();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            display.Resize(new Size(grid.ActualWidth, grid.ActualHeight));
+            Size size = new Size(grid.ActualWidth, grid.ActualHeight);
+            display.Resize(size);
+            gameLogic.SetupSize(new System.Drawing.Point((int)size.Width, (int)(size.Height - size.Height * 0.05)));
             display.InvalidateVisual();
         }
 

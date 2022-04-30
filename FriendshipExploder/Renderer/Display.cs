@@ -83,7 +83,7 @@ namespace FriendshipExploder.Renderer
 
 
                 //kockaméret átadása a logic részére
-                gameModel.SetupSize(new System.Drawing.Point((int)size.Width, (int)(size.Height - size.Height * 0.05)), (int)gameRectSize);
+                gameModel.SetupRectSize((int)gameRectSize);
 
                 //saját betütípus
                 Typeface typeface = new Typeface(new FontFamily(new Uri("pack://application:,,,/"), "./Fonts/#Bomberman"), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);

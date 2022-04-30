@@ -15,7 +15,8 @@ namespace FriendshipExploder.Logic
         public IElement[,] Powerups { get; set; }
         int[] PlayGroundSize { get; set; }
         public List<Player> Players { get; set; }
-        public void SetupSize(Point gameSize, int gameRectSize);
+        public void SetupSize(Point gameSize);
+        public void SetupRectSize(int gameRectSize);
         public string Timer { get; set; }
         public object _ElementsListLockObject { get; set; }
         public object _PlayersListLockObject { get; set; }

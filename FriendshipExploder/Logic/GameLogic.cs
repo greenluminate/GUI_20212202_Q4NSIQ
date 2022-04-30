@@ -95,19 +95,26 @@ namespace FriendshipExploder.Logic
             }
         }
 
-        public void SetupSize(Point gameSize, int gameRectSize)
+        public void SetupSize(Point gameSize)
         {
-            //játékos reszponzivitás
-            FixCharacterPosition(gameRectSize);
-
-            this.GameRectSize = gameRectSize;
             this.GameSize = gameSize;
             Players.ForEach(x => { x.Speed = (int)gameSize.X / 300; });
+        }
+
+        public void SetupRectSize(int gameRectSize)
+        {
+            //játékos reszponzivitás
+            if (this.GameRectSize != gameRectSize)
+            {
+                FixCharacterPosition(gameRectSize);
+            }
+            this.GameRectSize = gameRectSize;
         }
 
         //karakter reszponzivitása átméretezésnél
         private void FixCharacterPosition(int gameRectSize)
         {
+            //ToDo: ez csak akkor hívódjon meg, ha rossz helyre tesszük alapból a karaktert. De ha megoldjuk, akkro soha.
             if (GameRectSize != 0)
             {
                 int corrigSize = gameRectSize - this.GameRectSize;
@@ -200,7 +207,6 @@ namespace FriendshipExploder.Logic
 
             AITaskCreator();
             CountDown(150);
-
         }
 
         private void CountDown(int seconds)
@@ -243,33 +249,57 @@ namespace FriendshipExploder.Logic
             actionudlr, actionwasd
         }
 
+        private Point PlayerIndexes(Point position)//Itt kell hozzáadni a két %-át az Yhoz, hogy a hitboxát nézzük ak rakternek és a render nagyságát.
+        {
+            int playerCurrentIndexX = (int)Math.Floor((decimal)(position.X / GameRectSize));
+            int playerCurrentIndexY = (int)Math.Floor((decimal)((position.Y + (GameRectSize * PlayerHeightRateHangsIn)) / GameRectSize * PlayerHeightRate));//Étírni az y-t + 2%ára
+
+            return new Point(playerCurrentIndexX, playerCurrentIndexY);
+        }
+
         //Odaléphet-e a játékos
         private bool CanStepToPos(Player player, System.Windows.Vector direction)
         {
             Rectangle playerPrevRect = new Rectangle(player.Position.X, player.Position.Y, (int)(PlayerWidthRate * GameRectSize), (int)((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize));
             Rectangle playerRect = new Rectangle(player.Position.X + (int)direction.X, player.Position.Y + (int)direction.Y, (int)(PlayerWidthRate * GameRectSize), (int)((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize));
 
+            //Point playerCurrentIndexes = PlayerIndexes(player.Position);
+            //Point playerNextIndexes = PlayerIndexes(player.Position = new Point(player.Position.X + (int)direction.X, player.Position.Y + (int)direction.Y));
+
             int playerCurrentIndexX = (int)Math.Floor((decimal)(player.Position.X / GameRectSize));
             int playerCurrentIndexY = (int)Math.Floor((decimal)(player.Position.Y / GameRectSize));
 
-            //int playerNextIndexX = (int)Math.Floor((decimal)((player.Position.X + direction.X - (GameRectSize / 4) + (GameRectSize / 2)) / GameRectSize));
-            //int playerNextIndexY = (int)Math.Floor((decimal)((player.Position.Y + direction.Y - (GameRectSize / 4) + (GameRectSize / 2)) / GameRectSize));
-
-            //if (direction.Y > 0)//Ha lefelé szeretnénk menni, ne lógjunk belea cellába.
+            //if (playerNextIndexes.X < 0 || playerNextIndexes.Y < 0)
             //{
-            //    playerNextIndexY = (int)Math.Floor((decimal)((player.Position.Y + direction.Y + (GameRectSize / 4)) / GameRectSize * 1.15));
+            //    return false;
+            //}
+
+            //lock (_ElementsListLockObject)
+            //{
+            //    //IElement BombUnderPlayer = null;
+            //    //if (Elements[playerCurrentIndexes.X, playerCurrentIndexes.Y] is Bomb)
+            //    //{
+            //    //    BombUnderPlayer = Elements[playerCurrentIndexes.X, playerCurrentIndexes.Y];
+            //    //}
+
+            //    if (Elements[playerNextIndexes.X, playerNextIndexes.Y] != null)
+            //    {
+            //        Rectangle elementRect = new Rectangle(playerNextIndexes.X * GameRectSize, playerNextIndexes.Y * GameRectSize, GameRectSize, GameRectSize);
+            //        if (playerRect.IntersectsWith(elementRect) && !(Elements[playerNextIndexes.X, playerNextIndexes.Y] is Bomb && playerPrevRect.IntersectsWith(elementRect)))
+            //        {
+            //            return false;//Lejöhet arról a bombáról, ami alá került lerakásra.
+            //        }
+            //        else if (Elements[playerNextIndexes.X, playerNextIndexes.Y] is Bomb b && b.Explode)
+            //        {
+            //            return true;//Odaléphet a robbanásba, de belehal.
+            //        }
+            //    }
+
+            //    return true;
             //}
 
             lock (_ElementsListLockObject)
             {
-                IElement BombUnderPlayer = null;
-                if (Elements[playerCurrentIndexX, playerCurrentIndexY] is Bomb)
-                {
-                    BombUnderPlayer = Elements[playerCurrentIndexX, playerCurrentIndexY];
-                }
-
-                bool canStep = true;
-
                 for (int i = 0; i < Elements.GetLength(0); i++)
                 {
                     for (int j = 0; j < Elements.GetLength(1); j++)
@@ -281,18 +311,14 @@ namespace FriendshipExploder.Logic
                             {
                                 if (!(Elements[i, j] is Bomb && playerPrevRect.IntersectsWith(elementRect)))
                                 {
-                                    canStep = false;
+                                    return false;
                                 }
-
-                                //return false;
                             }
                         }
                     }
                 }
-                return canStep;
+                return true;
             }
-
-            //return true;
         }
 
         private Player GetKeyBindingForPlayer(PlayerAction playerAction)
@@ -350,36 +376,39 @@ namespace FriendshipExploder.Logic
         {
             Player pl = ai is null ? GetKeyBindingForPlayer(playerAction) : ai;
 
-            switch (playerAction)
+            if (pl != null)
             {
-                case PlayerAction.up:
-                case PlayerAction.down:
-                case PlayerAction.W:
-                case PlayerAction.S:
-                    if (pl != null && pl.MovingVertical == false)
-                    {
-                        pl.MovingVertical = true;
-                        while (pl.MovingVertical)
+                switch (playerAction)
+                {
+                    case PlayerAction.up:
+                    case PlayerAction.down:
+                    case PlayerAction.W:
+                    case PlayerAction.S:
+                        if (pl != null && pl.MovingVertical == false)
                         {
-                            Act(playerAction, pl);
-                            await Task.Delay(1);
+                            pl.MovingVertical = true;
+                            while (pl.MovingVertical)
+                            {
+                                Act(playerAction, pl);
+                                await Task.Delay(1);
+                            }
                         }
-                    }
-                    break;
-                case PlayerAction.left:
-                case PlayerAction.right:
-                case PlayerAction.A:
-                case PlayerAction.D:
-                    if (pl != null && pl.MovingHorizontal == false)
-                    {
-                        pl.MovingHorizontal = true;
-                        while (pl.MovingHorizontal)
+                        break;
+                    case PlayerAction.left:
+                    case PlayerAction.right:
+                    case PlayerAction.A:
+                    case PlayerAction.D:
+                        if (pl != null && pl.MovingHorizontal == false)
                         {
-                            Act(playerAction, pl);
-                            await Task.Delay(1);
+                            pl.MovingHorizontal = true;
+                            while (pl.MovingHorizontal)
+                            {
+                                Act(playerAction, pl);
+                                await Task.Delay(1);
+                            }
                         }
-                    }
-                    break;
+                        break;
+                }
             }
         }
 
@@ -437,62 +466,120 @@ namespace FriendshipExploder.Logic
         //A játékos mozgása
         public async void Act(PlayerAction playerAction, Player pl)
         {
-            int posX = pl.Position.X;
-            int posY = pl.Position.Y;
-
-            switch (playerAction)
+            if (pl != null)
             {
-                case PlayerAction.up:
-                case PlayerAction.W:
-                    if (posY - pl.Speed >= 0 && CanStepToPos(pl, new System.Windows.Vector(0, -1 * pl.Speed)))
-                    {
-                        pl.Move(0, -pl.Speed);
-                        pl.HeadDirection = PlayerDirection.up;
-                    }
-                    break;
-                case PlayerAction.down:
-                case PlayerAction.S:
-                    if (posY + ((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize) + pl.Speed <= (PlayGroundSize[1] - 1) * GameRectSize && CanStepToPos(pl, new System.Windows.Vector(0, pl.Speed)))
-                    {
-                        pl.Move(0, pl.Speed);
-                        pl.HeadDirection = PlayerDirection.down;
-                    }
-                    break;
-                case PlayerAction.left:
-                case PlayerAction.A:
-                    if (posX - pl.Speed >= 0 && CanStepToPos(pl, new System.Windows.Vector(-1 * pl.Speed, 0)))
-                    {
-                        pl.Move(-pl.Speed, 0);
-                        pl.HeadDirection = PlayerDirection.left;
-                    }
-                    break;
-                case PlayerAction.right:
-                case PlayerAction.D:
-                    if (posX + (PlayerWidthRate * GameRectSize) + pl.Speed <= ((PlayGroundSize[0] - 1) * GameRectSize) && CanStepToPos(pl, new System.Windows.Vector(pl.Speed, 0)))
-                    {
-                        pl.Move(pl.Speed, 0);
-                        pl.HeadDirection = PlayerDirection.right;
-                    }
-                    break;
+                int posX = pl.Position.X;
+                int posY = pl.Position.Y;
 
-                //Bomba lerakása
-                case PlayerAction.bombudlr:
-                case PlayerAction.bombwasd:
-                    BombThreadStarter(pl);
-                    break;
+                switch (playerAction)
+                {
+                    case PlayerAction.up:
+                    case PlayerAction.W:
+                        if (posY - pl.Speed >= 0 && CanStepToPos(pl, new System.Windows.Vector(0, -1 * pl.Speed)))
+                        {
+                            pl.Move(0, -pl.Speed);
+                            pl.HeadDirection = PlayerDirection.up;
+                        }
+                        break;
+                    case PlayerAction.down:
+                    case PlayerAction.S:
+                        if (posY + ((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize) + pl.Speed <= (PlayGroundSize[1] - 1) * GameRectSize && CanStepToPos(pl, new System.Windows.Vector(0, pl.Speed)))
+                        {
+                            pl.Move(0, pl.Speed);
+                            pl.HeadDirection = PlayerDirection.down;
+                        }
+                        break;
+                    case PlayerAction.left:
+                    case PlayerAction.A:
+                        if (posX - pl.Speed >= 0 && CanStepToPos(pl, new System.Windows.Vector(-1 * pl.Speed, 0)))
+                        {
+                            pl.Move(-pl.Speed, 0);
+                            pl.HeadDirection = PlayerDirection.left;
+                        }
+                        break;
+                    case PlayerAction.right:
+                    case PlayerAction.D:
+                        if (posX + (PlayerWidthRate * GameRectSize) + pl.Speed <= ((PlayGroundSize[0] - 1) * GameRectSize) && CanStepToPos(pl, new System.Windows.Vector(pl.Speed, 0)))
+                        {
+                            pl.Move(pl.Speed, 0);
+                            pl.HeadDirection = PlayerDirection.right;
+                        }
+                        break;
 
-                //Action
-                case PlayerAction.actionudlr:
-                case PlayerAction.actionwasd:
-                    break;
+                    //Bomba lerakása
+                    case PlayerAction.bombudlr:
+                    case PlayerAction.bombwasd:
+                        BombThreadStarter(pl);
+                        break;
+
+                    //Action
+                    case PlayerAction.actionudlr:
+                    case PlayerAction.actionwasd:
+                        break;
+                }
+                EnvironmentInteractionsOnStep(pl);
             }
+        }
+
+        private void EnvironmentInteractionsOnStep(Player player)
+        {
+            //Point playerIndexes = PlayerIndexes(player.Position);
+            Rectangle playerRect = new Rectangle(player.Position.X, player.Position.Y, (int)(PlayerWidthRate * GameRectSize), (int)((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize));
+            Rectangle elementRect = new Rectangle(player.Position.X * GameRectSize, player.Position.Y * GameRectSize, GameRectSize, GameRectSize);
+
+            //if (Powerups[playerIndexes.X, playerIndexes.Y] != null)
+            //{
+            //    switch (Powerups[playerIndexes.X, playerIndexes.Y].ElementType)
+            //    {
+            //        case ElementType.Bomb://Ha belesétálunk egy robbanásba, szintén meghalunk
+            //            if (Powerups[playerIndexes.X, playerIndexes.Y].Explode)
+            //            {
+            //                (Powerups[playerIndexes.X, playerIndexes.Y] as Bomb).Player.Kills++;
+            //                Players.Remove(player);
+            //            }
+            //            break;
+            //        case ElementType.Player://Betegség átpasszolása :3
+            //            break;
+            //        case ElementType.Kick:
+            //            break;
+            //        case ElementType.Jelly:
+            //            break;
+            //        case ElementType.Desease:
+            //            break;
+            //        case ElementType.BomUp:
+            //            break;
+            //        case ElementType.BlastUp:
+            //            break;
+            //        case ElementType.SpeedUp:
+            //            break;
+            //        case ElementType.SpeedDown:
+            //            break;
+            //        case ElementType.Schedule:
+            //            break;
+            //        case ElementType.Teleport:
+            //            break;
+            //        case ElementType.TravelatorRight:
+            //            break;
+            //        case ElementType.TravelatorLeft:
+            //            break;
+            //        case ElementType.TravelatorUp:
+            //            break;
+            //        case ElementType.TravelatorDown:
+            //            break;
+            //        default:
+            //            break;
+            //    }
+            //}
+            //else if (Elements[playerIndexes.X, playerIndexes.Y] != null)
+            //{
+            //}
         }
 
         private void BombThreadStarter(Player pl)
         {
             if (pl.BombList.Count < pl.BombAmount)
             {
-                //Itt beadható, ha scheduled, de még nem tudom, hogyan nézem meg, higy le van e nyomva az action is közben
+                //Itt beadható, ha scheduled, de még nem tudom, hogyan nézem meg, hogy le van e nyomva az action is közben
                 Bomb newBomb = pl.Bomb.BombCopy(
                                 new Point(
                                     (int)Math.Floor((decimal)((pl.Position.X + (PlayerWidthRate * GameRectSize) / 2) / GameRectSize)),
@@ -519,16 +606,10 @@ namespace FriendshipExploder.Logic
                     lock (_ElementsListLockObject)
                     {
                         bomb = (Bomb)Elements[i, j];
-                        //bomb = (Bomb)Array.Find(Elements, bomb => bomb.Equals(newBomb));
                     }
-
-                    //ImageBrush explosionImg = new ImageBrush(
-                    //                    new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "FireParts", "explosion.png"),
-                    //                    UriKind.RelativeOrAbsolute)));
 
                     if (bomb != null)
                     {
-                        //bomb.Image = explosionImg;
                         bomb.Explode = true;
                     }
 
