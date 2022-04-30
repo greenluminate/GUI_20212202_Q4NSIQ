@@ -690,8 +690,9 @@ namespace FriendshipExploder.Logic
             while (true)//ToDo: Majd amgí nem igaz, hogy vége
             {
                 int[] closestElementIndex = FindNearestDestructible(ai.Position);
-                
-                List<IElement> pathToDestructible = FindPathToDestructible( closestElementIndex,ai.Position);
+                int[] lol = new int[] { 3, 5 };
+                List<Node> path = FindPathToDestructible(lol, ai.Position);
+                //List<IElement> pathToDestructible = FindPathToDestructible( closestElementIndex,ai.Position);
                 //IElement[,] elements = new IElement[GameSize.X - 1, GameSize.Y - 1];
                 /*lock (_ElementsListLockObject)
                 {
@@ -729,23 +730,23 @@ namespace FriendshipExploder.Logic
                         ;
                     }
 
-                    if (nearestPlayer.Position.Y - ai.Position.Y < 0 && CanStepToPos(ai, new System.Windows.Vector(0, -1 * ai.Speed)))
-                    {
-                        StartMove(PlayerAction.up, ai);
-                        StopMove(PlayerAction.up, ai);
-                    }
+                    //if (nearestPlayer.Position.Y - ai.Position.Y < 0 && CanStepToPos(ai, new System.Windows.Vector(0, -1 * ai.Speed)))
+                    //{
+                    //    StartMove(PlayerAction.up, ai);
+                    //    StopMove(PlayerAction.up, ai);
+                    //}
 
-                    if (nearestPlayer.Position.X - ai.Position.X > 0 && CanStepToPos(ai, new System.Windows.Vector(ai.Speed, 0)))
-                    {
-                        StartMove(PlayerAction.right, ai);
-                        StopMove(PlayerAction.right, ai);
-                    }
+                    //if (nearestPlayer.Position.X - ai.Position.X > 0 && CanStepToPos(ai, new System.Windows.Vector(ai.Speed, 0)))
+                    //{
+                    //    StartMove(PlayerAction.right, ai);
+                    //    StopMove(PlayerAction.right, ai);
+                    //}
 
-                    if (nearestPlayer.Position.Y - ai.Position.Y > 0 && CanStepToPos(ai, new System.Windows.Vector(0, ai.Speed)))
-                    {
-                        StartMove(PlayerAction.down, ai);
-                        StopMove(PlayerAction.down, ai);
-                    }
+                    //if (nearestPlayer.Position.Y - ai.Position.Y > 0 && CanStepToPos(ai, new System.Windows.Vector(0, ai.Speed)))
+                    //{
+                    //    StartMove(PlayerAction.down, ai);
+                    //    StopMove(PlayerAction.down, ai);
+                    //}
                 }
             }
         }
@@ -763,6 +764,7 @@ namespace FriendshipExploder.Logic
                    Math.Abs(player.Position.Y - ai.Position.Y);
         }
 
+        
         private List<Point> FindAvailablePath(Player ai, int aiNextPosX, int aiNextPosY)
         {
             List<Point> availablePath = new List<Point>();
@@ -779,70 +781,146 @@ namespace FriendshipExploder.Logic
             return availablePath;
         }
 
-        private List<IElement> FindPathToDestructible(int[] targetElementIndex, Point startingPosition)
+        Node[,] ReconstructToNodes()
         {
+            Node[,] lvlMatrix = new Node[PlayGroundSize[0],PlayGroundSize[1]];
+            for (int i = 0; i < Elements.GetLength(0); i++)
+            {
+                for (int j = 0; j < Elements.GetLength(1); j++)
+                {
+                    if (Elements[i,j] == null)
+                    {
+                        lvlMatrix[i,j] = new Node("floor",true, new Point(i,j));
+                    }
+                    else if (Elements[i,j] is Wall)
+                    {
+                        lvlMatrix[i,j] =new Node("wall", false, Elements[i, j].Position);
+                    }
+                    else if (Elements[i,j] is FixWall)
+                    {
+                        lvlMatrix[i,j] = new Node("fixwall", false,Elements[i,j].Position);
+                    }
+                    else if (Elements[i,j] is Bomb)
+                    {
+                        lvlMatrix[i, j] = new Node("bomb", false, Elements[i, j].Position);
+
+                    }
+                }
+            }
+            return lvlMatrix;
+        }
+
+        
+        private List<Node> FindPathToDestructible(int[] targetElementIndex, Point startingPosition)
+        {
+            Node[,] lvlMatrix = ReconstructToNodes();
             int aiCurrentIndexX = (int)Math.Floor((decimal)(startingPosition.X / GameRectSize));
             int aiCurrentIndexY = (int)Math.Floor((decimal)(startingPosition.Y / GameRectSize));
-            IElement target = Elements[targetElementIndex[0], targetElementIndex[1]];
-            List<IElement> openSet = new List<IElement>();
-            HashSet<IElement> closedSet = new HashSet<IElement>();
-            openSet.Add(Elements[startingPosition.X,startingPosition.Y]);
-            int[] dRow = new int[] { -1, 0, 1, 0 }; // Csak arra kell, hogy végig tudjon iterálni a szomszédokon
-            int[] dCol = new int[] { 0, 1, 0, -1 };
+            Node target = lvlMatrix[targetElementIndex[0], targetElementIndex[1]];
+            List<Point> targetArea = GetTargetArea(target); // TODO kigyűjteni úgy a környező pontokat, hogy hasonlítani lehessen
+            List<Node> openSet = new List<Node>();
+            HashSet<Node> closedSet = new HashSet<Node>();
+            openSet.Add(lvlMatrix[aiCurrentIndexX, aiCurrentIndexY]);
 
             while (openSet.Count > 0)
             {
-                IElement currentElement = openSet[0];
-                for (int i = 1; i < openSet.Count; i++) //i = 1 mivel már 0 a currentpointnál megvan
+                Node currentNode = openSet[0];
+                for (int i = 1; i < openSet.Count; i++)
                 {
-                    if (openSet[i].fCost < currentElement.fCost || openSet[i].fCost == currentElement.fCost &&openSet[i].hCost < currentElement.hCost)
+                    if (openSet[i].fCost < currentNode.fCost || openSet[i].fCost == currentNode.fCost && openSet[i].hCost < currentNode.hCost)
                     {
-                        currentElement  = openSet[i];
+                        currentNode = openSet[i];
                     }
                 }
-                openSet.Remove(currentElement);
-                closedSet.Add(currentElement);
-                if (currentElement.Position == target.Position)
+                openSet.Remove(currentNode);
+                closedSet.Add(currentNode);
+                foreach (var x in targetArea)
                 {
+                    if (x.X == currentNode.Position.X && x.Y == currentNode.Position.Y && lvlMatrix[x.X,x.Y].Walkable)
+                    {
+                        List<Node> path = PathRetrace(lvlMatrix[aiCurrentIndexX, aiCurrentIndexY], currentNode);
+                        return path;
+                    }
                     
-                    return PathRetrace(Elements[startingPosition.X, startingPosition.Y], target);
+
                 }
-                for (int i = 0; i < 4; i++) 
+
+                foreach (Node neighbor in GetNeighbors(currentNode,lvlMatrix))
                 {
-                    int adjx = currentElement.Position.X + dRow[i];
-                    int adjy = currentElement.Position.Y + dCol[i];
-                    IElement neighBor = Elements[adjx, adjy];
-                    if (Elements[adjx,adjy] is null && ValidPath(adjx,adjy))
+                    if (!neighbor.Walkable|| closedSet.Contains(neighbor))
                     {
                         continue;
                     }
-                    int newMovementCostToNeighbour = currentElement.gCost + GetDistance(currentElement.Position, neighBor.Position);
-                    if (newMovementCostToNeighbour < neighBor.gCost || !openSet.Contains(neighBor))
+                    int newMovementCostToNeighbour = currentNode.gCost + GetDistance(currentNode.Position, neighbor.Position);
+                    if (newMovementCostToNeighbour < neighbor.gCost || !openSet.Contains(neighbor))
                     {
-                        neighBor.gCost = newMovementCostToNeighbour;
-                        neighBor.hCost = GetDistance(neighBor.Position, target.Position);
-                        neighBor.Parent = currentElement;
-
-                        if (!openSet.Contains(neighBor))
+                        neighbor.gCost = newMovementCostToNeighbour;
+                        neighbor.hCost = GetDistance(neighbor.Position, target.Position);
+                        neighbor.Parent = currentNode;
+                        if (!openSet.Contains(neighbor))
                         {
-                            openSet.Add(neighBor);
+                            openSet.Add(neighbor);
                         }
                     }
                 }
+
             }
             return null;
         }
 
-        List<IElement> PathRetrace(IElement startElement, IElement targetElement)
+        public List<Point> GetTargetArea(Node target)
         {
-            List<IElement> path = new List<IElement>();
-            IElement currentElement = targetElement;
-            while (currentElement != startElement)
+            List<Point> targetArea = new List<Point>();
+ 
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    if (x== 0 & y == 0)
+                    {
+                        continue;
+                    }
+
+                    int thisX = target.Position.X + x;
+                    int thisY = target.Position.Y + y;
+                    targetArea.Add(new Point(thisX, thisY));
+                }
+            }
+            return targetArea;
+        }
+        public List<Node> GetNeighbors(Node node,Node[,] lvlMatrix)
+        {
+            List<Node> neighbors = new List<Node>();
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    if (x == 0 && y == 0)
+                    {
+                        continue;
+                    }
+
+                    int checkX = node.Position.X + x;
+                    int checkY = node.Position.Y + y;
+                    if (checkX >= 0 && checkX < PlayGroundSize[0] && checkY >= 0 && checkY < PlayGroundSize[1])
+                    {
+                        neighbors.Add(lvlMatrix[checkX, checkY]);
+                    }
+                }
+            }
+            return neighbors;
+        }
+
+        List<Node> PathRetrace(Node startNode, Node targetNode)
+        {
+            List<Node> path = new List<Node>();
+            Node currentElement = targetNode;
+            while (currentElement != startNode)
             {
                 path.Add(currentElement);
                 currentElement = currentElement.Parent;
-                
-                
+
+
             }
             path.Reverse();
             return path;
@@ -855,11 +933,11 @@ namespace FriendshipExploder.Logic
             int distY = Math.Abs(pointA.Y - pointB.Y);
             if (distX > distY)
             {
-                return 14 + distY + 10*(distX - distY);
+                return 14 + distY + 10 * (distX - distY);
                 return 14 + distX + 10 * (distY - distX);
 
             }
-            return -1;
+            return 1;
         }
 
         public bool ValidPath(int row, int col)
