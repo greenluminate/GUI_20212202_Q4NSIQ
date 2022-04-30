@@ -781,7 +781,7 @@ namespace FriendshipExploder.Logic
             return availablePath;
         }
 
-
+        //Optimalizáció még erősen szükséges
         Node[,] ReconstructToNodes()
         {
             Node[,] lvlMatrix = new Node[PlayGroundSize[0],PlayGroundSize[1]];
