@@ -115,14 +115,30 @@ namespace FriendshipExploder.Renderer
                                 }
                                 else
                                 {
-                                    //Felrobbanás állapota
-                                    drawingContext.DrawRectangle(
-                                        new ImageBrush(
-                                        new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", $"{gameModel.Elements[i, j].ElementType}s", $"0_{gameModel.Elements[i, j].ElementType}Explode.png"),
-                                        UriKind.RelativeOrAbsolute))),
-                                        new Pen(Brushes.Black, 0),
-                                        new Rect(x, y, gameRectSize, gameRectSize)
-                                    );
+                                    if (!gameModel.Elements[i, j].IsMoving)
+                                    {
+                                        //Felrobbanás állapota
+                                        drawingContext.DrawRectangle(
+                                            new ImageBrush(
+                                            new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", $"{gameModel.Elements[i, j].ElementType}s", $"0_{gameModel.Elements[i, j].ElementType}Explode.png"),
+                                            UriKind.RelativeOrAbsolute))),
+                                            new Pen(Brushes.Black, 0),
+                                            new Rect(x, y, gameRectSize, gameRectSize)
+                                        );
+                                    }
+                                    else
+                                    {
+                                        double xx = startX + gameModel.Elements[i, j].PositionPixel.X - gameRectSize / 2;
+                                        double yy = startY + gameModel.Elements[i, j].PositionPixel.Y - gameRectSize / 2;
+
+                                        drawingContext.DrawRectangle(
+                                            new ImageBrush(
+                                            new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", $"{gameModel.Elements[i, j].ElementType}s", $"0_{gameModel.Elements[i, j].ElementType}.png"),
+                                            UriKind.RelativeOrAbsolute))),
+                                            new Pen(Brushes.Black, 0),
+                                            new Rect(xx, yy, gameRectSize, gameRectSize)
+                                        );
+                                    }
                                 }
                             }
                             else if (gameModel.Powerups[i, j] != null)

@@ -21,6 +21,7 @@ namespace FriendshipExploder.Model
         public int ExplosionRange { get; set; }//1-7 tile long.
         public bool Explode { get; set; }
         public ElementType ElementType { get; set; }
+        public bool IsMoving { get; set; }
 
         public Bomb(Player player, ElementType ElementType, BombType type = BombType.Normal)
         {
@@ -38,7 +39,7 @@ namespace FriendshipExploder.Model
             newBomb.IsBouncey = this.IsBouncey;
             newBomb.ExplosionRange = this.ExplosionRange;
             newBomb.Position = position;
-            PositionPixel = point;
+            newBomb.PositionPixel = point;
             return newBomb;
         }
 

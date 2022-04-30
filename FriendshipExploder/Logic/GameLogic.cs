@@ -552,7 +552,7 @@ namespace FriendshipExploder.Logic
                 //Action
                 case PlayerAction.actionudlr:
                 case PlayerAction.actionwasd:
-                    Act(PlayerAction.bombudlr, pl);
+                    Act(PlayerAction.actionudlr, pl);
                     await Task.Delay(1);
                     break;
             }
@@ -618,7 +618,7 @@ namespace FriendshipExploder.Logic
         }
 
         private void BombKickStarter(Player player)
-        {
+        {//ToDo: bool állítás 
             new Task(() =>
             {
                 Point playerCenter = new Point((int)(player.Position.X + (GameRectSize * PlayerWidthRate) / 2), (int)(player.Position.Y + (GameRectSize * PlayerHeightRate) / 2));
@@ -626,30 +626,145 @@ namespace FriendshipExploder.Logic
                 switch (player.HeadDirection)
                 {
                     case PlayerDirection.up:
-                        if (Elements[playerIndexes.X, playerIndexes.Y - 1] is Bomb b && playerCenter.Y - b.PositionPixel.Y < player.Position.Y * PlayerHeightRateHangsIn - 2)
+                        if (Elements[playerIndexes.X, playerIndexes.Y - 1] is Bomb b && playerCenter.Y - b.PositionPixel.Y < player.Position.Y * PlayerHeightRate * GameRectSize / 2 + GameRectSize / 2 + 10)
                         {
-                            while (Elements[b.Position.X, b.Position.Y - 1] == null)
+                            while (b.Position.Y - 1 >= 0 && Elements[b.Position.X, b.Position.Y - 1] == null)
                             {
+                                b.IsMoving = true;
                                 Thread.Sleep(1);
-                                lock (_TimerLockObject)
+                                if (GamePaused)
                                 {
-                                    Monitor.Wait(_TimerLockObject);
+                                    lock (_TimerLockObject)
+                                    {
+                                        Monitor.Wait(_TimerLockObject);
+                                    }
                                 }
-                                b.PositionPixel = new Point(b.PositionPixel.X, b.PositionPixel.Y - (int)GameRectSize / 8);
+
+                                b.PositionPixel = new Point(b.PositionPixel.X, (int)(b.PositionPixel.Y - (double)GameRectSize / 20.0));
+                                Point oldPos = b.Position;
                                 b.Position = PlayerPixelToMatrixCoordinate(b.PositionPixel);
+                                if (!oldPos.Equals(b.Position))
+                                {
+                                    lock (_ElementsListLockObject)
+                                    {
+                                        Elements[oldPos.X, oldPos.Y] = null;
+                                        Elements[b.Position.X, b.Position.Y] = b;
+                                    }
+                                }
+                            }
+
+                            if (b != null)
+                            {
+                                b.IsMoving = false;
                             }
                         }
                         break;
                     case PlayerDirection.down:
+                        if (Elements[playerIndexes.X, playerIndexes.Y + 1] is Bomb bdown && playerCenter.Y + bdown.PositionPixel.Y < player.Position.Y * PlayerHeightRate * GameRectSize / 2 + GameRectSize / 2 + 10)
+                        {
+                            while (bdown.Position.Y + 1 < PlayGroundSize[1] - 1 && Elements[bdown.Position.X, bdown.Position.Y + 1] == null)
+                            {
+                                bdown.IsMoving = true;
+                                Thread.Sleep(1);
+                                if (GamePaused)
+                                {
+                                    lock (_TimerLockObject)
+                                    {
+                                        Monitor.Wait(_TimerLockObject);
+                                    }
+                                }
+
+                                bdown.PositionPixel = new Point(bdown.PositionPixel.X, (int)(bdown.PositionPixel.Y + (double)GameRectSize / 20.0));
+                                Point oldPos = bdown.Position;
+                                bdown.Position = PlayerPixelToMatrixCoordinate(bdown.PositionPixel);
+                                if (!oldPos.Equals(bdown.Position))
+                                {
+                                    lock (_ElementsListLockObject)
+                                    {
+                                        Elements[oldPos.X, oldPos.Y] = null;
+                                        Elements[bdown.Position.X, bdown.Position.Y] = bdown;
+                                    }
+                                }
+                            }
+
+                            if (bdown != null)
+                            {
+                                bdown.IsMoving = false;
+                            }
+                        }
                         break;
                     case PlayerDirection.left:
+                        if (Elements[playerIndexes.X - 1, playerIndexes.Y] is Bomb bleft && playerCenter.X - bleft.PositionPixel.X < player.Position.X * PlayerWidthRate * GameRectSize / 2 + GameRectSize / 2 + 10)
+                        {
+                            while (bleft.Position.X - 1 >= 0 && Elements[bleft.Position.X - 1, bleft.Position.Y] == null)
+                            {
+                                bleft.IsMoving = true;
+                                Thread.Sleep(1);
+                                if (GamePaused)
+                                {
+                                    lock (_TimerLockObject)
+                                    {
+                                        Monitor.Wait(_TimerLockObject);
+                                    }
+                                }
+
+                                bleft.PositionPixel = new Point((int)(bleft.PositionPixel.X - (double)GameRectSize / 20.0), bleft.PositionPixel.Y);
+                                Point oldPos = bleft.Position;
+                                bleft.Position = PlayerPixelToMatrixCoordinate(bleft.PositionPixel);
+                                if (!oldPos.Equals(bleft.Position))
+                                {
+                                    lock (_ElementsListLockObject)
+                                    {
+                                        Elements[oldPos.X, oldPos.Y] = null;
+                                        Elements[bleft.Position.X, bleft.Position.Y] = bleft;
+                                    }
+                                }
+                            }
+
+                            if (bleft != null)
+                            {
+                                bleft.IsMoving = false;
+                            }
+                        }
                         break;
                     case PlayerDirection.right:
+                        if (Elements[playerIndexes.X + 1, playerIndexes.Y] is Bomb bright && playerCenter.X + bright.PositionPixel.X < player.Position.X * PlayerWidthRate * GameRectSize / 2 + GameRectSize / 2 + 10)
+                        {
+                            while (bright.Position.X + 1 < PlayGroundSize[0] - 1 && Elements[bright.Position.X + 1, bright.Position.Y] == null)
+                            {
+                                bright.IsMoving = true;
+                                Thread.Sleep(1);
+                                if (GamePaused)
+                                {
+                                    lock (_TimerLockObject)
+                                    {
+                                        Monitor.Wait(_TimerLockObject);
+                                    }
+                                }
+
+                                bright.PositionPixel = new Point((int)(bright.PositionPixel.X + (double)GameRectSize / 20.0), bright.PositionPixel.Y);
+                                Point oldPos = bright.Position;
+                                bright.Position = PlayerPixelToMatrixCoordinate(bright.PositionPixel);
+                                if (!oldPos.Equals(bright.Position))
+                                {
+                                    lock (_ElementsListLockObject)
+                                    {
+                                        Elements[oldPos.X, oldPos.Y] = null;
+                                        Elements[bright.Position.X, bright.Position.Y] = bright;
+                                    }
+                                }
+                            }
+
+                            if (bright != null)
+                            {
+                                bright.IsMoving = false;
+                            }
+                        }
                         break;
                     default:
                         break;
                 }
-            }, TaskCreationOptions.LongRunning);
+            }, TaskCreationOptions.LongRunning).Start();
         }
 
         private void EnvironmentInteractionsOnStep(Player player)
@@ -682,7 +797,7 @@ namespace FriendshipExploder.Logic
                                         player.BombAmount = 1;
                                         for (int i = 0; i < 3000; i++)
                                         {
-                                            if (!GamePaused)
+                                            if (GamePaused)
                                             {
                                                 lock (_TimerLockObject)
                                                 {
@@ -693,7 +808,7 @@ namespace FriendshipExploder.Logic
                                         }
                                         player.HasDesease = false;
                                         player.BombAmount = originalBombAmount;
-                                    }, TaskCreationOptions.LongRunning);
+                                    }, TaskCreationOptions.LongRunning).Start();
                                     break;
                                 case 1:
                                     new Task(() =>
@@ -702,7 +817,7 @@ namespace FriendshipExploder.Logic
                                         player.Speed = (int)GameSize.X / 360;
                                         for (int i = 0; i < 3000; i++)
                                         {
-                                            if (!GamePaused)
+                                            if (GamePaused)
                                             {
                                                 lock (_TimerLockObject)
                                                 {
@@ -713,7 +828,7 @@ namespace FriendshipExploder.Logic
                                         }
                                         player.HasDesease = false;
                                         player.Speed = originalSpeed;
-                                    }, TaskCreationOptions.LongRunning);
+                                    }, TaskCreationOptions.LongRunning).Start();
                                     break;
                                 case 2:
                                     new Task(() =>
@@ -722,7 +837,7 @@ namespace FriendshipExploder.Logic
                                         player.Bomb.ExplosionRange = 1;
                                         for (int i = 0; i < 3000; i++)
                                         {
-                                            if (!GamePaused)
+                                            if (GamePaused)
                                             {
                                                 lock (_TimerLockObject)
                                                 {
@@ -733,7 +848,7 @@ namespace FriendshipExploder.Logic
                                         }
                                         player.HasDesease = false;
                                         player.Bomb.ExplosionRange = originalBombExplosionRange;
-                                    }, TaskCreationOptions.LongRunning);
+                                    }, TaskCreationOptions.LongRunning).Start();
                                     break;
                                 default://ToDo: Inverse control
                                     break;
@@ -754,13 +869,13 @@ namespace FriendshipExploder.Logic
                         case ElementType.SpeedUp:
                             if (player.Speed < (int)GameSize.X / 200)
                             {
-                                player.Speed += (int)GameSize.X / 20;
+                                player.Speed += (int)GameSize.X / 80;
                             }
                             break;
                         case ElementType.SpeedDown:
                             if (player.Speed > (int)GameSize.X / 300)
                             {
-                                player.Speed -= (int)GameSize.X / 20;
+                                player.Speed -= (int)GameSize.X / 80;
                             }
                             break;
                         case ElementType.Schedule:
@@ -872,8 +987,9 @@ namespace FriendshipExploder.Logic
                     pl.BombList.Add(newBomb);
                 }
 
-                int i = (int)Math.Floor((decimal)(pl.Position.X / GameRectSize));
-                int j = (int)Math.Floor((decimal)(pl.Position.Y / GameRectSize));
+                Point xy = PlayerPixelToMatrixCoordinate(pl.Position);
+                int i = xy.X;
+                int j = xy.Y;
 
 
                 lock (_ElementsListLockObject)
@@ -883,7 +999,7 @@ namespace FriendshipExploder.Logic
 
                 new Task(async () =>
                 {
-                    Thread.Sleep(3000);//x másodperc múlva robban a bomba
+                    Thread.Sleep(66666);//x másodperc múlva robban a bomba
                     Bomb bomb = null;
 
                     lock (_ElementsListLockObject)

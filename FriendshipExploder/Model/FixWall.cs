@@ -15,6 +15,9 @@ namespace FriendshipExploder.Model
         public ImageBrush Image { get; set; }
         public bool Explode { get; set; }
         public ElementType ElementType { get; set; }
+        public bool IsMoving { get; set; }
+        public Point PositionPixel { get; set; }//Centerként kell megkapja
+
         public FixWall(Point position, ElementType ElementType)
         {
             Position = position;
