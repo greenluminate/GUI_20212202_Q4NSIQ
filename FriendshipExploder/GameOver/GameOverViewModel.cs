@@ -90,8 +90,25 @@ namespace FriendshipExploder.GameOver
         }
 
 
+        private int fontSize;
+        public int FontSize
+        {
+            get { return fontSize; }
+            set { SetProperty(ref fontSize, value); }
+        }
+
+        private double placeFontSize;
+        public double PlaceFontSize
+        {
+            get { return placeFontSize; }
+            set { SetProperty(ref placeFontSize, value); }
+        }
+
+
         public GameOverViewModel()
         {
+            FontSize = (int)System.Windows.SystemParameters.PrimaryScreenWidth / 80;
+            PlaceFontSize = (int)System.Windows.SystemParameters.PrimaryScreenWidth / 32;
             GameOverBackground = new ImageBrush(new BitmapImage(new Uri($"pack://application:,,,/Images/GameBackground/0_GameBackground.jpg")));
         }
 

@@ -23,7 +23,7 @@
             </Style.Resources>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontSize" Value="{Binding FontSize}"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Margin" Value="20,20,20,20"/>
             <Setter Property="Foreground" Value="White"/>
@@ -33,7 +33,7 @@
         <Style TargetType="Label" x:Key="nameLabel">
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Top"/>
-            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontSize" Value="{Binding FontSize}"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontFamily" Value="{StaticResource font}"/>
@@ -41,14 +41,14 @@
         <Style TargetType="Label" x:Key="placeLabel">
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="FontSize" Value="60"/>
+            <Setter Property="FontSize" Value="{Binding PlaceFontSize}"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="FontFamily" Value="{StaticResource font}"/>
         </Style>
         <Style TargetType="Label" x:Key="killLabel">
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Top"/>
-            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontSize" Value="{Binding FontSize}"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontFamily" Value="{StaticResource font}"/>
