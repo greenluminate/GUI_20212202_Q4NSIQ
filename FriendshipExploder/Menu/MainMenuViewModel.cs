@@ -28,6 +28,7 @@ namespace FriendshipExploder.Menu
             set {
                 SetProperty(ref selectedPlayground, value);
                 (StartCommand as RelayCommand).NotifyCanExecuteChanged();
+                UpdatePreviewImage();
             } 
         }
         private bool playgroundsEnabled;
@@ -161,6 +162,14 @@ namespace FriendshipExploder.Menu
         {
             get { return startEnabled; }
             set { SetProperty(ref startEnabled, value); }
+        }
+
+
+        private string playgroundImage;
+        public string PlaygroundImage
+        {
+            get { return playgroundImage; }
+            set { SetProperty(ref playgroundImage, value); }
         }
 
 
@@ -305,5 +314,9 @@ namespace FriendshipExploder.Menu
             }
         }
 
+        private void UpdatePreviewImage()
+        {
+            PlaygroundImage = $"../Playgrounds/Preview/{SelectedPlayground}.jpg";
+        }
     }
 }
