@@ -10,7 +10,32 @@
         WindowStartupLocation="CenterScreen"
         WindowStyle="None"
         Loaded="Window_Loaded"
-        KeyDown="pausedWindow_KeyDown">
+        ResizeMode="NoResize">
+    <Window.Resources>
+        <FontFamily x:Key="font" >/Fonts/#Bomberman</FontFamily>
+        <Style TargetType="Button" x:Key="roundedbtn">
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="10"/>
+                </Style>
+            </Style.Resources>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontFamily" Value="{StaticResource font}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="DimGray"/>
+        </Style>
+        <Style TargetType="Label" x:Key="title_lb">
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontFamily" Value="{StaticResource font}"/>
+            <Setter Property="Foreground" Value="DimGray"/>
+        </Style>
+    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*"/>
@@ -19,33 +44,11 @@
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Column="1">
             <Border BorderBrush="LightGray" BorderThickness="2" Margin="0,20,0,0">
-                <Label Content="Game paused" VerticalContentAlignment="Center" 
-                   HorizontalContentAlignment="Center" FontSize="24" FontWeight="Bold" Foreground="DimGray"/>
+                <Label x:Name="title_lb" Content="Game paused" Style="{StaticResource title_lb}" />
             </Border>
-            <Button Content="Resume" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                       FontSize="20" FontWeight="Bold" Margin="20,40,20,0" Click="Resume" Foreground="White" Background="DimGray">
-                <Button.Resources>
-                    <Style TargetType="{x:Type Border}">
-                        <Setter Property="CornerRadius" Value="10"/>
-                    </Style>
-                </Button.Resources>
-            </Button>
-            <Button Content="Main menu" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                       FontSize="20" FontWeight="Bold" Margin="20,20,20,0" Click="MainMenu" Foreground="White" Background="DimGray">
-                <Button.Resources>
-                    <Style TargetType="{x:Type Border}">
-                        <Setter Property="CornerRadius" Value="10"/>
-                    </Style>
-                </Button.Resources>
-            </Button>
-            <Button Content="Exit" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                       FontSize="20" FontWeight="Bold" Margin="20,20,20,0" Click="Exit" Foreground="White" Background="DimGray">
-                <Button.Resources>
-                    <Style TargetType="{x:Type Border}">
-                        <Setter Property="CornerRadius" Value="10"/>
-                    </Style>
-                </Button.Resources>
-            </Button>
+            <Button x:Name="resume_bt" Content="Resume" Margin="20,40,20,0" Click="Resume" Style="{StaticResource roundedbtn}" />
+            <Button x:Name="mainMenu_bt" Content="Main menu" Margin="20,20,20,0" Click="MainMenu" Style="{StaticResource roundedbtn}" />
+            <Button x:Name="exit_bt" Content="Exit" Margin="20,20,20,0" Click="Exit" Style="{StaticResource roundedbtn}" />
         </StackPanel>
     </Grid>
 </Window>

@@ -25,6 +25,11 @@ namespace FriendshipExploder.Menu
         public PausedWindow()
         {
             InitializeComponent();
+            int fontSize = (int)SystemParameters.PrimaryScreenWidth / 80;
+            title_lb.FontSize = fontSize;
+            resume_bt.FontSize = fontSize;
+            exit_bt.FontSize = fontSize;
+
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -47,11 +52,6 @@ namespace FriendshipExploder.Menu
         {
             ActionMainMenu = true;
             this.DialogResult = true;
-        }
-
-        private void pausedWindow_KeyDown(object sender, KeyEventArgs e)
-        {
-
         }
     }
 }
