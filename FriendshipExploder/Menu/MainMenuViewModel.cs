@@ -37,6 +37,20 @@ namespace FriendshipExploder.Menu
             set { SetProperty(ref playgroundsEnabled, value); }
         }
 
+        private int buttonFontSize;
+        public int ButtonFontSize
+        {
+            get { return buttonFontSize; }
+            set { SetProperty(ref buttonFontSize, value); }
+        }
+
+        private double labelFontSize;
+        public double LabelFontSize
+        {
+            get { return labelFontSize; }
+            set { SetProperty(ref labelFontSize, value); }
+        }
+
 
         public ICommand NewGameCommand { get; set; }
         public ICommand NextCommand { get; set; }
@@ -152,6 +166,8 @@ namespace FriendshipExploder.Menu
 
         public MainMenuViewModel()
         {
+            ButtonFontSize = (int)System.Windows.SystemParameters.PrimaryScreenWidth / 80;
+            LabelFontSize = (int)System.Windows.SystemParameters.PrimaryScreenWidth / 96;
             MenuBackground = new ImageBrush(new BitmapImage(new Uri($"pack://application:,,,/Images/GameBackground/0_GameBackground.jpg")));
             LoadPlaygrounds();
             NewGameEnabled = true;
