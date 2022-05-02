@@ -691,7 +691,7 @@ namespace FriendshipExploder.Logic
             {
                 int[] closestElementIndex = FindNearestDestructible(ai.Position);
                 int[] lol = new int[] { 3, 5 };
-                List<Node> path = FindPathToDestructible(lol, ai.Position);
+                List<Point> path = FindPathToDestructible(lol, ai.Position);
                 //List<IElement> pathToDestructible = FindPathToDestructible( closestElementIndex,ai.Position);
                 //IElement[,] elements = new IElement[GameSize.X - 1, GameSize.Y - 1];
                 /*lock (_ElementsListLockObject)
@@ -702,33 +702,59 @@ namespace FriendshipExploder.Logic
                 Player nearestPlayer = NearestPlayer(ai);
                 //ToDO: ha bomba van a közelében bújjon el.
                 //Az Elements lista = NotAvailablePoints;
-                if (nearestPlayer != null && PositionDifference(nearestPlayer, ai) <= 20)//ToDo: ai.Bomb.explosionSize vagy ami lesz
+
+
+                if (path != null)
+                {
+                    foreach (var pt in path)
+                    {
+
+                        if (pt.X > (int)Math.Floor((decimal)(ai.Position.X / GameRectSize)))
+                        {
+                            StartMove(PlayerAction.right, ai);
+                            StopMove(PlayerAction.right, ai);
+                            
+                        }
+                         if (pt.Y > (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize)))
+                        {
+                            StartMove(PlayerAction.down, ai);
+                            StopMove(PlayerAction.down, ai);
+                            
+                        }
+                        
+
+                    }
+                }
+                
+
+
+                //if (nearestPlayer != null && PositionDifference(nearestPlayer, ai) <= 20)//ToDo: ai.Bomb.explosionSize vagy ami lesz
                 {
                     //ToDo: Go and Install bomb
                     //ToDo: hide and wait until Explosion + x seconds
-                }
-                else
-                {
+               // }
+                //else
+                //{
                     //ToDo: follow player
                     //ToDO: AI javítása nullcheckekkel, ha egyedül lenne mit csináljon.
-                    if (nearestPlayer.Position.X - ai.Position.X < 0 && CanStepToPos(ai, new System.Windows.Vector(-1 * ai.Speed, 0)))
-                    {
-                        StartMove(PlayerAction.left, ai);
-                        StopMove(PlayerAction.left, ai);
-                    }
+                    //if (nearestPlayer.Position.X - ai.Position.X < 0 && CanStepToPos(ai, new System.Windows.Vector(-1 * ai.Speed, 0)))
+                    //{
+                        //StartMove(PlayerAction.left, ai);
+                        //StopMove(PlayerAction.left, ai);
+                    //}
 
-                    if (!CanStepToPos(ai, new System.Windows.Vector(-1 * ai.Speed, 0)))
-                    {
-                        int aiNextPosX = ai.Position.X + (-1 * ai.Speed);//Kiszervezni az egészet külön metódusba.
-                        int aiNextPosY = ai.Position.Y;
+                    //if (!CanStepToPos(ai, new System.Windows.Vector(-1 * ai.Speed, 0)))
+                    //{
+                       // int aiNextPosX = ai.Position.X + (-1 * ai.Speed);//Kiszervezni az egészet külön metódusba.
+                        //int aiNextPosY = ai.Position.Y;
                         //IElement blockingElement = elements[aiNextPosX, aiNextPosY];
                         
-                        List<Point> availablePath = FindAvailablePath(ai, aiNextPosX, aiNextPosY);
-                        List<PlayerAction> availableRoundaboutActions = FindAvailableRoundaboutActions(ai, aiNextPosX, aiNextPosY);
+                        //List<Point> availablePath = FindAvailablePath(ai, aiNextPosX, aiNextPosY);
+                        //List<PlayerAction> availableRoundaboutActions = FindAvailableRoundaboutActions(ai, aiNextPosX, aiNextPosY);
                         //availableRoundaboutActions.ForEach(Action => Action.Pop);
                         //ToDo: jó irány keresése a megkerüléshez, majd móaction-ök meghívása sorban.
-                        ;
-                    }
+                        //;
+                    //}
 
                     //if (nearestPlayer.Position.Y - ai.Position.Y < 0 && CanStepToPos(ai, new System.Windows.Vector(0, -1 * ai.Speed)))
                     //{
@@ -764,7 +790,8 @@ namespace FriendshipExploder.Logic
                    Math.Abs(player.Position.Y - ai.Position.Y);
         }
 
-        
+       
+
         private List<Point> FindAvailablePath(Player ai, int aiNextPosX, int aiNextPosY)
         {
             List<Point> availablePath = new List<Point>();
@@ -811,7 +838,7 @@ namespace FriendshipExploder.Logic
             return lvlMatrix;
         }
 
-        private List<Node> FindPathToDestructible(int[] targetElementIndex, Point startingPosition)
+        private List<Point> FindPathToDestructible(int[] targetElementIndex, Point startingPosition)
         {
             Node[,] lvlMatrix = ReconstructToNodes();
             int aiCurrentIndexX = (int)Math.Floor((decimal)(startingPosition.X / GameRectSize));
@@ -838,8 +865,8 @@ namespace FriendshipExploder.Logic
                 {
                     if (x.X == currentNode.Position.X && x.Y == currentNode.Position.Y && lvlMatrix[x.X,x.Y].Walkable)
                     {
-                        List<Node> path = PathRetrace(lvlMatrix[aiCurrentIndexX, aiCurrentIndexY], currentNode);
-                        return path;
+                        List<Point> path = PathRetrace(lvlMatrix[aiCurrentIndexX, aiCurrentIndexY], currentNode);
+                        return path;    
                     }
                     
 
@@ -911,13 +938,13 @@ namespace FriendshipExploder.Logic
             return neighbors;
         }
 
-        List<Node> PathRetrace(Node startNode, Node targetNode)
+        List<Point> PathRetrace(Node startNode, Node targetNode)
         {
-            List<Node> path = new List<Node>();
+            List<Point> path = new List<Point>();
             Node currentElement = targetNode;
             while (currentElement != startNode)
             {
-                path.Add(currentElement);
+                path.Add(currentElement.Position);
                 currentElement = currentElement.Parent;
 
 
