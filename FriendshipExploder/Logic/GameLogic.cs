@@ -690,8 +690,7 @@ namespace FriendshipExploder.Logic
             while (true)//ToDo: Majd amgí nem igaz, hogy vége
             {
                 int[] closestElementIndex = FindNearestDestructible(ai.Position);
-                int[] lol = new int[] { 3, 5 };
-                List<Point> path = FindPathToDestructible(lol, ai.Position);
+                List<Point> path = FindPathToDestructible(closestElementIndex, ai.Position);
                 //List<IElement> pathToDestructible = FindPathToDestructible( closestElementIndex,ai.Position);
                 //IElement[,] elements = new IElement[GameSize.X - 1, GameSize.Y - 1];
                 /*lock (_ElementsListLockObject)
@@ -715,7 +714,7 @@ namespace FriendshipExploder.Logic
                             StopMove(PlayerAction.right, ai);
                             
                         }
-                         if (pt.Y > (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize)))
+                        if(pt.Y > (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize)))
                         {
                             StartMove(PlayerAction.down, ai);
                             StopMove(PlayerAction.down, ai);
@@ -927,12 +926,16 @@ namespace FriendshipExploder.Logic
                         continue;
                     }
 
-                    int checkX = node.Position.X + x;
-                    int checkY = node.Position.Y + y;
-                    if (checkX >= 0 && checkX < PlayGroundSize[0] && checkY >= 0 && checkY < PlayGroundSize[1])
+                    if (x != y && x != -1*y)
                     {
-                        neighbors.Add(lvlMatrix[checkX, checkY]);
+                        int checkX = node.Position.X + x;
+                        int checkY = node.Position.Y + y;
+                        if (checkX >= 0 && checkX < PlayGroundSize[0] && checkY >= 0 && checkY < PlayGroundSize[1])
+                        {
+                            neighbors.Add(lvlMatrix[checkX, checkY]);
+                        }
                     }
+                    
                 }
             }
             return neighbors;
