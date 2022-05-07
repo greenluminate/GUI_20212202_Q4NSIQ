@@ -687,10 +687,101 @@ namespace FriendshipExploder.Logic
         private async void AIWakeUp(Player ai)
         {
             Thread.Sleep(1000);//1 másodperc előny a valódi játékosoknak
+            
             while (true)//ToDo: Majd amgí nem igaz, hogy vége
             {
-                int[] closestElementIndex = FindNearestDestructible(ai.Position);
-                List<Point> path = FindPathToDestructible(closestElementIndex, ai.Position);
+                    
+                Node[,] lvlMatrix = ReconstructToNodes();
+                int[] targetElementIndex = FindNearestDestructible(ai.Position);
+                Node target = lvlMatrix[targetElementIndex[0], targetElementIndex[1]];
+                List<Point> area = GetTargetArea(target);
+                List<Point> path = FindPathToDestructible(FindNearestDestructible(ai.Position), ai.Position, lvlMatrix,area);
+                if (path != null)
+                {
+                    foreach (var pt in path)
+                    {
+                        if (pt.X > (int)Math.Floor((decimal)(ai.Position.X / GameRectSize)))
+                        {
+                            if (pt.X > (int)Math.Floor((decimal)(ai.Position.X / GameRectSize)))
+                            {
+
+                                    StartMove(PlayerAction.right, ai);
+                                    StopMove(PlayerAction.right, ai);
+                                    Thread.Sleep(50);
+                                    break;
+                                        
+                                    
+                               
+                                
+                            }
+                            
+
+                        }
+                        else if(pt.X < (int)Math.Floor((decimal)(ai.Position.X / GameRectSize)))
+                        {
+                            if (pt.X < (int)Math.Floor((decimal)(ai.Position.X / GameRectSize)))
+                            {
+                                
+                                    StartMove(PlayerAction.left, ai);
+                                    StopMove(PlayerAction.left, ai);
+                                    Thread.Sleep(50);
+                                    break;
+                                    
+                                
+                                
+                            }
+
+                        }
+                        else if (pt.Y > (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize)))
+                        {
+                            if (pt.Y > (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize)))
+                            {
+                                
+                                    StartMove(PlayerAction.down, ai);
+                                    StopMove(PlayerAction.down, ai);
+                                    Thread.Sleep(50);
+                                    break;
+                                    
+
+                                
+                                
+                            }
+                        }
+                        else if (pt.Y < (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize)))
+                        {
+                            if (pt.Y < (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize)))
+                            {
+
+                                StartMove(PlayerAction.up, ai);
+                                StopMove(PlayerAction.up, ai);
+                                Thread.Sleep(50);
+                                break;
+
+
+                                 
+                                
+                            }
+                        }
+                        else if (area.Contains(pt))
+                        {
+                            Act(PlayerAction.bombudlr, ai);
+                            StartMove(PlayerAction.left, ai);
+                            StopMove(PlayerAction.left, ai);
+                            StartMove(PlayerAction.down, ai);
+                            StopMove(PlayerAction.down, ai);
+                            break;
+                        }
+
+
+
+
+                    }
+                    
+                }
+                
+                
+                
+                
                 //List<IElement> pathToDestructible = FindPathToDestructible( closestElementIndex,ai.Position);
                 //IElement[,] elements = new IElement[GameSize.X - 1, GameSize.Y - 1];
                 /*lock (_ElementsListLockObject)
@@ -702,28 +793,8 @@ namespace FriendshipExploder.Logic
                 //ToDO: ha bomba van a közelében bújjon el.
                 //Az Elements lista = NotAvailablePoints;
 
-
-                if (path != null)
-                {
-                    foreach (var pt in path)
-                    {
-
-                        if (pt.X > (int)Math.Floor((decimal)(ai.Position.X / GameRectSize)))
-                        {
-                            StartMove(PlayerAction.right, ai);
-                            StopMove(PlayerAction.right, ai);
-                            
-                        }
-                        if(pt.Y > (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize)))
-                        {
-                            StartMove(PlayerAction.down, ai);
-                            StopMove(PlayerAction.down, ai);
-                            
-                        }
-                        
-
-                    }
-                }
+                
+                
                 
 
 
@@ -790,6 +861,7 @@ namespace FriendshipExploder.Logic
         }
 
        
+       
 
         private List<Point> FindAvailablePath(Player ai, int aiNextPosX, int aiNextPosY)
         {
@@ -837,13 +909,12 @@ namespace FriendshipExploder.Logic
             return lvlMatrix;
         }
 
-        private List<Point> FindPathToDestructible(int[] targetElementIndex, Point startingPosition)
+        private List<Point> FindPathToDestructible(int[] targetElementIndex, Point startingPosition, Node[,] lvlMatrix, List<Point> area)
         {
-            Node[,] lvlMatrix = ReconstructToNodes();
             int aiCurrentIndexX = (int)Math.Floor((decimal)(startingPosition.X / GameRectSize));
             int aiCurrentIndexY = (int)Math.Floor((decimal)(startingPosition.Y / GameRectSize));
             Node target = lvlMatrix[targetElementIndex[0], targetElementIndex[1]];
-            List<Point> targetArea = GetTargetArea(target); // TODO kigyűjteni úgy a környező pontokat, hogy hasonlítani lehessen
+            List<Point> targetArea = area; // TODO kigyűjteni úgy a környező pontokat, hogy hasonlítani lehessen
             List<Node> openSet = new List<Node>();
             HashSet<Node> closedSet = new HashSet<Node>();
             openSet.Add(lvlMatrix[aiCurrentIndexX, aiCurrentIndexY]);
@@ -864,6 +935,12 @@ namespace FriendshipExploder.Logic
                 {
                     if (x.X == currentNode.Position.X && x.Y == currentNode.Position.Y && lvlMatrix[x.X,x.Y].Walkable)
                     {
+                        if (aiCurrentIndexX == currentNode.Position.X && aiCurrentIndexY == currentNode.Position.Y)
+                        {
+                            List<Point> pathself = new List<Point>();
+                            pathself.Add(new Point(aiCurrentIndexX, aiCurrentIndexY));
+                            return pathself;
+                        }
                         List<Point> path = PathRetrace(lvlMatrix[aiCurrentIndexX, aiCurrentIndexY], currentNode);
                         return path;    
                     }
@@ -907,9 +984,16 @@ namespace FriendshipExploder.Logic
                         continue;
                     }
 
-                    int thisX = target.Position.X + x;
-                    int thisY = target.Position.Y + y;
-                    targetArea.Add(new Point(thisX, thisY));
+                    if (x != y && x != -1*y && (target.Position.X + x) > -1 && (target.Position.Y + y) > -1)
+                    {
+                        int thisX = target.Position.X + x;
+                        int thisY = target.Position.Y + y;
+                        if (Elements[thisX, thisY] == null){
+                            targetArea.Add(new Point(thisX, thisY));
+                        }
+                        
+                    }
+                    
                 }
             }
             return targetArea;
