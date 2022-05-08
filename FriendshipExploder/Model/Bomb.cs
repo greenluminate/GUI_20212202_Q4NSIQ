@@ -48,5 +48,7 @@ namespace FriendshipExploder.Model
             Bomb bomb = (obj as Bomb);
             return this.Position.X == bomb.Position.X && this.Position.Y == bomb.Position.Y && this.Player == bomb.Player;
         }
+
+
     }
 }

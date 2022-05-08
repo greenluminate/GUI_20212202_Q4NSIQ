@@ -1529,11 +1529,93 @@ namespace FriendshipExploder.Logic
             Parallel.ForEach(aiTasks, task => task.Start());//Hogy amennyire csak lehet egyszerre induljanak
         }
 
-        private async void AIWakeUp(Player ai)
+        private async void AIWakeUp(Player ai) 
         {
             Thread.Sleep(1000);//1 másodperc előny a valódi játékosoknak
             while (true)//ToDo: Majd amgí nem igaz, hogy vége
             {
+                List<IElement> bombs = CollectBombs();
+                Node[,] lvlMatrix = ReconstructToNodes();
+                int[] targetElementIndex = FindNearestDestructible(ai.Position);
+
+                Node target = lvlMatrix[targetElementIndex[0], targetElementIndex[1]];
+                int aiPosX = (int)Math.Floor((decimal)(ai.Position.X / GameRectSize));
+                int aiPosY = (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize));
+                Point aiPosition = new Point(aiPosX, aiPosY);
+                List<Point> area = GetTargetArea(target);
+                List<Point> path = FindPathToDestructible(FindNearestDestructible(ai.Position), ai.Position, lvlMatrix, area);
+                foreach (var bomb in bombs)
+                {
+
+                    if (bomb != null)
+                    {
+                        if (GetBombArea(bomb).Contains(aiPosition) || bomb.Position.X == (int)Math.Floor((decimal)(ai.Position.X / GameRectSize)) && bomb.Position.Y == (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize)))
+                        {
+                            IElement currentBomb = bomb;
+                            while (Elements[currentBomb.Position.X, currentBomb.Position.Y] is Bomb && aiPosY == bomb.Position.Y)
+                            {
+                               Hide(bomb, ai);
+                            }
+                            
+
+                        }
+                        
+                    }
+
+                }
+                if (path != null)
+                {
+
+                    foreach (var pt in path)
+                    {
+
+
+                        if (pt.X > aiPosX && Elements[aiPosX + 1, aiPosY] == null)
+                        {
+
+                            StartMove(PlayerAction.right, ai);
+                            StopMove(PlayerAction.right, ai);
+                            Thread.Sleep(20);
+                            break;
+
+
+
+                        }
+                        else if (pt.X < aiPosX)
+                        {
+                            StartMove(PlayerAction.left, ai);
+                            StopMove(PlayerAction.left, ai);
+                            Thread.Sleep(20);
+                            break;
+                        }
+                        else if (pt.Y > aiPosY)
+                        {
+                            StartMove(PlayerAction.down, ai);
+                            StopMove(PlayerAction.down, ai);
+                            Thread.Sleep(20);
+                            break;
+                        }
+                        else if (pt.Y < aiPosY)
+                        {
+                            StartMove(PlayerAction.up, ai);
+                            StopMove(PlayerAction.up, ai);
+                            Thread.Sleep(20);
+                            break;
+                        }
+                        else if (area.Contains(pt))
+                        {
+                            Act(PlayerAction.bombudlr, ai);
+                            bombs.Add(Elements[pt.X, pt.Y]);
+                            break;
+                        }
+
+                    }
+
+                }
+
+
+
+                //List<IElement> pathToDestructible = FindPathToDestructible( closestElementIndex,ai.Position);
                 //IElement[,] elements = new IElement[GameSize.X - 1, GameSize.Y - 1];
                 /*lock (_ElementsListLockObject)
                 {
@@ -1543,121 +1625,394 @@ namespace FriendshipExploder.Logic
                 Player nearestPlayer = NearestPlayer(ai);
                 //ToDO: ha bomba van a közelében bújjon el.
                 //Az Elements lista = NotAvailablePoints;
-                if (nearestPlayer != null && PositionDifference(nearestPlayer, ai) <= 20)//ToDo: ai.Bomb.explosionSize vagy ami lesz
+
+
+
+
+
+
+                //if (nearestPlayer != null && PositionDifference(nearestPlayer, ai) <= 20)//ToDo: ai.Bomb.explosionSize vagy ami lesz
                 {
                     //ToDo: Go and Install bomb
                     //ToDo: hide and wait until Explosion + x seconds
-                }
-                else
-                {
+                    // }
+                    //else
+                    //{
                     //ToDo: follow player
                     //ToDO: AI javítása nullcheckekkel, ha egyedül lenne mit csináljon.
-                    if (nearestPlayer != null && nearestPlayer.Position.X - ai.Position.X < 0 && CanStepToPos(ai, new System.Windows.Vector(-1 * ai.Speed, 0)))
-                    {
-                        StartMove(PlayerAction.left, ai);
-                        StopMove(PlayerAction.left, ai);
-                    }
+                    //if (nearestPlayer != null && nearestPlayer.Position.X - ai.Position.X < 0 && CanStepToPos(ai, new System.Windows.Vector(-1 * ai.Speed, 0)))
+                    //{
+                    //    StartMove(PlayerAction.left, ai);
+                    //    StopMove(PlayerAction.left, ai);
+                    //}
 
-                    if (!CanStepToPos(ai, new System.Windows.Vector(-1 * ai.Speed, 0)))
-                    {
-                        int aiNextPosX = ai.Position.X + (-1 * ai.Speed);//Kiszervezni az egészet külön metódusba.
-                        int aiNextPosY = ai.Position.Y;
-                        //IElement blockingElement = elements[aiNextPosX, aiNextPosY];
-                        List<Point> availablePath = FindAvailablePath(ai, aiNextPosX, aiNextPosY);
-                        List<PlayerAction> availableRoundaboutActions = FindAvailableRoundaboutActions(ai, aiNextPosX, aiNextPosY);
-                        //availableRoundaboutActions.ForEach(Action => Action.Pop);
-                        //ToDo: jó irány keresése a megkerüléshez, majd móaction-ök meghívása sorban.
-                        ;
-                    }
+                    //if (!CanStepToPos(ai, new System.Windows.Vector(-1 * ai.Speed, 0)))
+                    //{
+                    // int aiNextPosX = ai.Position.X + (-1 * ai.Speed);//Kiszervezni az egészet külön metódusba.
+                    //int aiNextPosY = ai.Position.Y;
+                    //IElement blockingElement = elements[aiNextPosX, aiNextPosY];
 
-                    if (nearestPlayer != null && nearestPlayer.Position.Y - ai.Position.Y < 0 && CanStepToPos(ai, new System.Windows.Vector(0, -1 * ai.Speed)))
-                    {
-                        StartMove(PlayerAction.up, ai);
-                        StopMove(PlayerAction.up, ai);
-                    }
+                    //List<Point> availablePath = FindAvailablePath(ai, aiNextPosX, aiNextPosY);
+                    //List<PlayerAction> availableRoundaboutActions = FindAvailableRoundaboutActions(ai, aiNextPosX, aiNextPosY);
+                    //availableRoundaboutActions.ForEach(Action => Action.Pop);
+                    //ToDo: jó irány keresése a megkerüléshez, majd móaction-ök meghívása sorban.
+                    //;
+                    //}
 
-                    if (nearestPlayer != null && nearestPlayer.Position.X - ai.Position.X > 0 && CanStepToPos(ai, new System.Windows.Vector(ai.Speed, 0)))
-                    {
-                        StartMove(PlayerAction.right, ai);
-                        StopMove(PlayerAction.right, ai);
-                    }
+                    //if (nearestPlayer.Position.Y - ai.Position.Y < 0 && CanStepToPos(ai, new System.Windows.Vector(0, -1 * ai.Speed)))
+                    //{
+                    //    StartMove(PlayerAction.up, ai);
+                    //    StopMove(PlayerAction.up, ai);
+                    //}
 
-                    if (nearestPlayer != null && nearestPlayer.Position.Y - ai.Position.Y > 0 && CanStepToPos(ai, new System.Windows.Vector(0, ai.Speed)))
-                    {
-                        StartMove(PlayerAction.down, ai);
-                        StopMove(PlayerAction.down, ai);
-                    }
+                    //if (nearestPlayer.Position.X - ai.Position.X > 0 && CanStepToPos(ai, new System.Windows.Vector(ai.Speed, 0)))
+                    //{
+                    //    StartMove(PlayerAction.right, ai);
+                    //    StopMove(PlayerAction.right, ai);
+                    //}
+
+                    //if (nearestPlayer.Position.Y - ai.Position.Y > 0 && CanStepToPos(ai, new System.Windows.Vector(0, ai.Speed)))
+                    //{
+                    //    StartMove(PlayerAction.down, ai);
+                    //    StopMove(PlayerAction.down, ai);
+                    //}
                 }
             }
         }
 
         private Player NearestPlayer(Player ai)
         {
-            lock (_PlayersListLockObject)
-            {
-                return Players.Where(player => player.Id != ai.Id)
-                              .OrderBy(player => PositionDifference(player, ai))
-                              .FirstOrDefault();
-            }
+            return Players.Where(player => player.Id != ai.Id)
+                          .OrderBy(player => PositionDifference(player, ai))
+                          .FirstOrDefault();
         }
 
         private double PositionDifference(Player player, Player ai)
         {
-            lock (_PlayersListLockObject)
-            {
-                return Math.Abs(player.Position.X - ai.Position.X) +
+            return Math.Abs(player.Position.X - ai.Position.X) +
                    Math.Abs(player.Position.Y - ai.Position.Y);
-            }
         }
 
-        private List<Point> FindAvailablePath(Player ai, int aiNextPosX, int aiNextPosY)
+
+        private List<IElement> CollectBombs()
         {
-            List<Point> availablePath = new List<Point>();
-            for (int x = -1 * (GameRectSize / 2); x < (GameRectSize / 2); x++)
+
+            List<IElement> bombPlaces = new List<IElement>();
+            foreach (var element in Elements)
             {
-                for (int y = -1 * (GameRectSize / 2); y < (GameRectSize / 2); y++)
+                if (element is Bomb)
                 {
-                    if (!(ai.Position.X + x == aiNextPosX && ai.Position.Y + y == aiNextPosY) && CanStepToPos(ai, new System.Windows.Vector(x * ai.Speed, y * ai.Speed)))
+                    bombPlaces.Add(element);
+                }
+            }
+            return bombPlaces;
+
+        }
+
+        private void Hide(IElement bomb, Player ai)
+        {
+            int aiPosX = (int)Math.Floor((decimal)(ai.Position.X / GameRectSize));
+            int aiPosY = (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize));
+            if (aiPosX > 0 && Elements[aiPosX - 1, aiPosY] == null)
+            {
+                StartMove(PlayerAction.left, ai);
+                //if (Math.Abs((int)Math.Floor((decimal)(ai.Position.X / GameRectSize)) - bomb.Position.X) > 5)
+                //{
+                //    StopMove(PlayerAction.left, ai);
+                //    Thread.Sleep(4500);
+                //}
+            }
+            else if (aiPosY < Elements.GetLength(0) && Elements[aiPosY + 1, aiPosX] == null)
+            {
+                StartMove(PlayerAction.right, ai);
+
+            }
+            else if (Math.Abs((int)Math.Floor((decimal)(ai.Position.X / GameRectSize)) - bomb.Position.X) < 5)
+            {
+                if (aiPosY > 0 && Elements[aiPosX, aiPosY - 1] == null)
+                {
+                    StartMove(PlayerAction.up, ai);
+
+
+                }
+                else if (aiPosY < Elements.GetLength(1) && Elements[aiPosX, aiPosY + 1] == null)
+                {
+                    StartMove(PlayerAction.down, ai);
+
+
+                }
+            }
+
+        }
+
+
+
+        //Optimalizáció még erősen szükséges
+        Node[,] ReconstructToNodes()
+        {
+            Node[,] lvlMatrix = new Node[PlayGroundSize[0], PlayGroundSize[1]];
+            for (int i = 0; i < Elements.GetLength(0); i++)
+            {
+                for (int j = 0; j < Elements.GetLength(1); j++)
+                {
+                    if (Elements[i, j] == null)
                     {
-                        availablePath.Add(new Point(ai.Position.X + (x * ai.Speed), ai.Position.Y + (y * ai.Speed)));
+                        lvlMatrix[i, j] = new Node("floor", true, new Point(i, j));
+                    }
+                    else if (Elements[i, j] is Wall)
+                    {
+                        lvlMatrix[i, j] = new Node("wall", false, Elements[i, j].Position);
+                    }
+                    else if (Elements[i, j] is FixWall)
+                    {
+                        lvlMatrix[i, j] = new Node("fixwall", false, Elements[i, j].Position);
+                    }
+                    else if (Elements[i, j] is Bomb)
+                    {
+                        lvlMatrix[i, j] = new Node("bomb", false, Elements[i, j].Position);
+
                     }
                 }
             }
-            return availablePath;
+            return lvlMatrix;
         }
 
-        private List<PlayerAction> FindAvailableRoundaboutActions(Player ai, int aiNextPosX, int aiNextPosY)
+        private List<Point> FindPathToDestructible(int[] targetElementIndex, Point startingPosition, Node[,] lvlMatrix, List<Point> area)
         {
-            List<PlayerAction> availableActions = new List<PlayerAction>();
-            for (int x = -1 * (GameRectSize / 2); x < (GameRectSize / 2); x++)
+            int aiCurrentIndexX = (int)Math.Floor((decimal)(startingPosition.X / GameRectSize));
+            int aiCurrentIndexY = (int)Math.Floor((decimal)(startingPosition.Y / GameRectSize));
+            Node target = lvlMatrix[targetElementIndex[0], targetElementIndex[1]];
+            List<Point> targetArea = area; // TODO kigyűjteni úgy a környező pontokat, hogy hasonlítani lehessen
+            List<Node> openSet = new List<Node>();
+            HashSet<Node> closedSet = new HashSet<Node>();
+            openSet.Add(lvlMatrix[aiCurrentIndexX, aiCurrentIndexY]);
+
+            while (openSet.Count > 0)
             {
-                for (int y = -1 * (GameRectSize / 2); y < (GameRectSize / 2); y++)
+                Node currentNode = openSet[0];
+                for (int i = 1; i < openSet.Count; i++)
                 {
-                    if (!(ai.Position.X + x == aiNextPosX && ai.Position.Y + y == aiNextPosY) && CanStepToPos(ai, new System.Windows.Vector(x * ai.Speed, y * ai.Speed)))
+                    if (openSet[i].fCost < currentNode.fCost || openSet[i].fCost == currentNode.fCost && openSet[i].hCost < currentNode.hCost)
                     {
-                        if (ai.Position.X + x - ai.Position.X < 0)
+                        currentNode = openSet[i];
+                    }
+                }
+                openSet.Remove(currentNode);
+                closedSet.Add(currentNode);
+                foreach (var x in targetArea)
+                {
+                    if (x.X == currentNode.Position.X && x.Y == currentNode.Position.Y && lvlMatrix[x.X, x.Y].Walkable)
+                    {
+                        if (aiCurrentIndexX == currentNode.Position.X && aiCurrentIndexY == currentNode.Position.Y)
                         {
-                            availableActions.Add(PlayerAction.left);
+                            List<Point> pathself = new List<Point>();
+                            pathself.Add(new Point(aiCurrentIndexX, aiCurrentIndexY));
+                            return pathself;
                         }
-
-                        if (ai.Position.Y + y - ai.Position.Y < 0)
+                        List<Point> path = PathRetrace(lvlMatrix[aiCurrentIndexX, aiCurrentIndexY], currentNode);
+                        return path;
+                    }
+                }
+                foreach (Node neighbor in GetNeighbors(currentNode, lvlMatrix))
+                {
+                    if (!neighbor.Walkable || closedSet.Contains(neighbor))
+                    {
+                        continue;
+                    }
+                    int newMovementCostToNeighbour = currentNode.gCost + GetDistance(currentNode.Position, neighbor.Position);
+                    if (newMovementCostToNeighbour < neighbor.gCost || !openSet.Contains(neighbor))
+                    {
+                        neighbor.gCost = newMovementCostToNeighbour;
+                        neighbor.hCost = GetDistance(neighbor.Position, target.Position);
+                        neighbor.Parent = currentNode;
+                        if (!openSet.Contains(neighbor))
                         {
-                            availableActions.Add(PlayerAction.up);
-                        }
-
-                        if (ai.Position.X + x - ai.Position.X > 0)
-                        {
-                            availableActions.Add(PlayerAction.right);
-                        }
-
-                        if (ai.Position.Y + y - ai.Position.Y > 0)
-                        {
-                            availableActions.Add(PlayerAction.down);
+                            openSet.Add(neighbor);
                         }
                     }
                 }
             }
-            return availableActions;
+            return null;
         }
+
+        public List<Point> GetTargetArea(Node target)
+        {
+            List<Point> targetArea = new List<Point>();
+
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    if (x == 0 & y == 0)
+                    {
+                        continue;
+                    }
+
+                    if (x != y && x != -1 * y && (target.Position.X + x) > -1 && (target.Position.Y + y) > -1)
+                    {
+                        int thisX = target.Position.X + x;
+                        int thisY = target.Position.Y + y;
+                        if (Elements[thisX, thisY] == null)
+                        {
+                            targetArea.Add(new Point(thisX, thisY));
+                        }
+
+                    }
+
+                }
+            }
+            return targetArea;
+        }
+        public List<Point> GetBombArea(IElement bomb)
+        {
+            List<Point> targetArea = new List<Point>();
+            if (bomb != null)
+            {
+                for (int x = -1; x <= 1; x++)
+                {
+                    for (int y = -1; y <= 1; y++)
+                    {
+                        if (x == 0 & y == 0)
+                        {
+                            continue;
+                        }
+
+                        if (x != y && x != -1 * y && (bomb.Position.X + x) > -1 && (bomb.Position.Y + y) > -1)
+                        {
+                            int thisX = bomb.Position.X + x;
+                            int thisY = bomb.Position.Y + y;
+                            if (Elements[thisX, thisY] == null)
+                            {
+                                targetArea.Add(new Point(thisX, thisY));
+                            }
+
+                        }
+
+                    }
+                }
+            }
+
+            return targetArea;
+        }
+        public List<Node> GetNeighbors(Node node, Node[,] lvlMatrix)
+        {
+            List<Node> neighbors = new List<Node>();
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    if (x == 0 && y == 0)
+                    {
+                        continue;
+                    }
+
+                    if (x != y && x != -1 * y)
+                    {
+                        int checkX = node.Position.X + x;
+                        int checkY = node.Position.Y + y;
+                        if (checkX >= 0 && checkX < PlayGroundSize[0] && checkY >= 0 && checkY < PlayGroundSize[1])
+                        {
+                            neighbors.Add(lvlMatrix[checkX, checkY]);
+                        }
+                    }
+
+                }
+            }
+            return neighbors;
+        }
+
+        List<Point> PathRetrace(Node startNode, Node targetNode)
+        {
+            List<Point> path = new List<Point>();
+            Node currentElement = targetNode;
+            while (currentElement != startNode)
+            {
+                path.Add(currentElement.Position);
+                currentElement = currentElement.Parent;
+
+
+            }
+            path.Reverse();
+            return path;
+
+        }
+
+        int GetDistance(Point pointA, Point pointB)
+        {
+            int distX = Math.Abs(pointA.X - pointB.X);
+            int distY = Math.Abs(pointA.Y - pointB.Y);
+            if (distX > distY)
+            {
+                return 14 + distY + 10 * (distX - distY);
+                return 14 + distX + 10 * (distY - distX);
+
+            }
+            return 1;
+        }
+
+        public bool ValidPath(int row, int col)
+        {
+            if (row < 0 || col < 0 || row >= PlayGroundSize[0] || col >= PlayGroundSize[1]) //Ha kint van a pályán nem valid
+            {
+                return false;
+            }
+            return true;
+        }
+
+
+        private int[] FindNearestDestructible(Point aiPosition)
+        {
+            int aiCurrentIndexX = (int)Math.Floor((decimal)(aiPosition.X / GameRectSize));
+            int aiCurrentIndexY = (int)Math.Floor((decimal)(aiPosition.Y / GameRectSize));
+            bool[,] vis = new bool[PlayGroundSize[0], PlayGroundSize[1]]; //Bool tömb, azt nézi, hogy mely elemek vannak feldolgozva
+            int[] dRow = new int[] { -1, 0, 1, 0 }; // Csak arra kell, hogy végig tudjon iterálni a szomszédokon
+            int[] dCol = new int[] { 0, 1, 0, -1 };
+            Queue<int[]> indexQueue = new Queue<int[]>(); //A queue amibe kigyűjti az elemeket
+            indexQueue.Enqueue(new int[] { aiCurrentIndexX, aiCurrentIndexY });
+            vis[aiCurrentIndexX, aiCurrentIndexY] = true;
+            while (indexQueue.Count != 0)
+            {
+                int[] cell = indexQueue.Peek(); //Megnézi a queue tetején lévő elemet
+                int x = cell[0];
+                int y = cell[1];
+                if (Elements[x, y] is Wall)
+                {
+                    return cell;
+                    break;
+                }
+                else
+                {
+                    indexQueue.Dequeue(); //Ha nem fal dequeueoljuk
+                }
+                if (!(Elements[x, y] is FixWall))
+                {
+                    for (int i = 0; i < 4; i++) //Végig iterálunk a négy környező elemen
+                    {
+                        int adjx = x + dRow[i];
+                        int adjy = y + dCol[i];
+                        if (isValid(vis, adjx, adjy))
+                        {
+                            indexQueue.Enqueue(new int[] { adjx, adjy });
+                            vis[adjx, adjy] = true;
+                        }
+                    }
+                }
+
+            }
+            return new int[] { -1, -1 };
+        }
+        private bool isValid(bool[,] vis, int row, int col)
+        {
+            if (row < 0 || col < 0 || row >= PlayGroundSize[0] || col >= PlayGroundSize[1]) //Ha kint van a pályán nem valid
+            {
+                return false;
+            }
+            if (vis[row, col]) //Ha már látogattuk, nem valid
+            {
+                return false;
+            }
+            return true;
+        }
+
     }
 }
