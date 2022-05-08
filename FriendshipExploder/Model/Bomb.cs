@@ -21,6 +21,7 @@ namespace FriendshipExploder.Model
         public bool Explode { get; set; }
         public ElementType ElementType { get; set; }
         public bool IsMoving { get; set; }
+        public object _bombTriggerLock { get; set; }
 
         public Bomb(Player player, ElementType ElementType)
         {
@@ -29,6 +30,7 @@ namespace FriendshipExploder.Model
             Explode = false;
             this.ElementType = ElementType;
             PositionPixel = new Point();
+            _bombTriggerLock = new object();
         }
 
         public Bomb BombCopy(Point position, ElementType type = ElementType.Bomb, Point point = new Point())

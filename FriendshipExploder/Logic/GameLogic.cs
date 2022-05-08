@@ -1275,8 +1275,8 @@ namespace FriendshipExploder.Logic
                                 newBombCoords,
                                 pl.ActionPressed ? ElementType.ScheduledBomb : ElementType.Bomb,
                                 new Point((int)((newBombCoords.X == 0 ? newBombCoords.X : newBombCoords.X) * GameRectSize), (int)((newBombCoords.Y == 0 ? newBombCoords.Y : newBombCoords.Y) * GameRectSize)));//ToDo: valszeg nem jól van eltárolva itt és emiatt rossz helyre rúgja; HA nem ó, akkor +1 kell mindegyikhez
-                                //new Point((int)((newBombCoords.X == 0 ? newBombCoords.X : newBombCoords.X - 1) * GameRectSize) + 1, (int)((newBombCoords.Y == 0 ? newBombCoords.Y : newBombCoords.Y - 1) * GameRectSize) + 1));//ToDo: valszeg nem jól van eltárolva itt és emiatt rossz helyre rúgja; HA nem ó, akkor +1 kell mindegyikhez
-                                                                                                                                                                                                                               //new Point((int)(pl.Position.X + (GameRectSize * PlayerWidthRate) / 2), (int)(pl.Position.Y + (GameRectSize * (PlayerHeightRate + PlayerHeightRateHangsIn)) / 2)));//ToDo: valszeg nem jól van eltárolva itt és emiatt rossz helyre rúgja
+                                                                                                                                                                                                               //new Point((int)((newBombCoords.X == 0 ? newBombCoords.X : newBombCoords.X - 1) * GameRectSize) + 1, (int)((newBombCoords.Y == 0 ? newBombCoords.Y : newBombCoords.Y - 1) * GameRectSize) + 1));//ToDo: valszeg nem jól van eltárolva itt és emiatt rossz helyre rúgja; HA nem ó, akkor +1 kell mindegyikhez
+                                                                                                                                                                                                               //new Point((int)(pl.Position.X + (GameRectSize * PlayerWidthRate) / 2), (int)(pl.Position.Y + (GameRectSize * (PlayerHeightRate + PlayerHeightRateHangsIn)) / 2)));//ToDo: valszeg nem jól van eltárolva itt és emiatt rossz helyre rúgja
                 lock (pl._bombListLockObject)
                 {
                     pl.BombList.Add(newBomb);
@@ -1303,16 +1303,32 @@ namespace FriendshipExploder.Logic
                     }
                     else
                     {
-                        for (int i = 0; i < 3000; i++)//x másodperc múlva robban a bomba
+                        new Task(() =>
                         {
-                            lock (_TimerLockObject)
+                            for (int i = 0; i < 3000; i++)//x másodperc múlva robban a bomba
                             {
-                                if (GamePaused)
+                                lock (_TimerLockObject)
                                 {
-                                    Monitor.Wait(_TimerLockObject);
+                                    if (GamePaused)
+                                    {
+                                        Monitor.Wait(_TimerLockObject);
+                                    }
+                                }
+                                Thread.Sleep(1);
+                            }
+
+                            if (newBomb != null)
+                            {
+                                lock (newBomb._bombTriggerLock)
+                                {
+                                    Monitor.Pulse(newBomb._bombTriggerLock);
                                 }
                             }
-                            Thread.Sleep(1);
+                        }, TaskCreationOptions.LongRunning).Start();
+
+                        lock (newBomb._bombTriggerLock)
+                        {
+                            Monitor.Wait(newBomb._bombTriggerLock);
                         }
                     }
 
@@ -1445,7 +1461,10 @@ namespace FriendshipExploder.Logic
                     {
                         //Mivel másik bombát is ért a robbanás ezért az is felrobban.
                         //ToDo: ez így nem jó, triggerelni kell a robbanását, nem újrakezdeni. Ami miatt kétszer akarna felrobbanni.
-                        Trigger(t.Player, t, row, col, 1);
+                        lock (t._bombTriggerLock)
+                        {
+                            Monitor.Pulse(t._bombTriggerLock);
+                        }
                     }
                     else if (Elements[row, col] is Wall w)//ToDo: || Elements[row, col] is Skill/Booster   ami lesz a neve
                     {
