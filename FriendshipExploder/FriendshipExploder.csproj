@@ -9,6 +9,8 @@
   <ItemGroup>
     <None Remove="Fonts\bomberman.TTF" />
     <None Remove="Images\Bombs\0_Bomb.png" />
+    <None Remove="Images\Bombs\0_ScheduledBomb.png" />
+    <None Remove="Images\Bombs\0_ScheduledBombExplode.png" />
     <None Remove="Images\Bombs\bomb.jpg" />
     <None Remove="Images\FixWalls\0_FixWall.png" />
     <None Remove="Images\Floors\0_Floor.png" />
@@ -67,7 +69,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Images\Bombs\0_Bomb.png" />
+    <Resource Include="Images\Bombs\0_ScheduledBombExplode.png" />
     <Resource Include="Images\Bombs\0_BombExplode.png" />
+    <Resource Include="Images\Bombs\0_ScheduledBomb.png" />
     <Resource Include="Images\FixWalls\0_FixWall.png" />
     <Resource Include="Images\Floors\0_Floor.png" />
     <Resource Include="Images\GameBackground\0_GameBackground.jpg" />

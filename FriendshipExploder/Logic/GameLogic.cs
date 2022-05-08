@@ -134,13 +134,19 @@ namespace FriendshipExploder.Logic
                         {
                             if (CanStepToPos(x, new System.Windows.Vector(corrigSize, corrigSize)))
                             {
-                                x.Move(corrigSize, corrigSize);
+                                lock (_PlayersListLockObject)
+                                {
+                                    x.Move(corrigSize, corrigSize);
+                                }
                             }
                             else
                             {
-                                int cellX = x.Position.X / GameRectSize;
-                                int cellY = x.Position.Y / GameRectSize;
-                                x.SetPos(cellX * gameRectSize + (gameRectSize / 2), cellY * gameRectSize + (gameRectSize / 2));
+                                lock (_PlayersListLockObject)
+                                {
+                                    int cellX = x.Position.X / GameRectSize;
+                                    int cellY = x.Position.Y / GameRectSize;
+                                    x.SetPos(cellX * gameRectSize + (gameRectSize / 2), cellY * gameRectSize + (gameRectSize / 2));
+                                }
                             }
                         }
                     });
@@ -262,7 +268,10 @@ namespace FriendshipExploder.Logic
                             Elements[x, startY] = new FixWall(new Point(x, startY), ElementType.FixWall);
                         }
 
-                        PlayerKiller(new Point(x, startY));
+                        lock (_PlayersListLockObject)
+                        {
+                            PlayerKiller(new Point(x, startY));
+                        }
 
                         Thread.Sleep(50);
                     }
@@ -283,7 +292,10 @@ namespace FriendshipExploder.Logic
                             Elements[endX - 1, y] = new FixWall(new Point(endX - 1, y), ElementType.FixWall);
                         }
 
-                        PlayerKiller(new Point(endX - 1, y));
+                        lock (_PlayersListLockObject)
+                        {
+                            PlayerKiller(new Point(endX - 1, y));
+                        }
 
                         Thread.Sleep(50);
                     }
@@ -303,8 +315,10 @@ namespace FriendshipExploder.Logic
                         {
                             Elements[x, endY - 1] = new FixWall(new Point(x, endY - 1), ElementType.FixWall);
                         }
-
-                        PlayerKiller(new Point(x, endY - 1));
+                        lock (_PlayersListLockObject)
+                        {
+                            PlayerKiller(new Point(x, endY - 1));
+                        }
 
                         Thread.Sleep(50);
                     }
@@ -325,7 +339,10 @@ namespace FriendshipExploder.Logic
                             Elements[startX, y] = new FixWall(new Point(startX, y), ElementType.FixWall);
                         }
 
-                        PlayerKiller(new Point(startX, y));
+                        lock (_PlayersListLockObject)
+                        {
+                            PlayerKiller(new Point(startX, y));
+                        }
 
                         Thread.Sleep(50);
                     }
@@ -341,32 +358,30 @@ namespace FriendshipExploder.Logic
 
         private void PlayerKiller(Point playerCoords)
         {
-            lock (_PlayersListLockObject)
+            for (int i = 0; i < Players.Count; i++)
             {
-                Players.ForEach(pl =>
+                if (PlayerPixelToMatrixCoordinate(Players[i].Position) == playerCoords)
                 {
-                    if (PlayerPixelToMatrixCoordinate(pl.Position) == playerCoords)
-                    {
-                        pl.Explode = true;
-                        for (int i = 0; i < 200; i++)
-                        {
-                            if (GamePaused)
-                            {
-                                lock (_TimerLockObject)
-                                {
-                                    Monitor.Wait(_TimerLockObject);
-                                }
-                            }
-                            Thread.Sleep(1);
-                        }
-                        Players.Remove(pl);
+                    Players[i].Explode = true;
 
-                        if (Players.Count == 0)
+                    for (int j = 0; j < 200; j++)
+                    {
+                        if (GamePaused)
                         {
-                            RoundOver = true;
+                            lock (_TimerLockObject)
+                            {
+                                Monitor.Wait(_TimerLockObject);
+                            }
                         }
+                        Thread.Sleep(1);
                     }
-                });
+                    Players.Remove(Players[i]);
+
+                    if (Players.Count == 0)
+                    {
+                        RoundOver = true;
+                    }
+                }
             }
         }
 
@@ -741,32 +756,44 @@ namespace FriendshipExploder.Logic
                     case PlayerAction.W:
                         if (posY - pl.Speed >= 0 && CanStepToPos(pl, new System.Windows.Vector(0, -1 * pl.Speed)))
                         {
-                            pl.Move(0, -pl.Speed);
-                            pl.HeadDirection = PlayerDirection.up;
+                            lock (_PlayersListLockObject)
+                            {
+                                pl.Move(0, -pl.Speed);
+                                pl.HeadDirection = PlayerDirection.up;
+                            }
                         }
                         break;
                     case PlayerAction.down:
                     case PlayerAction.S:
                         if (posY + ((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize) + pl.Speed <= (PlayGroundSize[1] - 1) * GameRectSize && CanStepToPos(pl, new System.Windows.Vector(0, pl.Speed)))
                         {
-                            pl.Move(0, pl.Speed);
-                            pl.HeadDirection = PlayerDirection.down;
+                            lock (_PlayersListLockObject)
+                            {
+                                pl.Move(0, pl.Speed);
+                                pl.HeadDirection = PlayerDirection.down;
+                            }
                         }
                         break;
                     case PlayerAction.left:
                     case PlayerAction.A:
                         if (posX - pl.Speed >= 0 && CanStepToPos(pl, new System.Windows.Vector(-1 * pl.Speed, 0)))
                         {
-                            pl.Move(-pl.Speed, 0);
-                            pl.HeadDirection = PlayerDirection.left;
+                            lock (_PlayersListLockObject)
+                            {
+                                pl.Move(-pl.Speed, 0);
+                                pl.HeadDirection = PlayerDirection.left;
+                            }
                         }
                         break;
                     case PlayerAction.right:
                     case PlayerAction.D:
                         if (posX + (PlayerWidthRate * GameRectSize) + pl.Speed <= ((PlayGroundSize[0] - 1) * GameRectSize) && CanStepToPos(pl, new System.Windows.Vector(pl.Speed, 0)))
                         {
-                            pl.Move(pl.Speed, 0);
-                            pl.HeadDirection = PlayerDirection.right;
+                            lock (_PlayersListLockObject)
+                            {
+                                pl.Move(pl.Speed, 0);
+                                pl.HeadDirection = PlayerDirection.right;
+                            }
                         }
                         break;
 
@@ -809,7 +836,7 @@ namespace FriendshipExploder.Logic
                                     }
                                 }
 
-                                b.PositionPixel = new Point(b.PositionPixel.X, (int)(b.PositionPixel.Y - (double)GameRectSize / 20.0));
+                                b.PositionPixel = new Point(b.PositionPixel.X, (int)(b.PositionPixel.Y - (double)GameRectSize / 10.0));
                                 Point oldPos = b.Position;
                                 b.Position = ItemPixelToMatrixCoordinate(b.PositionPixel);
                                 if (!oldPos.Equals(b.Position))
@@ -958,7 +985,7 @@ namespace FriendshipExploder.Logic
             {
                 if (player.BombList.Count != 0)
                 {
-                    player.BombList.Where(bomb => bomb.Type == BombType.Scheduled).ToList().ForEach(bomb =>
+                    player.BombList.Where(bomb => bomb.ElementType == ElementType.ScheduledBomb).ToList().ForEach(bomb =>
                     {
                         bomb.Explode = true;
 
@@ -1200,7 +1227,7 @@ namespace FriendshipExploder.Logic
                                 new Point(
                                     (int)Math.Floor((decimal)((pl.Position.X + (PlayerWidthRate * GameRectSize) / 2) / GameRectSize)),
                                     (int)Math.Floor((decimal)((pl.Position.Y + ((PlayerHeightRate + PlayerHeightRateHangsIn) * GameRectSize) / 2) / GameRectSize))),
-                                pl.ActionPressed ? BombType.Scheduled : BombType.Normal,
+                                pl.ActionPressed ? ElementType.ScheduledBomb : ElementType.Bomb,
                                 new Point((int)(pl.Position.X + (GameRectSize * PlayerWidthRate) / 2), (int)(pl.Position.Y + (GameRectSize * (PlayerHeightRate + PlayerHeightRateHangsIn)) / 2)));
                 lock (pl._bombListLockObject)
                 {
@@ -1217,7 +1244,7 @@ namespace FriendshipExploder.Logic
                     Elements[i, j] = newBomb;
                 }
 
-                if (newBomb.Type == BombType.Normal)
+                if (newBomb.ElementType == ElementType.Bomb)
                 {
                     new Task(() =>
                     {
@@ -1351,22 +1378,12 @@ namespace FriendshipExploder.Logic
                                 (int)Math.Floor((decimal)(player.Position.X / GameRectSize)) == row &&
                                 (int)Math.Floor((decimal)(player.Position.Y / GameRectSize)) == col)
                                 .ToList();
-
+                        playersToKill.ForEach(player => player.Explode = true);
                         if (playersToKill.Count == 0 && bomb != null)
                         {
                             bomb.Explode = true;
                             Elements[row, col] = bomb;
                         }
-
-                        playersToKill.ForEach(player =>
-                            {
-                                int x = (int)Math.Floor((decimal)(player.Position.X / GameRectSize));
-                                int y = (int)Math.Floor((decimal)(player.Position.Y / GameRectSize));
-                                //player.Image = Halál image helye;
-                                //player.Image.Freeze();
-                                //ToDo: vagy a playerbe tárolnia ssaját képének elérését, vagy máshogy megoldani.
-                                //ToDo: Player image cserélhetősége a haláluk miatt is fontos.
-                            });
                     }
                     else if (Elements[row, col] is Bomb t)
                     {
@@ -1374,14 +1391,22 @@ namespace FriendshipExploder.Logic
                         //ToDo: ez így nem jó, triggerelni kell a robbanását, nem újrakezdeni. Ami miatt kétszer akarna felrobbanni.
                         Trigger(t.Player, t, row, col, 1);
                     }
-                    else if (Elements[row, col] is Wall)//ToDo: || Elements[row, col] is Skill/Booster   ami lesz a neve
+                    else if (Elements[row, col] is Wall w)//ToDo: || Elements[row, col] is Skill/Booster   ami lesz a neve
                     {
-                        //Elements[row, col].Image = image;
-                        //Elements[row, col].Image.Freeze();
-                        //Elements[row, col].Image.Freeze();
+                        w.Explode = true;
                     }
 
-                    Thread.Sleep(1400);
+                    for (int i = 0; i < 1400; i++)
+                    {
+                        lock (_TimerLockObject)
+                        {
+                            if (GamePaused)
+                            {
+                                Monitor.Wait(_TimerLockObject);
+                            }
+                        }
+                        Thread.Sleep(1);
+                    }
 
                     lock (_ElementsListLockObject)
                     {
@@ -1495,15 +1520,21 @@ namespace FriendshipExploder.Logic
 
         private Player NearestPlayer(Player ai)
         {
-            return Players.Where(player => player.Id != ai.Id)
-                          .OrderBy(player => PositionDifference(player, ai))
-                          .FirstOrDefault();
+            lock (_PlayersListLockObject)
+            {
+                return Players.Where(player => player.Id != ai.Id)
+                              .OrderBy(player => PositionDifference(player, ai))
+                              .FirstOrDefault();
+            }
         }
 
         private double PositionDifference(Player player, Player ai)
         {
-            return Math.Abs(player.Position.X - ai.Position.X) +
+            lock (_PlayersListLockObject)
+            {
+                return Math.Abs(player.Position.X - ai.Position.X) +
                    Math.Abs(player.Position.Y - ai.Position.Y);
+            }
         }
 
         private List<Point> FindAvailablePath(Player ai, int aiNextPosX, int aiNextPosY)

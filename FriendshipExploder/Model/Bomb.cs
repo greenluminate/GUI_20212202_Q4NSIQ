@@ -14,7 +14,6 @@ namespace FriendshipExploder.Model
         public Point Position { get; set; }
         public Point PositionPixel { get; set; }//Centerként kell megkapja
         public ImageBrush Image { get; set; }
-        public BombType Type { get; set; }
         public Player Player { get; private set; }
         //public bool IsScheduled { get; set; }//Akkor robban fel, ha lenyom egy adott gombot a játékos.
         public bool IsBouncey { get; set; }//Akadályt érve elindul az ellenkező irányba, amíg fel nem robban. Permanens tulajdonság.
@@ -23,9 +22,8 @@ namespace FriendshipExploder.Model
         public ElementType ElementType { get; set; }
         public bool IsMoving { get; set; }
 
-        public Bomb(Player player, ElementType ElementType, BombType type = BombType.Normal)
+        public Bomb(Player player, ElementType ElementType)
         {
-            this.Type = type;
             this.Player = player;
             this.ExplosionRange = 3;
             Explode = false;
@@ -33,9 +31,9 @@ namespace FriendshipExploder.Model
             PositionPixel = new Point();
         }
 
-        public Bomb BombCopy(Point position, BombType type = BombType.Normal, Point point = new Point())
+        public Bomb BombCopy(Point position, ElementType type = ElementType.Bomb, Point point = new Point())
         {
-            Bomb newBomb = new Bomb(this.Player, this.ElementType, type);
+            Bomb newBomb = new Bomb(this.Player, type);
             newBomb.IsBouncey = this.IsBouncey;
             newBomb.ExplosionRange = this.ExplosionRange;
             newBomb.Position = position;
