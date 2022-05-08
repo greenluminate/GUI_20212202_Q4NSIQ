@@ -104,6 +104,14 @@ namespace FriendshipExploder.Controller
                     control.StopMove(GameLogic.PlayerAction.D);
                     break;
 
+                //Bomba lerakása
+                case Key.RightShift:
+                    control.StopMove(GameLogic.PlayerAction.bombudlr);
+                    break;
+                case Key.LeftShift:
+                    control.StopMove(GameLogic.PlayerAction.bombwasd);
+                    break;
+
                 //Action
                 case Key.RightCtrl:
                     control.StopMove(GameLogic.PlayerAction.actionudlr);

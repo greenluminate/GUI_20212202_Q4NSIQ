@@ -212,7 +212,7 @@ namespace FriendshipExploder.Logic
             }
 
             AITaskCreator();
-            CountDown(3);
+            CountDown(30);
         }
 
         private void CountDown(int seconds)
@@ -713,6 +713,13 @@ namespace FriendshipExploder.Logic
                         pl.MovingHorizontal = false;
                     }
                     break;
+                case PlayerAction.bombudlr:
+                case PlayerAction.bombwasd:
+                    if (pl != null)
+                    {
+                        pl.SetBombPressed = false;
+                    }
+                    break;
                 case PlayerAction.actionudlr:
                 case PlayerAction.actionwasd:
                     if (pl != null)
@@ -738,7 +745,6 @@ namespace FriendshipExploder.Logic
                         pl.SetBombPressed = true;//It is necessary, else a btn press is called more than once.
                         Act(PlayerAction.bombudlr, pl);
                         await Task.Delay(1);
-                        pl.SetBombPressed = false;
                     }
                     break;
 
@@ -756,7 +762,7 @@ namespace FriendshipExploder.Logic
         }
 
         //A játékos mozgása
-        public void Act(PlayerAction playerAction, Player pl)
+        public async void Act(PlayerAction playerAction, Player pl)
         {
             if (pl != null && !pl.Explode)
             {
@@ -869,9 +875,13 @@ namespace FriendshipExploder.Logic
                         }
                         else
                         {
-                            lock (player._triggerBombLockObject)
+                            Thread.Sleep(300);
+                            if (!player.SetBombPressed)
                             {
-                                Monitor.PulseAll(player._triggerBombLockObject);
+                                lock (player._triggerBombLockObject)
+                                {
+                                    Monitor.PulseAll(player._triggerBombLockObject);
+                                }
                             }
                         }
                         break;
@@ -890,7 +900,7 @@ namespace FriendshipExploder.Logic
                                     }
                                 }
 
-                                bdown.PositionPixel = new Point(bdown.PositionPixel.X, (int)(bdown.PositionPixel.Y + (double)GameRectSize / 20.0));
+                                bdown.PositionPixel = new Point(bdown.PositionPixel.X, (int)(bdown.PositionPixel.Y + (double)GameRectSize / 10.0));
                                 Point oldPos = bdown.Position;
                                 bdown.Position = ItemPixelToMatrixCoordinate(bdown.PositionPixel);
                                 if (!oldPos.Equals(bdown.Position))
@@ -910,9 +920,12 @@ namespace FriendshipExploder.Logic
                         }
                         else
                         {
-                            lock (player._triggerBombLockObject)
+                            if (!player.SetBombPressed)
                             {
-                                Monitor.PulseAll(player._triggerBombLockObject);
+                                lock (player._triggerBombLockObject)
+                                {
+                                    Monitor.PulseAll(player._triggerBombLockObject);
+                                }
                             }
                         }
                         break;
@@ -931,7 +944,7 @@ namespace FriendshipExploder.Logic
                                     }
                                 }
 
-                                bleft.PositionPixel = new Point((int)(bleft.PositionPixel.X - (double)GameRectSize / 20.0), bleft.PositionPixel.Y);
+                                bleft.PositionPixel = new Point((int)(bleft.PositionPixel.X - (double)GameRectSize / 10.0), bleft.PositionPixel.Y);
                                 Point oldPos = bleft.Position;
                                 bleft.Position = ItemPixelToMatrixCoordinate(bleft.PositionPixel);
                                 if (!oldPos.Equals(bleft.Position))
@@ -951,9 +964,12 @@ namespace FriendshipExploder.Logic
                         }
                         else
                         {
-                            lock (player._triggerBombLockObject)
+                            if (!player.SetBombPressed)
                             {
-                                Monitor.PulseAll(player._triggerBombLockObject);
+                                lock (player._triggerBombLockObject)
+                                {
+                                    Monitor.PulseAll(player._triggerBombLockObject);
+                                }
                             }
                         }
                         break;
@@ -972,7 +988,7 @@ namespace FriendshipExploder.Logic
                                     }
                                 }
 
-                                bright.PositionPixel = new Point((int)(bright.PositionPixel.X + (double)GameRectSize / 20.0), bright.PositionPixel.Y);
+                                bright.PositionPixel = new Point((int)(bright.PositionPixel.X + (double)GameRectSize / 10.0), bright.PositionPixel.Y);
                                 Point oldPos = bright.Position;
                                 bright.Position = ItemPixelToMatrixCoordinate(bright.PositionPixel);//Korrigálni
                                 if (!oldPos.Equals(bright.Position))
@@ -992,9 +1008,12 @@ namespace FriendshipExploder.Logic
                         }
                         else
                         {
-                            lock (player._triggerBombLockObject)
+                            if (!player.SetBombPressed)
                             {
-                                Monitor.PulseAll(player._triggerBombLockObject);
+                                lock (player._triggerBombLockObject)
+                                {
+                                    Monitor.PulseAll(player._triggerBombLockObject);
+                                }
                             }
                         }
                         break;
@@ -1248,12 +1267,16 @@ namespace FriendshipExploder.Logic
             if (pl.BombList.Count < pl.BombAmount)
             {
                 //Itt beadható, ha scheduled, de még nem tudom, hogyan nézem meg, hogy le van e nyomva az action is közben
-                Bomb newBomb = pl.Bomb.BombCopy(
-                                new Point(
+                Point newBombCoords = new Point(
                                     (int)Math.Floor((decimal)((pl.Position.X + (PlayerWidthRate * GameRectSize) / 2) / GameRectSize)),
-                                    (int)Math.Floor((decimal)((pl.Position.Y + ((PlayerHeightRate + PlayerHeightRateHangsIn) * GameRectSize) / 2) / GameRectSize))),
+                                    (int)Math.Floor((decimal)((pl.Position.Y + ((PlayerHeightRate + PlayerHeightRateHangsIn) * GameRectSize) / 2) / GameRectSize)));
+
+                Bomb newBomb = pl.Bomb.BombCopy(
+                                newBombCoords,
                                 pl.ActionPressed ? ElementType.ScheduledBomb : ElementType.Bomb,
-                                new Point((int)(pl.Position.X + (GameRectSize * PlayerWidthRate) / 2), (int)(pl.Position.Y + (GameRectSize * (PlayerHeightRate + PlayerHeightRateHangsIn)) / 2)));
+                                new Point((int)((newBombCoords.X == 0 ? newBombCoords.X : newBombCoords.X) * GameRectSize), (int)((newBombCoords.Y == 0 ? newBombCoords.Y : newBombCoords.Y) * GameRectSize)));//ToDo: valszeg nem jól van eltárolva itt és emiatt rossz helyre rúgja; HA nem ó, akkor +1 kell mindegyikhez
+                                //new Point((int)((newBombCoords.X == 0 ? newBombCoords.X : newBombCoords.X - 1) * GameRectSize) + 1, (int)((newBombCoords.Y == 0 ? newBombCoords.Y : newBombCoords.Y - 1) * GameRectSize) + 1));//ToDo: valszeg nem jól van eltárolva itt és emiatt rossz helyre rúgja; HA nem ó, akkor +1 kell mindegyikhez
+                                                                                                                                                                                                                               //new Point((int)(pl.Position.X + (GameRectSize * PlayerWidthRate) / 2), (int)(pl.Position.Y + (GameRectSize * (PlayerHeightRate + PlayerHeightRateHangsIn)) / 2)));//ToDo: valszeg nem jól van eltárolva itt és emiatt rossz helyre rúgja
                 lock (pl._bombListLockObject)
                 {
                     pl.BombList.Add(newBomb);
@@ -1269,110 +1292,107 @@ namespace FriendshipExploder.Logic
                     Elements[i, j] = newBomb;
                 }
 
-                if (newBomb.ElementType == ElementType.Bomb)
+                new Task(() =>
                 {
-                    new Task(() =>
+                    if (newBomb.ElementType == ElementType.ScheduledBomb)
                     {
-                        if (newBomb.ElementType == ElementType.ScheduledBomb)
+                        lock (pl._triggerBombLockObject)
                         {
-                            lock (pl._triggerBombLockObject)
+                            Monitor.Wait(pl._triggerBombLockObject);
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < 3000; i++)//x másodperc múlva robban a bomba
+                        {
+                            lock (_TimerLockObject)
                             {
-                                Monitor.Wait(pl._triggerBombLockObject);
+                                if (GamePaused)
+                                {
+                                    Monitor.Wait(_TimerLockObject);
+                                }
                             }
+                            Thread.Sleep(1);
                         }
-                        else
+                    }
+                    if (newBomb != null)
+                    {
+                        newBomb.Explode = true;
+
+                        //ToDo: várjon, amíg megáll a bomba, vagy állítsa meg a rúgást.
+                        //newBomb.Image.Freeze();
+                        //ToDO: ha a karakter rajtamard, akkro is haljon meg. IDe.
+                        int explsoionRange = pl.Bomb.ExplosionRange;
+
+                        List<Task> explosionTasks = new List<Task>();
+
+                        explosionTasks.Add(new Task(() =>
                         {
-                            for (int i = 0; i < 3000; i++)//x másodperc múlva robban a bomba
+                            for (int row = newBomb.Position.X + 1; row <= newBomb.Position.X + explsoionRange; row++)
                             {
-                                lock (_TimerLockObject)
+                                if (row < Elements.GetLength(0) - 1)
                                 {
-                                    if (GamePaused)
+                                    ExplosionEffects(row, newBomb.Position.Y, newBomb, pl);
+                                    if (BombStopper(row, newBomb.Position.Y))
                                     {
-                                        Monitor.Wait(_TimerLockObject);
+                                        break;
                                     }
                                 }
-                                Thread.Sleep(1);
                             }
-                        }
-                        if (newBomb != null)
+                        }, TaskCreationOptions.LongRunning));
+                        explosionTasks.Add(new Task(() =>
                         {
-                            newBomb.Explode = true;
-
-                            //ToDo: várjon, amíg megáll a bomba, vagy állítsa meg a rúgást.
-                            //newBomb.Image.Freeze();
-                            //ToDO: ha a karakter rajtamard, akkro is haljon meg. IDe.
-                            int explsoionRange = pl.Bomb.ExplosionRange;
-
-                            List<Task> explosionTasks = new List<Task>();
-
-                            explosionTasks.Add(new Task(() =>
+                            for (int row = newBomb.Position.X - 1; row >= newBomb.Position.X - explsoionRange; row--)
                             {
-                                for (int row = newBomb.Position.X + 1; row <= newBomb.Position.X + explsoionRange; row++)
+                                if (row >= 0)
                                 {
-                                    if (row < Elements.GetLength(0) - 1)
+                                    //ExplosionEffects(row, j, bomb, explosionImg, pl);
+                                    ExplosionEffects(row, newBomb.Position.Y, newBomb, pl);
+                                    if (BombStopper(row, newBomb.Position.Y))
                                     {
-                                        ExplosionEffects(row, newBomb.Position.Y, newBomb, pl);
-                                        if (BombStopper(row, newBomb.Position.Y))
-                                        {
-                                            break;
-                                        }
+                                        break;
                                     }
                                 }
-                            }, TaskCreationOptions.LongRunning));
-                            explosionTasks.Add(new Task(() =>
+                            }
+                        }));
+
+                        explosionTasks.Add(new Task(() =>
+                        {
+                            for (int col = newBomb.Position.Y + 1; col <= newBomb.Position.Y + explsoionRange; col++)
                             {
-                                for (int row = newBomb.Position.X - 1; row >= newBomb.Position.X - explsoionRange; row--)
+                                if (col < Elements.GetLength(1) - 1)
                                 {
-                                    if (row >= 0)
+                                    //ExplosionEffects(i, col, bomb, explosionImg, pl);
+                                    ExplosionEffects(newBomb.Position.X, col, newBomb, pl);
+                                    if (BombStopper(newBomb.Position.X, col))
                                     {
-                                        //ExplosionEffects(row, j, bomb, explosionImg, pl);
-                                        ExplosionEffects(row, newBomb.Position.Y, newBomb, pl);
-                                        if (BombStopper(row, newBomb.Position.Y))
-                                        {
-                                            break;
-                                        }
+                                        break;
                                     }
                                 }
-                            }));
+                            }
+                        }, TaskCreationOptions.LongRunning));
 
-                            explosionTasks.Add(new Task(() =>
+                        explosionTasks.Add(new Task(() =>
+                        {
+                            for (int col = newBomb.Position.Y - 1; col >= newBomb.Position.Y - explsoionRange; col--)
                             {
-                                for (int col = newBomb.Position.Y + 1; col <= newBomb.Position.Y + explsoionRange; col++)
+                                if (col >= 0)
                                 {
-                                    if (col < Elements.GetLength(1) - 1)
+                                    //ExplosionEffects(i, col, bomb, explosionImg, pl);
+                                    ExplosionEffects(newBomb.Position.X, col, newBomb, pl);
+
+                                    if (BombStopper(newBomb.Position.X, col))
                                     {
-                                        //ExplosionEffects(i, col, bomb, explosionImg, pl);
-                                        ExplosionEffects(newBomb.Position.X, col, newBomb, pl);
-                                        if (BombStopper(newBomb.Position.X, col))
-                                        {
-                                            break;
-                                        }
+                                        break;
                                     }
                                 }
-                            }, TaskCreationOptions.LongRunning));
+                            }
+                        }, TaskCreationOptions.LongRunning));
 
-                            explosionTasks.Add(new Task(() =>
-                            {
-                                for (int col = newBomb.Position.Y - 1; col >= newBomb.Position.Y - explsoionRange; col--)
-                                {
-                                    if (col >= 0)
-                                    {
-                                        //ExplosionEffects(i, col, bomb, explosionImg, pl);
-                                        ExplosionEffects(newBomb.Position.X, col, newBomb, pl);
-
-                                        if (BombStopper(newBomb.Position.X, col))
-                                        {
-                                            break;
-                                        }
-                                    }
-                                }
-                            }, TaskCreationOptions.LongRunning));
-
-                            Parallel.ForEach(explosionTasks, t => t.Start());
-                            Trigger(pl, newBomb, newBomb.Position.X, newBomb.Position.Y, 1500);
-                        }
-                    }, TaskCreationOptions.LongRunning).Start();
-                }
+                        Parallel.ForEach(explosionTasks, t => t.Start());
+                        Trigger(pl, newBomb, newBomb.Position.X, newBomb.Position.Y, 1500);
+                    }
+                }, TaskCreationOptions.LongRunning).Start();
             }
         }
 

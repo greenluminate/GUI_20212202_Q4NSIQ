@@ -144,13 +144,26 @@ namespace FriendshipExploder.Renderer
                             else if (gameModel.Powerups[i, j] != null)
                             {
                                 //Powerups
-                                drawingContext.DrawRectangle(
+                                if (!gameModel.Powerups[i, j].Explode)
+                                {
+                                    drawingContext.DrawRectangle(
+                                            new ImageBrush(
+                                                new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "Powerups", $"{gameModel.Powerups[i, j].ElementType}.png"),
+                                                UriKind.RelativeOrAbsolute))),
+                                            new Pen(Brushes.Black, 0),
+                                            new Rect(x, y, gameRectSize, gameRectSize)
+                                        );
+                                }
+                                else
+                                {
+                                    drawingContext.DrawRectangle(
                                         new ImageBrush(
-                                            new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "Powerups", $"{gameModel.Powerups[i, j].ElementType}.png"),
+                                            new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "Powerups", "Explode.png"),
                                             UriKind.RelativeOrAbsolute))),
                                         new Pen(Brushes.Black, 0),
                                         new Rect(x, y, gameRectSize, gameRectSize)
                                     );
+                                }
                             }
                         }
                         //játékosok kirajzolása
