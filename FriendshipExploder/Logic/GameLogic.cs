@@ -212,7 +212,7 @@ namespace FriendshipExploder.Logic
             }
 
             AITaskCreator();
-            CountDown(30);
+            CountDown(150);
         }
 
         private void CountDown(int seconds)
