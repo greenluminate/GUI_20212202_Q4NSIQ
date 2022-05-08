@@ -690,82 +690,74 @@ namespace FriendshipExploder.Logic
             
             while (true)//ToDo: Majd amgí nem igaz, hogy vége
             {
-                    
+                List<IElement> bombs = CollectBombs();
                 Node[,] lvlMatrix = ReconstructToNodes();
                 int[] targetElementIndex = FindNearestDestructible(ai.Position);
                 Node target = lvlMatrix[targetElementIndex[0], targetElementIndex[1]];
+                int aiPosX = (int)Math.Floor((decimal)(ai.Position.X / GameRectSize));
+                int aiPosY = (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize));
+
                 List<Point> area = GetTargetArea(target);
                 List<Point> path = FindPathToDestructible(FindNearestDestructible(ai.Position), ai.Position, lvlMatrix,area);
                 if (path != null)
                 {
+
                     foreach (var pt in path)
                     {
-                        if (pt.X > (int)Math.Floor((decimal)(ai.Position.X / GameRectSize)))
+                        foreach (var bomb in bombs)
                         {
-                            if (pt.X > (int)Math.Floor((decimal)(ai.Position.X / GameRectSize)) && CanStepToPos(ai, new System.Windows.Vector(0, ai.Speed)))
-                            {
 
-                                    StartMove(PlayerAction.right, ai);
-                                    StopMove(PlayerAction.right, ai);
-                                    Thread.Sleep(20);
+                            if (bomb != null)
+                            {
+                                if (GetBombArea(bomb).Contains(pt) || bomb.Position.X == aiPosX && bomb.Position.Y == aiPosY)
+                                {
+                                    IElement currentBomb = bomb;
+                                    while (currentBomb.Explode != true || GetBombArea(bomb).Contains(pt) == false)
+                                    {
+                                        Hide(bomb,ai);
+                                    }
                                     break;
-                                        
-                                    
-                               
-                                
+                                }
+
                             }
+
+                        }
+                        if (pt.X > aiPosX)
+                        {
+                           
+                                StartMove(PlayerAction.right, ai);
+                                StopMove(PlayerAction.right, ai);
+                                Thread.Sleep(20);
+                                break;
+                           
                             
 
                         }
-                        else if(pt.X < (int)Math.Floor((decimal)(ai.Position.X / GameRectSize)))
+                        else if(pt.X < aiPosX)
                         {
-                            if (pt.X < (int)Math.Floor((decimal)(ai.Position.X / GameRectSize)) && CanStepToPos(ai, new System.Windows.Vector(0, -1* ai.Speed)))
-                            {
-                                
-                                    StartMove(PlayerAction.left, ai);
-                                    StopMove(PlayerAction.left, ai);
-                                    Thread.Sleep(20);
-                                    break;
-                                    
-                                
-                                
-                            }
-
+                                StartMove(PlayerAction.left, ai);
+                                StopMove(PlayerAction.left, ai);
+                                Thread.Sleep(20);
+                                break;
                         }
-                        else if (pt.Y > (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize)))
+                        else if (pt.Y > aiPosY)
                         {
-                            if (pt.Y > (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize)) && CanStepToPos(ai, new System.Windows.Vector(0, ai.Speed)))
-                            {
-                                
-                                    StartMove(PlayerAction.down, ai);
-                                    StopMove(PlayerAction.down, ai);
-                                    Thread.Sleep(20);
-                                    break;
-                                    
-
-                                
-                                
-                            }
+                                StartMove(PlayerAction.down, ai);
+                                StopMove(PlayerAction.down, ai);
+                                Thread.Sleep(20);
+                                break;
                         }
-                        else if (pt.Y < (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize)))
+                        else if (pt.Y < aiPosY)
                         {
-                            if (pt.Y < (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize)) && CanStepToPos(ai, new System.Windows.Vector(0, -1 * ai.Speed)))
-                            {
-
                                 StartMove(PlayerAction.up, ai);
                                 StopMove(PlayerAction.up, ai);
                                 Thread.Sleep(20);
                                 break;
-
-
-                                 
-                                
-                            }
                         }
                         else if (area.Contains(pt))
                         {
                             Act(PlayerAction.bombudlr, ai);
-                            List<IElement> e = FindHiding(ai.Position, Elements);
+                            bombs.Add(Elements[pt.X, pt.Y]);               
                             break;
                         }
 
@@ -858,10 +850,11 @@ namespace FriendshipExploder.Logic
         }
 
        
-        private List<IElement> FindHiding(Point startingPoint, IElement[,] elements)
+        private List<IElement> CollectBombs()
         {
+
             List<IElement> bombPlaces = new List<IElement>();
-            foreach (var element in elements)
+            foreach (var element in Elements)
             {
                 if (element is Bomb)
                 {
@@ -872,21 +865,15 @@ namespace FriendshipExploder.Logic
 
         }
 
-        private List<Point> FindAvailablePath(Player ai, int aiNextPosX, int aiNextPosY)
+        private void Hide(IElement bomb, Player ai)
         {
-            List<Point> availablePath = new List<Point>();
-            for (int x = -1 * (GameRectSize / 2); x < (GameRectSize / 2); x++)
+            if (bomb.Position.X > ai.Position.X)
             {
-                for (int y = -1 * (GameRectSize / 2); y < (GameRectSize / 2); y++)
-                {
-                    if (!(ai.Position.X + x == aiNextPosX && ai.Position.Y + y == aiNextPosY) && CanStepToPos(ai, new System.Windows.Vector(x * ai.Speed, y * ai.Speed)))
-                    {
-                        availablePath.Add(new Point(ai.Position.X + (x * ai.Speed), ai.Position.Y + (y * ai.Speed)));
-                    }
-                }
+                StartMove(PlayerAction.right, ai);
             }
-            return availablePath;
         }
+
+        
 
         //Optimalizáció még erősen szükséges
         Node[,] ReconstructToNodes()
@@ -1007,6 +994,37 @@ namespace FriendshipExploder.Logic
             }
             return targetArea;
         }
+        public List<Point> GetBombArea(IElement bomb)
+        {
+            List<Point> targetArea = new List<Point>();
+            if (bomb != null)
+            {
+                for (int x = -1; x <= 1; x++)
+                {
+                    for (int y = -1; y <= 1; y++)
+                    {
+                        if (x == 0 & y == 0)
+                        {
+                            continue;
+                        }
+
+                        if (x != y && x != -1 * y && (bomb.Position.X + x) > -1 && (bomb.Position.Y + y) > -1)
+                        {
+                            int thisX = bomb.Position.X + x;
+                            int thisY = bomb.Position.Y + y;
+                            if (Elements[thisX, thisY] == null)
+                            {
+                                targetArea.Add(new Point(thisX, thisY));
+                            }
+
+                        }
+
+                    }
+                }
+            }
+            
+            return targetArea;
+        }
         public List<Node> GetNeighbors(Node node,Node[,] lvlMatrix)
         {
             List<Node> neighbors = new List<Node>();
@@ -1123,40 +1141,5 @@ namespace FriendshipExploder.Logic
             return true;
         }
 
-
-
-        private List<PlayerAction> FindAvailableRoundaboutActions(Player ai, int aiNextPosX, int aiNextPosY)
-        {
-            List<PlayerAction> availableActions = new List<PlayerAction>();
-            for (int x = -1 * (GameRectSize / 2); x < (GameRectSize / 2); x++)
-            {
-                for (int y = -1 * (GameRectSize / 2); y < (GameRectSize / 2); y++)
-                {
-                    if (!(ai.Position.X + x == aiNextPosX && ai.Position.Y + y == aiNextPosY) && CanStepToPos(ai, new System.Windows.Vector(x * ai.Speed, y * ai.Speed)))
-                    {
-                        if (ai.Position.X + x - ai.Position.X < 0)
-                        {
-                            availableActions.Add(PlayerAction.left);
-                        }
-
-                        if (ai.Position.Y + y - ai.Position.Y < 0)
-                        {
-                            availableActions.Add(PlayerAction.up);
-                        }
-
-                        if (ai.Position.X + x - ai.Position.X > 0)
-                        {
-                            availableActions.Add(PlayerAction.right);
-                        }
-
-                        if (ai.Position.Y + y - ai.Position.Y > 0)
-                        {
-                            availableActions.Add(PlayerAction.down);
-                        }
-                    }
-                }
-            }
-            return availableActions;
-        }
     }
 }
