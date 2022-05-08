@@ -310,10 +310,17 @@ namespace FriendshipExploder.Logic
 
                 if (direction.X < 0)//Left
                 {
-                    if ((Elements[playerNextUpperRightCornerIndexes.X, playerNextUpperRightCornerIndexes.Y] != null && !(Elements[playerNextUpperRightCornerIndexes.X, playerNextUpperRightCornerIndexes.Y] is Bomb)) ||
-                    (Elements[playerNextBottomRightCornerIndexes.X, playerNextBottomRightCornerIndexes.Y] != null && !(Elements[playerNextBottomRightCornerIndexes.X, playerNextBottomRightCornerIndexes.Y] is Bomb)) ||
-                    Elements[playerNextUpperLeftCornerIndexes.X, playerNextUpperLeftCornerIndexes.Y] != null ||
-                    Elements[playerNextBottomLeftCornerIndexes.X, playerNextBottomLeftCornerIndexes.Y] != null)
+                    if (playerNextUpperRightCornerIndexes.X < 0)
+                    {
+                        return false;
+                    }
+
+                    if ((Elements[playerNextUpperRightCornerIndexes.X, playerNextUpperRightCornerIndexes.Y] != null &&
+                        !(Elements[playerNextUpperRightCornerIndexes.X, playerNextUpperRightCornerIndexes.Y] is Bomb)) ||
+                        (Elements[playerNextBottomRightCornerIndexes.X, playerNextBottomRightCornerIndexes.Y] != null &&
+                        !(Elements[playerNextBottomRightCornerIndexes.X, playerNextBottomRightCornerIndexes.Y] is Bomb)) ||
+                        Elements[playerNextUpperLeftCornerIndexes.X, playerNextUpperLeftCornerIndexes.Y] != null ||
+                        Elements[playerNextBottomLeftCornerIndexes.X, playerNextBottomLeftCornerIndexes.Y] != null)
                     {
                         if ((Elements[playerNextIndexes.X, playerNextIndexes.Y] is Bomb nextBomb) && currentBomb != null && nextBomb.Equals(currentBomb))
                         {
@@ -329,6 +336,11 @@ namespace FriendshipExploder.Logic
                 }
                 else if (direction.X > 0)
                 {
+                    if (playerNextUpperRightCornerIndexes.X >= PlayGroundSize[0] - 1)
+                    {
+                        return false;
+                    }
+
                     if (Elements[playerNextUpperRightCornerIndexes.X, playerNextUpperRightCornerIndexes.Y] != null ||
                         Elements[playerNextBottomRightCornerIndexes.X, playerNextBottomRightCornerIndexes.Y] != null ||
                         (Elements[playerNextUpperLeftCornerIndexes.X, playerNextUpperLeftCornerIndexes.Y] != null && !(Elements[playerNextUpperLeftCornerIndexes.X, playerNextUpperLeftCornerIndexes.Y] is Bomb)) ||
@@ -348,6 +360,11 @@ namespace FriendshipExploder.Logic
                 }
                 else if (direction.Y < 0)//Up
                 {
+                    if (playerNextUpperRightCornerIndexes.Y < 0)
+                    {
+                        return false;
+                    }
+
                     if (Elements[playerNextUpperRightCornerIndexes.X, playerNextUpperRightCornerIndexes.Y] != null ||
                     (Elements[playerNextBottomRightCornerIndexes.X, playerNextBottomRightCornerIndexes.Y] != null && !(Elements[playerNextBottomRightCornerIndexes.X, playerNextBottomRightCornerIndexes.Y] is Bomb)) ||
                     Elements[playerNextUpperLeftCornerIndexes.X, playerNextUpperLeftCornerIndexes.Y] != null ||
@@ -367,6 +384,11 @@ namespace FriendshipExploder.Logic
                 }
                 else
                 {
+                    if (playerNextUpperRightCornerIndexes.Y >= PlayGroundSize[1] - 1)
+                    {
+                        return false;
+                    }
+
                     if ((Elements[playerNextUpperRightCornerIndexes.X, playerNextUpperRightCornerIndexes.Y] != null && !(Elements[playerNextUpperRightCornerIndexes.X, playerNextUpperRightCornerIndexes.Y] is Bomb) ||
                         Elements[playerNextBottomRightCornerIndexes.X, playerNextBottomRightCornerIndexes.Y] != null ||
                         (Elements[playerNextUpperLeftCornerIndexes.X, playerNextUpperLeftCornerIndexes.Y] != null && !(Elements[playerNextUpperLeftCornerIndexes.X, playerNextUpperLeftCornerIndexes.Y] is Bomb)) ||
