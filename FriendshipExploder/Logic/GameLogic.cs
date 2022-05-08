@@ -1529,56 +1529,46 @@ namespace FriendshipExploder.Logic
             Parallel.ForEach(aiTasks, task => task.Start());//Hogy amennyire csak lehet egyszerre induljanak
         }
 
-        private async void AIWakeUp(Player ai) 
+        private async void AIWakeUp(Player ai)
         {
             Thread.Sleep(1000);//1 másodperc előny a valódi játékosoknak
-            while (true)//ToDo: Majd amgí nem igaz, hogy vége
+            while (!RoundOver)//ToDo: Majd amgí nem igaz, hogy vége
             {
                 List<IElement> bombs = CollectBombs();
                 Node[,] lvlMatrix = ReconstructToNodes();
                 int[] targetElementIndex = FindNearestDestructible(ai.Position);
 
                 Node target = lvlMatrix[targetElementIndex[0], targetElementIndex[1]];
-                int aiPosX = (int)Math.Floor((decimal)(ai.Position.X / GameRectSize));
-                int aiPosY = (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize));
-                Point aiPosition = new Point(aiPosX, aiPosY);
+                Point aiPosition = PlayerPixelToMatrixCoordinate(ai.Position);
+                int aiPosX = aiPosition.X;
+                int aiPosY = aiPosition.Y;
+
                 List<Point> area = GetTargetArea(target);
                 List<Point> path = FindPathToDestructible(FindNearestDestructible(ai.Position), ai.Position, lvlMatrix, area);
                 foreach (var bomb in bombs)
                 {
-
                     if (bomb != null)
                     {
-                        if (GetBombArea(bomb).Contains(aiPosition) || bomb.Position.X == (int)Math.Floor((decimal)(ai.Position.X / GameRectSize)) && bomb.Position.Y == (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize)))
+                        if (GetBombArea(bomb).Contains(aiPosition) || bomb.Position.X == aiPosition.X && bomb.Position.Y == aiPosition.Y)
                         {
                             IElement currentBomb = bomb;
                             while (Elements[currentBomb.Position.X, currentBomb.Position.Y] is Bomb && aiPosY == bomb.Position.Y)
                             {
-                               Hide(bomb, ai);
+                                Hide(bomb, ai);
                             }
-                            
-
                         }
-                        
                     }
-
                 }
                 if (path != null)
                 {
-
                     foreach (var pt in path)
                     {
-
-
                         if (pt.X > aiPosX && Elements[aiPosX + 1, aiPosY] == null)
                         {
-
                             StartMove(PlayerAction.right, ai);
                             StopMove(PlayerAction.right, ai);
                             Thread.Sleep(20);
                             break;
-
-
 
                         }
                         else if (pt.X < aiPosX)
@@ -1604,16 +1594,11 @@ namespace FriendshipExploder.Logic
                         }
                         else if (area.Contains(pt))
                         {
-                            Act(PlayerAction.bombudlr, ai);
-                            bombs.Add(Elements[pt.X, pt.Y]);
+                            StartAct(PlayerAction.bombudlr, ai);
                             break;
                         }
-
                     }
-
                 }
-
-
 
                 //List<IElement> pathToDestructible = FindPathToDestructible( closestElementIndex,ai.Position);
                 //IElement[,] elements = new IElement[GameSize.X - 1, GameSize.Y - 1];
@@ -1711,9 +1696,11 @@ namespace FriendshipExploder.Logic
 
         private void Hide(IElement bomb, Player ai)
         {
-            int aiPosX = (int)Math.Floor((decimal)(ai.Position.X / GameRectSize));
-            int aiPosY = (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize));
-            if (aiPosX > 0 && Elements[aiPosX - 1, aiPosY] == null)
+            Point aiPosition = PlayerPixelToMatrixCoordinate(ai.Position);
+            int aiPosX = aiPosition.X;
+            int aiPosY = aiPosition.Y;
+
+            if (aiPosX > 0 && (Elements[aiPosX - 1, aiPosY] == null || (Elements[aiPosX - 1, aiPosY] is Bomb b && Elements[aiPosX, aiPosY] is Bomb borigi && b.Equals(borigi))))
             {
                 StartMove(PlayerAction.left, ai);
                 //if (Math.Abs((int)Math.Floor((decimal)(ai.Position.X / GameRectSize)) - bomb.Position.X) > 5)
@@ -1722,30 +1709,23 @@ namespace FriendshipExploder.Logic
                 //    Thread.Sleep(4500);
                 //}
             }
-            else if (aiPosY < Elements.GetLength(0) && Elements[aiPosY + 1, aiPosX] == null)
+            else if (aiPosY < Elements.GetLength(0) && (Elements[aiPosY + 1, aiPosX] == null || (Elements[aiPosY + 1, aiPosX] is Bomb bundernext && Elements[aiPosX, aiPosY] is Bomb bunder && bundernext.Equals(bunder))))
             {
                 StartMove(PlayerAction.right, ai);
-
             }
-            else if (Math.Abs((int)Math.Floor((decimal)(ai.Position.X / GameRectSize)) - bomb.Position.X) < 5)
+            else if ((aiPosX - bomb.Position.X) < 5)
             {
-                if (aiPosY > 0 && Elements[aiPosX, aiPosY - 1] == null)
+                if (aiPosY > 0 && (Elements[aiPosX, aiPosY - 1] == null || (Elements[aiPosX, aiPosY - 1] is Bomb bupundernext && Elements[aiPosX, aiPosY] is Bomb bupunder && bupundernext.Equals(bupunder))))
                 {
                     StartMove(PlayerAction.up, ai);
-
-
                 }
-                else if (aiPosY < Elements.GetLength(1) && Elements[aiPosX, aiPosY + 1] == null)
+                else if (aiPosY < Elements.GetLength(1) && (Elements[aiPosX, aiPosY + 1] == null || (Elements[aiPosX, aiPosY + 1] is Bomb bdownundernext && Elements[aiPosX, aiPosY] is Bomb bdownunder && bdownundernext.Equals(bdownunder))))
                 {
                     StartMove(PlayerAction.down, ai);
-
-
                 }
             }
 
         }
-
-
 
         //Optimalizáció még erősen szükséges
         Node[,] ReconstructToNodes()
@@ -1770,7 +1750,6 @@ namespace FriendshipExploder.Logic
                     else if (Elements[i, j] is Bomb)
                     {
                         lvlMatrix[i, j] = new Node("bomb", false, Elements[i, j].Position);
-
                     }
                 }
             }
@@ -1779,8 +1758,10 @@ namespace FriendshipExploder.Logic
 
         private List<Point> FindPathToDestructible(int[] targetElementIndex, Point startingPosition, Node[,] lvlMatrix, List<Point> area)
         {
-            int aiCurrentIndexX = (int)Math.Floor((decimal)(startingPosition.X / GameRectSize));
-            int aiCurrentIndexY = (int)Math.Floor((decimal)(startingPosition.Y / GameRectSize));
+            Point aiPosition = PlayerPixelToMatrixCoordinate(startingPosition);
+            int aiCurrentIndexX = aiPosition.X;
+            int aiCurrentIndexY = aiPosition.Y;
+
             Node target = lvlMatrix[targetElementIndex[0], targetElementIndex[1]];
             List<Point> targetArea = area; // TODO kigyűjteni úgy a környező pontokat, hogy hasonlítani lehessen
             List<Node> openSet = new List<Node>();
@@ -1944,7 +1925,7 @@ namespace FriendshipExploder.Logic
             if (distX > distY)
             {
                 return 14 + distY + 10 * (distX - distY);
-                return 14 + distX + 10 * (distY - distX);
+                //return 14 + distX + 10 * (distY - distX);
 
             }
             return 1;
@@ -1962,8 +1943,9 @@ namespace FriendshipExploder.Logic
 
         private int[] FindNearestDestructible(Point aiPosition)
         {
-            int aiCurrentIndexX = (int)Math.Floor((decimal)(aiPosition.X / GameRectSize));
-            int aiCurrentIndexY = (int)Math.Floor((decimal)(aiPosition.Y / GameRectSize));
+            Point aiPositionIndexes = PlayerPixelToMatrixCoordinate(aiPosition);
+            int aiCurrentIndexX = aiPositionIndexes.X;
+            int aiCurrentIndexY = aiPositionIndexes.Y;
             bool[,] vis = new bool[PlayGroundSize[0], PlayGroundSize[1]]; //Bool tömb, azt nézi, hogy mely elemek vannak feldolgozva
             int[] dRow = new int[] { -1, 0, 1, 0 }; // Csak arra kell, hogy végig tudjon iterálni a szomszédokon
             int[] dCol = new int[] { 0, 1, 0, -1 };
@@ -1978,7 +1960,6 @@ namespace FriendshipExploder.Logic
                 if (Elements[x, y] is Wall)
                 {
                     return cell;
-                    break;
                 }
                 else
                 {
