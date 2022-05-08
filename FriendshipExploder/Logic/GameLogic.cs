@@ -262,7 +262,9 @@ namespace FriendshipExploder.Logic
                             Elements[x, startY] = new FixWall(new Point(x, startY), ElementType.FixWall);
                         }
 
-                        Thread.Sleep(200);
+                        PlayerKiller(new Point(x, startY));
+
+                        Thread.Sleep(50);
                     }
 
                     //Vertical fill right
@@ -280,7 +282,10 @@ namespace FriendshipExploder.Logic
                         {
                             Elements[endX - 1, y] = new FixWall(new Point(endX - 1, y), ElementType.FixWall);
                         }
-                        Thread.Sleep(200);
+
+                        PlayerKiller(new Point(endX - 1, y));
+
+                        Thread.Sleep(50);
                     }
 
                     //Horizontal fill bottom
@@ -298,7 +303,10 @@ namespace FriendshipExploder.Logic
                         {
                             Elements[x, endY - 1] = new FixWall(new Point(x, endY - 1), ElementType.FixWall);
                         }
-                        Thread.Sleep(200);
+
+                        PlayerKiller(new Point(x, endY - 1));
+
+                        Thread.Sleep(50);
                     }
 
                     //Vertical fill left
@@ -316,7 +324,10 @@ namespace FriendshipExploder.Logic
                         {
                             Elements[startX, y] = new FixWall(new Point(startX, y), ElementType.FixWall);
                         }
-                        Thread.Sleep(200);
+
+                        PlayerKiller(new Point(startX, y));
+
+                        Thread.Sleep(50);
                     }
 
                     startX++;
@@ -326,6 +337,32 @@ namespace FriendshipExploder.Logic
                 }
             });
             countDownTask.Start();
+        }
+
+        private void PlayerKiller(Point playerCoords)
+        {
+            lock (_PlayersListLockObject)
+            {
+                Players.ForEach(pl =>
+                {
+                    if (PlayerPixelToMatrixCoordinate(pl.Position) == playerCoords)
+                    {
+                        pl.Explode = true;
+                        for (int i = 0; i < 200; i++)
+                        {
+                            if (GamePaused)
+                            {
+                                lock (_TimerLockObject)
+                                {
+                                    Monitor.Wait(_TimerLockObject);
+                                }
+                            }
+                            Thread.Sleep(1);
+                        }
+                        Players.Remove(pl);
+                    }
+                });
+            }
         }
 
         public enum PlayerAction
