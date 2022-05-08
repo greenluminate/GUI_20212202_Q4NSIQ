@@ -16,7 +16,7 @@ namespace FriendshipExploder.Model
         public ElementType ElementType { get; set; }
         public bool IsMoving { get; set; }
         public Point PositionPixel { get; set; }//Centerként kell megkapja
-        public Powerup(ElementType ElementType)
+        public Powerup(Point Position, ElementType ElementType)
         {
             this.Explode = false;
             this.ElementType = ElementType;

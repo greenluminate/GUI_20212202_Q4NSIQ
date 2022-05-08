@@ -36,6 +36,9 @@ namespace FriendshipExploder.Model
         public int SumOfKills { get; set; }
         public object _bombListLockObject;
         public bool HasDesease { get; set; }
+        public bool ActionPressed { get; set; }
+        public bool SetBombPressed { get; set; }
+        public bool Explode { get; set; }
 
         public Player(int id, Point position, KeyBinding keyBinding)
         {
@@ -53,6 +56,9 @@ namespace FriendshipExploder.Model
             SumOfKills = 0;
             HasDesease = false;
             CanKick = true;
+            ActionPressed = false;
+            SetBombPressed = false;
+            Explode = false;
         }
 
         public void SetupKeyBinding(int binding)
