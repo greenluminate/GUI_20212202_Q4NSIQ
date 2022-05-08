@@ -684,15 +684,15 @@ namespace FriendshipExploder.Logic
             Parallel.ForEach(aiTasks, task => task.Start());//Hogy amennyire csak lehet egyszerre induljanak
         }
 
-        private async void AIWakeUp(Player ai)
+        private async void AIWakeUp(Player ai) 
         {
             Thread.Sleep(1000);//1 másodperc előny a valódi játékosoknak
-            
             while (true)//ToDo: Majd amgí nem igaz, hogy vége
             {
                 List<IElement> bombs = CollectBombs();
                 Node[,] lvlMatrix = ReconstructToNodes();
                 int[] targetElementIndex = FindNearestDestructible(ai.Position);
+
                 Node target = lvlMatrix[targetElementIndex[0], targetElementIndex[1]];
                 int aiPosX = (int)Math.Floor((decimal)(ai.Position.X / GameRectSize));
                 int aiPosY = (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize));
@@ -704,16 +704,16 @@ namespace FriendshipExploder.Logic
 
                     if (bomb != null)
                     {
-                        if (GetBombArea(bomb).Contains(aiPosition) || bomb.Position.X == aiPosX && bomb.Position.Y == aiPosY)
+                        if (GetBombArea(bomb).Contains(aiPosition) || bomb.Position.X == (int)Math.Floor((decimal)(ai.Position.X / GameRectSize)) && bomb.Position.Y == (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize)))
                         {
                             IElement currentBomb = bomb;
-                            while (Elements[currentBomb.Position.X,currentBomb.Position.Y] is Bomb)
+                            while (Elements[currentBomb.Position.X,currentBomb.Position.Y] is Bomb && aiPosY == bomb.Position.Y )
                             {
-                                Hide(bomb, ai);
+                               Hide(bomb, ai);
                             }
-                            break;
+                            
                         }
-
+                        
                     }
 
                 }
@@ -724,7 +724,7 @@ namespace FriendshipExploder.Logic
                     {
                         
                         
-                        if (pt.X > aiPosX)
+                        if (pt.X > aiPosX && Elements[aiPosX+1,aiPosY] == null)
                         {
                            
                                 StartMove(PlayerAction.right, ai);
@@ -762,19 +762,13 @@ namespace FriendshipExploder.Logic
                             bombs.Add(Elements[pt.X, pt.Y]);
                             break;
                         }
-                        
-
-
-
-
 
                     }
                     
                 }
-                
-                
-                
-                
+
+
+
                 //List<IElement> pathToDestructible = FindPathToDestructible( closestElementIndex,ai.Position);
                 //IElement[,] elements = new IElement[GameSize.X - 1, GameSize.Y - 1];
                 /*lock (_ElementsListLockObject)
@@ -876,19 +870,33 @@ namespace FriendshipExploder.Logic
             if (aiPosX > 0 && Elements[aiPosX-1, aiPosY] == null)
             {
                 StartMove(PlayerAction.left, ai);
+                //if (Math.Abs((int)Math.Floor((decimal)(ai.Position.X / GameRectSize)) - bomb.Position.X) > 5)
+                //{
+                //    StopMove(PlayerAction.left, ai);
+                //    Thread.Sleep(4500);
+                //}
             }
-            else if (Math.Abs(aiPosX - bomb.Position.X) < 5)
+            else if (aiPosY < Elements.GetLength(0) && Elements[aiPosY+1, aiPosX] == null)
+            {
+                StartMove(PlayerAction.right, ai);
+
+            }
+            else if (Math.Abs((int)Math.Floor((decimal)(ai.Position.X / GameRectSize)) - bomb.Position.X) < 5)
             {
                 if (aiPosY > 0 && Elements[aiPosX, aiPosY-1] == null)
                 {
                     StartMove(PlayerAction.up, ai);
+                    
+
                 }
                 else if (aiPosY < Elements.GetLength(1) && Elements[aiPosX, aiPosY+1] == null)
                 {
                     StartMove(PlayerAction.down, ai);
-                }
+                   
 
+                }
             }
+            
         }
 
 
