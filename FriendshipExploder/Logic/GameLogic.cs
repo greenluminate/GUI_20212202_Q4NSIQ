@@ -212,7 +212,7 @@ namespace FriendshipExploder.Logic
             }
 
             AITaskCreator();
-            CountDown(5);
+            CountDown(3);
         }
 
         private void CountDown(int seconds)
@@ -376,7 +376,7 @@ namespace FriendshipExploder.Logic
                         Thread.Sleep(1);
                     }
                     Players.Remove(Players[i]);
-
+                    i--;
                     if (Players.Count == 0)
                     {
                         RoundOver = true;
@@ -713,6 +713,13 @@ namespace FriendshipExploder.Logic
                         pl.MovingHorizontal = false;
                     }
                     break;
+                case PlayerAction.actionudlr:
+                case PlayerAction.actionwasd:
+                    if (pl != null)
+                    {
+                        pl.ActionPressed = false;
+                    }
+                    break;
             }
         }
 
@@ -743,14 +750,13 @@ namespace FriendshipExploder.Logic
                         pl.ActionPressed = true;//It is necessary, else a btn press is called more than once.
                         Act(PlayerAction.actionudlr, pl);
                         await Task.Delay(1);
-                        pl.ActionPressed = false;
                     }
                     break;
             }
         }
 
         //A játékos mozgása
-        public async void Act(PlayerAction playerAction, Player pl)
+        public void Act(PlayerAction playerAction, Player pl)
         {
             if (pl != null && !pl.Explode)
             {
@@ -863,7 +869,10 @@ namespace FriendshipExploder.Logic
                         }
                         else
                         {
-                            TriggerScheduledBombs(player);
+                            lock (player._triggerBombLockObject)
+                            {
+                                Monitor.PulseAll(player._triggerBombLockObject);
+                            }
                         }
                         break;
                     case PlayerDirection.down:
@@ -901,7 +910,10 @@ namespace FriendshipExploder.Logic
                         }
                         else
                         {
-                            TriggerScheduledBombs(player);
+                            lock (player._triggerBombLockObject)
+                            {
+                                Monitor.PulseAll(player._triggerBombLockObject);
+                            }
                         }
                         break;
                     case PlayerDirection.left:
@@ -939,7 +951,10 @@ namespace FriendshipExploder.Logic
                         }
                         else
                         {
-                            TriggerScheduledBombs(player);
+                            lock (player._triggerBombLockObject)
+                            {
+                                Monitor.PulseAll(player._triggerBombLockObject);
+                            }
                         }
                         break;
                     case PlayerDirection.right:
@@ -977,7 +992,10 @@ namespace FriendshipExploder.Logic
                         }
                         else
                         {
-                            TriggerScheduledBombs(player);
+                            lock (player._triggerBombLockObject)
+                            {
+                                Monitor.PulseAll(player._triggerBombLockObject);
+                            }
                         }
                         break;
                     default:
@@ -986,31 +1004,31 @@ namespace FriendshipExploder.Logic
             }, TaskCreationOptions.LongRunning).Start();
         }
 
-        private void TriggerScheduledBombs(Player player)
-        {
-            lock (player._bombListLockObject)
-            {
-                if (player.BombList.Count != 0)
-                {
-                    player.BombList.Where(bomb => bomb.ElementType == ElementType.ScheduledBomb).ToList().ForEach(bomb =>
-                    {
-                        bomb.Explode = true;
+        //private void TriggerScheduledBombs(Player player)
+        //{
+        //    lock (player._bombListLockObject)
+        //    {
+        //        if (player.BombList.Count != 0)
+        //        {
+        //            player.BombList.Where(bomb => bomb.ElementType == ElementType.ScheduledBomb).ToList().ForEach(bomb =>
+        //            {
+        //                bomb.Explode = true;
 
-                        player.BombList.Remove(bomb);
+        //                player.BombList.Remove(bomb);
 
-                        int x = bomb.Position.X;
-                        int y = bomb.Position.Y;
-                        lock (_ElementsListLockObject)
-                        {
-                            if (Elements[x, y] != null && (Elements[x, y] as Bomb).Equals(bomb))
-                            {
-                                Elements[x, y] = null;
-                            }
-                        }
-                    });
-                }
-            }
-        }
+        //                int x = bomb.Position.X;
+        //                int y = bomb.Position.Y;
+        //                lock (_ElementsListLockObject)
+        //                {
+        //                    if (Elements[x, y] != null && (Elements[x, y] as Bomb).Equals(bomb))
+        //                    {
+        //                        Elements[x, y] = null;
+        //                    }
+        //                }
+        //            });
+        //        }
+        //    }
+        //}
 
         private void EnvironmentInteractionsOnStep(Player player)
         {
@@ -1255,18 +1273,27 @@ namespace FriendshipExploder.Logic
                 {
                     new Task(() =>
                     {
-                        for (int i = 0; i < 3000; i++)//x másodperc múlva robban a bomba
+                        if (newBomb.ElementType == ElementType.ScheduledBomb)
                         {
-                            lock (_TimerLockObject)
+                            lock (pl._triggerBombLockObject)
                             {
-                                if (GamePaused)
-                                {
-                                    Monitor.Wait(_TimerLockObject);
-                                }
+                                Monitor.Wait(pl._triggerBombLockObject);
                             }
-                            Thread.Sleep(1);
                         }
-
+                        else
+                        {
+                            for (int i = 0; i < 3000; i++)//x másodperc múlva robban a bomba
+                            {
+                                lock (_TimerLockObject)
+                                {
+                                    if (GamePaused)
+                                    {
+                                        Monitor.Wait(_TimerLockObject);
+                                    }
+                                }
+                                Thread.Sleep(1);
+                            }
+                        }
                         if (newBomb != null)
                         {
                             newBomb.Explode = true;
@@ -1382,9 +1409,9 @@ namespace FriendshipExploder.Logic
                     {
                         //Mivel az elementsben nincsenek bene a playerek.
                         playersToKill = Players.Where(player =>
-                                (int)Math.Floor((decimal)(player.Position.X / GameRectSize)) == row &&
-                                (int)Math.Floor((decimal)(player.Position.Y / GameRectSize)) == col)
-                                .ToList();
+                                    (int)Math.Floor((decimal)(player.Position.X / GameRectSize)) == row &&
+                                    (int)Math.Floor((decimal)(player.Position.Y / GameRectSize)) == col)
+                                    .ToList();
                         playersToKill.ForEach(player => player.Explode = true);
                         if (playersToKill.Count == 0 && bomb != null)
                         {
@@ -1504,19 +1531,19 @@ namespace FriendshipExploder.Logic
                         ;
                     }
 
-                    if (nearestPlayer.Position.Y - ai.Position.Y < 0 && CanStepToPos(ai, new System.Windows.Vector(0, -1 * ai.Speed)))
+                    if (nearestPlayer != null && nearestPlayer.Position.Y - ai.Position.Y < 0 && CanStepToPos(ai, new System.Windows.Vector(0, -1 * ai.Speed)))
                     {
                         StartMove(PlayerAction.up, ai);
                         StopMove(PlayerAction.up, ai);
                     }
 
-                    if (nearestPlayer.Position.X - ai.Position.X > 0 && CanStepToPos(ai, new System.Windows.Vector(ai.Speed, 0)))
+                    if (nearestPlayer != null && nearestPlayer.Position.X - ai.Position.X > 0 && CanStepToPos(ai, new System.Windows.Vector(ai.Speed, 0)))
                     {
                         StartMove(PlayerAction.right, ai);
                         StopMove(PlayerAction.right, ai);
                     }
 
-                    if (nearestPlayer.Position.Y - ai.Position.Y > 0 && CanStepToPos(ai, new System.Windows.Vector(0, ai.Speed)))
+                    if (nearestPlayer != null && nearestPlayer.Position.Y - ai.Position.Y > 0 && CanStepToPos(ai, new System.Windows.Vector(0, ai.Speed)))
                     {
                         StartMove(PlayerAction.down, ai);
                         StopMove(PlayerAction.down, ai);

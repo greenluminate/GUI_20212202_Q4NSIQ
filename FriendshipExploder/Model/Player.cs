@@ -35,6 +35,8 @@ namespace FriendshipExploder.Model
         public int Kills { get; set; }
         public int SumOfKills { get; set; }
         public object _bombListLockObject;
+
+        public object _triggerBombLockObject;
         public bool HasDesease { get; set; }
         public bool ActionPressed { get; set; }
         public bool SetBombPressed { get; set; }
@@ -51,6 +53,7 @@ namespace FriendshipExploder.Model
             Bomb = new Bomb(this, ElementType.Bomb);
             BombList = new List<Bomb>();
             _bombListLockObject = new object();
+            _triggerBombLockObject = new object();
             BombAmount = 3;
             Kills = 0;//Lehet azelőző körös killszámot át kéne adni, de nem feltélen, sőt külön fájlba is menthetnénk a körök között az addigi killeket, vagy mindegy hová.
             SumOfKills = 0;
@@ -96,6 +99,7 @@ namespace FriendshipExploder.Model
             Bomb = new Bomb(this, ElementType.Bomb);
             BombList = new List<Bomb>();
             _bombListLockObject = new object();
+            _triggerBombLockObject = new object();
             BombAmount = 1;
             HasDesease = false;
         }

@@ -103,6 +103,14 @@ namespace FriendshipExploder.Controller
                 case Key.D:
                     control.StopMove(GameLogic.PlayerAction.D);
                     break;
+
+                //Action
+                case Key.RightCtrl:
+                    control.StopMove(GameLogic.PlayerAction.actionudlr);
+                    break;
+                case Key.LeftCtrl:
+                    control.StopMove(GameLogic.PlayerAction.actionwasd);
+                    break;
             }
         }
     }
