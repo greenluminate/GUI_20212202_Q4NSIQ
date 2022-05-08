@@ -206,7 +206,7 @@ namespace FriendshipExploder.Logic
             }
 
             AITaskCreator();
-            CountDown(150);
+            CountDown(5);
         }
 
         private void CountDown(int seconds)
@@ -237,8 +237,94 @@ namespace FriendshipExploder.Logic
                     }
                 }
             }, TaskCreationOptions.LongRunning);
-            //countDownTask.ContinueWith((t) => {
-            //});
+            countDownTask.ContinueWith((t) =>
+            {
+                int startX = 0;
+                int startY = 0;
+                int endX = PlayGroundSize[0] - 1;
+                int endY = PlayGroundSize[1] - 1;
+
+                while (!(startX >= endX) || !(startY >= endY))
+                {
+                    //Horizontal fill top
+                    for (int x = startX; x < endX; x++)
+                    {
+                        if (GamePaused)
+                        {
+                            lock (_TimerLockObject)
+                            {
+                                Monitor.Wait(_TimerLockObject);
+                            }
+                        }
+
+                        lock (_ElementsListLockObject)
+                        {
+                            Elements[x, startY] = new FixWall(new Point(x, startY), ElementType.FixWall);
+                        }
+
+                        Thread.Sleep(200);
+                    }
+
+                    //Vertical fill right
+                    for (int y = startY; y < endY; y++)
+                    {
+                        if (GamePaused)
+                        {
+                            lock (_TimerLockObject)
+                            {
+                                Monitor.Wait(_TimerLockObject);
+                            }
+                        }
+
+                        lock (_ElementsListLockObject)
+                        {
+                            Elements[endX - 1, y] = new FixWall(new Point(endX - 1, y), ElementType.FixWall);
+                        }
+                        Thread.Sleep(200);
+                    }
+
+                    //Horizontal fill bottom
+                    for (int x = endX - 1; x >= startX; x--)
+                    {
+                        if (GamePaused)
+                        {
+                            lock (_TimerLockObject)
+                            {
+                                Monitor.Wait(_TimerLockObject);
+                            }
+                        }
+
+                        lock (_ElementsListLockObject)
+                        {
+                            Elements[x, endY - 1] = new FixWall(new Point(x, endY - 1), ElementType.FixWall);
+                        }
+                        Thread.Sleep(200);
+                    }
+
+                    //Vertical fill left
+                    for (int y = endY - 1; y >= startY; y--)
+                    {
+                        if (GamePaused)
+                        {
+                            lock (_TimerLockObject)
+                            {
+                                Monitor.Wait(_TimerLockObject);
+                            }
+                        }
+
+                        lock (_ElementsListLockObject)
+                        {
+                            Elements[startX, y] = new FixWall(new Point(startX, y), ElementType.FixWall);
+                        }
+                        Thread.Sleep(200);
+                    }
+
+                    startX++;
+                    startY++;
+                    endX--;
+                    endY--;
+                }
+            });
             countDownTask.Start();
         }
 
