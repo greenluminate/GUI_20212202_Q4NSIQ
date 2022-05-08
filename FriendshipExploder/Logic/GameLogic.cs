@@ -1315,6 +1315,7 @@ namespace FriendshipExploder.Logic
                             Thread.Sleep(1);
                         }
                     }
+
                     if (newBomb != null)
                     {
                         newBomb.Explode = true;
@@ -1390,7 +1391,8 @@ namespace FriendshipExploder.Logic
                         }, TaskCreationOptions.LongRunning));
 
                         Parallel.ForEach(explosionTasks, t => t.Start());
-                        Trigger(pl, newBomb, newBomb.Position.X, newBomb.Position.Y, 1500);
+
+                        Trigger(pl, newBomb, newBomb.Position.X, newBomb.Position.Y, newBomb.ElementType == ElementType.ScheduledBomb ? 0 : 1500);
                     }
                 }, TaskCreationOptions.LongRunning).Start();
             }
