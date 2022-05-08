@@ -249,6 +249,14 @@ namespace FriendshipExploder.Logic
             actionudlr, actionwasd
         }
 
+        private Point ItemPixelToMatrixCoordinate(Point position)
+        {
+            int playerIndexX = (int)Math.Floor((decimal)((position.X + GameRectSize / 2) / GameRectSize));
+            int playerIndexY = (int)Math.Floor((decimal)((position.Y + GameRectSize / 2) / GameRectSize));
+
+            return new Point(playerIndexX, playerIndexY);
+        }
+
         private Point PlayerPixelToMatrixCoordinate(Point position)//Itt kell hozzáadni a két %-át az Yhoz, hogy a hitboxát nézzük ak rakternek és a render nagyságát.
         {
             int playerIndexX = (int)Math.Floor((decimal)((position.X + (GameRectSize * PlayerWidthRate) / 2) / GameRectSize));
@@ -626,9 +634,10 @@ namespace FriendshipExploder.Logic
                 switch (player.HeadDirection)
                 {
                     case PlayerDirection.up:
+                        //ToDo: check if > 0 a változás és kisebb egyelőe m int amximum pont
                         if (Elements[playerIndexes.X, playerIndexes.Y - 1] is Bomb b && playerCenter.Y - b.PositionPixel.Y < player.Position.Y * PlayerHeightRate * GameRectSize / 2 + GameRectSize / 2 + 10)
                         {
-                            while (b.Position.Y - 1 >= 0 && Elements[b.Position.X, b.Position.Y - 1] == null)
+                            while (b.Explode != true && b.Position.Y - 1 >= 0 && Elements[b.Position.X, b.Position.Y - 1] == null)
                             {
                                 b.IsMoving = true;
                                 Thread.Sleep(1);
@@ -642,7 +651,7 @@ namespace FriendshipExploder.Logic
 
                                 b.PositionPixel = new Point(b.PositionPixel.X, (int)(b.PositionPixel.Y - (double)GameRectSize / 20.0));
                                 Point oldPos = b.Position;
-                                b.Position = PlayerPixelToMatrixCoordinate(b.PositionPixel);
+                                b.Position = ItemPixelToMatrixCoordinate(b.PositionPixel);
                                 if (!oldPos.Equals(b.Position))
                                 {
                                     lock (_ElementsListLockObject)
@@ -662,7 +671,7 @@ namespace FriendshipExploder.Logic
                     case PlayerDirection.down:
                         if (Elements[playerIndexes.X, playerIndexes.Y + 1] is Bomb bdown && playerCenter.Y + bdown.PositionPixel.Y < player.Position.Y * PlayerHeightRate * GameRectSize / 2 + GameRectSize / 2 + 10)
                         {
-                            while (bdown.Position.Y + 1 < PlayGroundSize[1] - 1 && Elements[bdown.Position.X, bdown.Position.Y + 1] == null)
+                            while (bdown.Explode != true && bdown.Position.Y + 1 < PlayGroundSize[1] - 1 && Elements[bdown.Position.X, bdown.Position.Y + 1] == null)
                             {
                                 bdown.IsMoving = true;
                                 Thread.Sleep(1);
@@ -676,7 +685,7 @@ namespace FriendshipExploder.Logic
 
                                 bdown.PositionPixel = new Point(bdown.PositionPixel.X, (int)(bdown.PositionPixel.Y + (double)GameRectSize / 20.0));
                                 Point oldPos = bdown.Position;
-                                bdown.Position = PlayerPixelToMatrixCoordinate(bdown.PositionPixel);
+                                bdown.Position = ItemPixelToMatrixCoordinate(bdown.PositionPixel);
                                 if (!oldPos.Equals(bdown.Position))
                                 {
                                     lock (_ElementsListLockObject)
@@ -696,7 +705,7 @@ namespace FriendshipExploder.Logic
                     case PlayerDirection.left:
                         if (Elements[playerIndexes.X - 1, playerIndexes.Y] is Bomb bleft && playerCenter.X - bleft.PositionPixel.X < player.Position.X * PlayerWidthRate * GameRectSize / 2 + GameRectSize / 2 + 10)
                         {
-                            while (bleft.Position.X - 1 >= 0 && Elements[bleft.Position.X - 1, bleft.Position.Y] == null)
+                            while (bleft.Explode != true && bleft.Position.X - 1 >= 0 && Elements[bleft.Position.X - 1, bleft.Position.Y] == null)
                             {
                                 bleft.IsMoving = true;
                                 Thread.Sleep(1);
@@ -710,7 +719,7 @@ namespace FriendshipExploder.Logic
 
                                 bleft.PositionPixel = new Point((int)(bleft.PositionPixel.X - (double)GameRectSize / 20.0), bleft.PositionPixel.Y);
                                 Point oldPos = bleft.Position;
-                                bleft.Position = PlayerPixelToMatrixCoordinate(bleft.PositionPixel);
+                                bleft.Position = ItemPixelToMatrixCoordinate(bleft.PositionPixel);
                                 if (!oldPos.Equals(bleft.Position))
                                 {
                                     lock (_ElementsListLockObject)
@@ -730,7 +739,7 @@ namespace FriendshipExploder.Logic
                     case PlayerDirection.right:
                         if (Elements[playerIndexes.X + 1, playerIndexes.Y] is Bomb bright && playerCenter.X + bright.PositionPixel.X < player.Position.X * PlayerWidthRate * GameRectSize / 2 + GameRectSize / 2 + 10)
                         {
-                            while (bright.Position.X + 1 < PlayGroundSize[0] - 1 && Elements[bright.Position.X + 1, bright.Position.Y] == null)
+                            while (bright.Explode != true && bright.Position.X + 1 < PlayGroundSize[0] - 1 && Elements[bright.Position.X + 1, bright.Position.Y] == null)
                             {
                                 bright.IsMoving = true;
                                 Thread.Sleep(1);
@@ -744,7 +753,7 @@ namespace FriendshipExploder.Logic
 
                                 bright.PositionPixel = new Point((int)(bright.PositionPixel.X + (double)GameRectSize / 20.0), bright.PositionPixel.Y);
                                 Point oldPos = bright.Position;
-                                bright.Position = PlayerPixelToMatrixCoordinate(bright.PositionPixel);
+                                bright.Position = ItemPixelToMatrixCoordinate(bright.PositionPixel);//Korrigálni
                                 if (!oldPos.Equals(bright.Position))
                                 {
                                     lock (_ElementsListLockObject)
@@ -979,9 +988,9 @@ namespace FriendshipExploder.Logic
                 Bomb newBomb = pl.Bomb.BombCopy(
                                 new Point(
                                     (int)Math.Floor((decimal)((pl.Position.X + (PlayerWidthRate * GameRectSize) / 2) / GameRectSize)),
-                                    (int)Math.Floor((decimal)((pl.Position.Y + ((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize) / 2) / GameRectSize))),
+                                    (int)Math.Floor((decimal)((pl.Position.Y + ((PlayerHeightRate + PlayerHeightRateHangsIn) * GameRectSize) / 2) / GameRectSize))),
                                 BombType.Normal,
-                                new Point((int)(pl.Position.X + (GameRectSize * PlayerWidthRate) / 2), (int)(pl.Position.Y + (GameRectSize * (PlayerHeightRate - PlayerHeightRateHangsIn)) / 2)));
+                                new Point((int)(pl.Position.X + (GameRectSize * PlayerWidthRate) / 2), (int)(pl.Position.Y + (GameRectSize * (PlayerHeightRate + PlayerHeightRateHangsIn)) / 2)));
                 lock (pl._bombListLockObject)
                 {
                     pl.BombList.Add(newBomb);
@@ -999,19 +1008,23 @@ namespace FriendshipExploder.Logic
 
                 new Task(async () =>
                 {
-                    Thread.Sleep(66666);//x másodperc múlva robban a bomba
-                    Bomb bomb = null;
-
-                    lock (_ElementsListLockObject)
+                    for (int i = 0; i < 3000; i++)
                     {
-                        bomb = (Bomb)Elements[i, j];
+                        lock (_TimerLockObject)
+                        {
+                            if (GamePaused)
+                            {
+                                Monitor.Wait(_TimerLockObject);
+                            }
+                        }
+                        Thread.Sleep(1);//x másodperc múlva robban a bomba
                     }
 
-                    if (bomb != null)
+                    if (newBomb != null)
                     {
-                        bomb.Explode = true;
+                        newBomb.Explode = true;
                     }
-
+                    //ToDo: várjon, amíg megáll a bomba, vagy állítsa meg a rúgást.
                     //newBomb.Image.Freeze();
                     //ToDO: ha a karakter rajtamard, akkro is haljon meg. IDe.
                     int explsoionRange = pl.Bomb.ExplosionRange;
@@ -1020,28 +1033,28 @@ namespace FriendshipExploder.Logic
 
                     explosionTasks.Add(new Task(() =>
                     {
-                        for (int row = i + 1; row <= i + explsoionRange; row++)
+                        for (int row = newBomb.Position.X + 1; row <= newBomb.Position.X + explsoionRange; row++)
                         {
                             if (row < Elements.GetLength(0) - 1)
                             {
-                                ExplosionEffects(row, j, bomb, pl);
+                                ExplosionEffects(row, newBomb.Position.Y, newBomb, pl);
                                 //ExplosionEffects(row, j, bomb, explosionImg, pl);
-                                if (BombStopper(row, j))
+                                if (BombStopper(row, newBomb.Position.Y))
                                 {
                                     break;
                                 }
                             }
                         }
-                    }));
+                    }, TaskCreationOptions.LongRunning));
                     explosionTasks.Add(new Task(() =>
                     {
-                        for (int row = i - 1; row >= i - explsoionRange; row--)
+                        for (int row = newBomb.Position.X - 1; row >= newBomb.Position.X - explsoionRange; row--)
                         {
                             if (row >= 0)
                             {
                                 //ExplosionEffects(row, j, bomb, explosionImg, pl);
-                                ExplosionEffects(row, j, bomb, pl);
-                                if (BombStopper(row, j))
+                                ExplosionEffects(row, newBomb.Position.Y, newBomb, pl);
+                                if (BombStopper(row, newBomb.Position.Y))
                                 {
                                     break;
                                 }
@@ -1051,40 +1064,39 @@ namespace FriendshipExploder.Logic
 
                     explosionTasks.Add(new Task(() =>
                     {
-                        for (int col = j + 1; col <= j + explsoionRange; col++)
+                        for (int col = newBomb.Position.Y + 1; col <= newBomb.Position.Y + explsoionRange; col++)
                         {
                             if (col < Elements.GetLength(1) - 1)
                             {
                                 //ExplosionEffects(i, col, bomb, explosionImg, pl);
-                                ExplosionEffects(i, col, bomb, pl);
-                                if (BombStopper(i, col))
+                                ExplosionEffects(newBomb.Position.X, col, newBomb, pl);
+                                if (BombStopper(newBomb.Position.X, col))
                                 {
                                     break;
                                 }
                             }
                         }
-                    }));
+                    }, TaskCreationOptions.LongRunning));
 
                     explosionTasks.Add(new Task(() =>
                     {
-                        for (int col = j - 1; col >= j - explsoionRange; col--)
+                        for (int col = newBomb.Position.Y - 1; col >= newBomb.Position.Y - explsoionRange; col--)
                         {
                             if (col >= 0)
                             {
                                 //ExplosionEffects(i, col, bomb, explosionImg, pl);
-                                ExplosionEffects(i, col, bomb, pl);
+                                ExplosionEffects(newBomb.Position.X, col, newBomb, pl);
 
-                                if (BombStopper(i, col))
+                                if (BombStopper(newBomb.Position.X, col))
                                 {
                                     break;
                                 }
                             }
                         }
-                    }));
+                    }, TaskCreationOptions.LongRunning));
 
                     Parallel.ForEach(explosionTasks, t => t.Start());
-                    await Task.Delay(1);//Ez nem megoldás.
-                    Trigger(pl, newBomb, i, j, 1500);
+                    Trigger(pl, newBomb, newBomb.Position.X, newBomb.Position.Y, 1500);
 
                 }, TaskCreationOptions.LongRunning).Start();
             }
