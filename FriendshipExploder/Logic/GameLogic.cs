@@ -696,32 +696,34 @@ namespace FriendshipExploder.Logic
                 Node target = lvlMatrix[targetElementIndex[0], targetElementIndex[1]];
                 int aiPosX = (int)Math.Floor((decimal)(ai.Position.X / GameRectSize));
                 int aiPosY = (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize));
-
+                Point aiPosition = new Point(aiPosX, aiPosY);
                 List<Point> area = GetTargetArea(target);
                 List<Point> path = FindPathToDestructible(FindNearestDestructible(ai.Position), ai.Position, lvlMatrix,area);
+                foreach (var bomb in bombs)
+                {
+
+                    if (bomb != null)
+                    {
+                        if (GetBombArea(bomb).Contains(aiPosition) || bomb.Position.X == aiPosX && bomb.Position.Y == aiPosY)
+                        {
+                            IElement currentBomb = bomb;
+                            while (Elements[currentBomb.Position.X,currentBomb.Position.Y] is Bomb)
+                            {
+                                Hide(bomb, ai);
+                            }
+                            break;
+                        }
+
+                    }
+
+                }
                 if (path != null)
                 {
 
                     foreach (var pt in path)
                     {
-                        foreach (var bomb in bombs)
-                        {
-
-                            if (bomb != null)
-                            {
-                                if (GetBombArea(bomb).Contains(pt) || bomb.Position.X == aiPosX && bomb.Position.Y == aiPosY)
-                                {
-                                    IElement currentBomb = bomb;
-                                    while (currentBomb.Explode != true || GetBombArea(bomb).Contains(pt) == false)
-                                    {
-                                        Hide(bomb,ai);
-                                    }
-                                    break;
-                                }
-
-                            }
-
-                        }
+                        
+                        
                         if (pt.X > aiPosX)
                         {
                            
@@ -757,9 +759,11 @@ namespace FriendshipExploder.Logic
                         else if (area.Contains(pt))
                         {
                             Act(PlayerAction.bombudlr, ai);
-                            bombs.Add(Elements[pt.X, pt.Y]);               
+                            bombs.Add(Elements[pt.X, pt.Y]);
                             break;
                         }
+                        
+
 
 
 
@@ -867,13 +871,27 @@ namespace FriendshipExploder.Logic
 
         private void Hide(IElement bomb, Player ai)
         {
-            if (bomb.Position.X > ai.Position.X)
+            int aiPosX = (int)Math.Floor((decimal)(ai.Position.X / GameRectSize));
+            int aiPosY = (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize));
+            if (aiPosX > 0 && Elements[aiPosX-1, aiPosY] == null)
             {
-                StartMove(PlayerAction.right, ai);
+                StartMove(PlayerAction.left, ai);
+            }
+            else if (Math.Abs(aiPosX - bomb.Position.X) < 5)
+            {
+                if (aiPosY > 0 && Elements[aiPosX, aiPosY-1] == null)
+                {
+                    StartMove(PlayerAction.up, ai);
+                }
+                else if (aiPosY < Elements.GetLength(1) && Elements[aiPosX, aiPosY+1] == null)
+                {
+                    StartMove(PlayerAction.down, ai);
+                }
+
             }
         }
 
-        
+
 
         //Optimalizáció még erősen szükséges
         Node[,] ReconstructToNodes()
@@ -1115,16 +1133,20 @@ namespace FriendshipExploder.Logic
                 {
                     indexQueue.Dequeue(); //Ha nem fal dequeueoljuk
                 }
-                for (int i = 0; i < 4; i++) //Végig iterálunk a négy környező elemen
+                if (!(Elements[x,y] is FixWall))
                 {
-                    int adjx = x + dRow[i];
-                    int adjy = y  + dCol[i];
-                    if (isValid(vis, adjx, adjy))
+                    for (int i = 0; i < 4; i++) //Végig iterálunk a négy környező elemen
                     {
-                        indexQueue.Enqueue(new int[] { adjx, adjy });
-                        vis[adjx,adjy] = true;
+                        int adjx = x + dRow[i];
+                        int adjy = y + dCol[i];
+                        if (isValid(vis, adjx, adjy))
+                        {
+                            indexQueue.Enqueue(new int[] { adjx, adjy });
+                            vis[adjx, adjy] = true;
+                        }
                     }
                 }
+                
             }
             return new int[] {-1,-1};
         }
