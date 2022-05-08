@@ -687,31 +687,31 @@ namespace FriendshipExploder.Logic
         private async void AIWakeUp(Player ai)
         {
             Thread.Sleep(1000);//1 másodperc előny a valódi játékosoknak
-            
             while (true)//ToDo: Majd amgí nem igaz, hogy vége
             {
                 List<IElement> bombs = CollectBombs();
                 Node[,] lvlMatrix = ReconstructToNodes();
                 int[] targetElementIndex = FindNearestDestructible(ai.Position);
+
                 Node target = lvlMatrix[targetElementIndex[0], targetElementIndex[1]];
                 int aiPosX = (int)Math.Floor((decimal)(ai.Position.X / GameRectSize));
                 int aiPosY = (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize));
                 Point aiPosition = new Point(aiPosX, aiPosY);
                 List<Point> area = GetTargetArea(target);
-                List<Point> path = FindPathToDestructible(FindNearestDestructible(ai.Position), ai.Position, lvlMatrix,area);
+                List<Point> path = FindPathToDestructible(FindNearestDestructible(ai.Position), ai.Position, lvlMatrix, area);
                 foreach (var bomb in bombs)
                 {
 
                     if (bomb != null)
                     {
-                        if (GetBombArea(bomb).Contains(aiPosition) || bomb.Position.X == aiPosX && bomb.Position.Y == aiPosY)
+                        if (GetBombArea(bomb).Contains(aiPosition) || bomb.Position.X == (int)Math.Floor((decimal)(ai.Position.X / GameRectSize)) && bomb.Position.Y == (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize)))
                         {
                             IElement currentBomb = bomb;
-                            while (Elements[currentBomb.Position.X,currentBomb.Position.Y] is Bomb)
+                            while (Elements[currentBomb.Position.X, currentBomb.Position.Y] is Bomb && aiPosY == bomb.Position.Y)
                             {
                                 Hide(bomb, ai);
                             }
-                            break;
+
                         }
 
                     }
@@ -722,39 +722,39 @@ namespace FriendshipExploder.Logic
 
                     foreach (var pt in path)
                     {
-                        
-                        
-                        if (pt.X > aiPosX)
+
+
+                        if (pt.X > aiPosX && Elements[aiPosX + 1, aiPosY] == null)
                         {
-                           
-                                StartMove(PlayerAction.right, ai);
-                                StopMove(PlayerAction.right, ai);
-                                Thread.Sleep(20);
-                                break;
-                           
-                            
+
+                            StartMove(PlayerAction.right, ai);
+                            StopMove(PlayerAction.right, ai);
+                            Thread.Sleep(20);
+                            break;
+
+
 
                         }
-                        else if(pt.X < aiPosX)
+                        else if (pt.X < aiPosX)
                         {
-                                StartMove(PlayerAction.left, ai);
-                                StopMove(PlayerAction.left, ai);
-                                Thread.Sleep(20);
-                                break;
+                            StartMove(PlayerAction.left, ai);
+                            StopMove(PlayerAction.left, ai);
+                            Thread.Sleep(20);
+                            break;
                         }
                         else if (pt.Y > aiPosY)
                         {
-                                StartMove(PlayerAction.down, ai);
-                                StopMove(PlayerAction.down, ai);
-                                Thread.Sleep(20);
-                                break;
+                            StartMove(PlayerAction.down, ai);
+                            StopMove(PlayerAction.down, ai);
+                            Thread.Sleep(20);
+                            break;
                         }
                         else if (pt.Y < aiPosY)
                         {
-                                StartMove(PlayerAction.up, ai);
-                                StopMove(PlayerAction.up, ai);
-                                Thread.Sleep(20);
-                                break;
+                            StartMove(PlayerAction.up, ai);
+                            StopMove(PlayerAction.up, ai);
+                            Thread.Sleep(20);
+                            break;
                         }
                         else if (area.Contains(pt))
                         {
@@ -762,19 +762,13 @@ namespace FriendshipExploder.Logic
                             bombs.Add(Elements[pt.X, pt.Y]);
                             break;
                         }
-                        
-
-
-
-
 
                     }
-                    
+
                 }
-                
-                
-                
-                
+
+
+
                 //List<IElement> pathToDestructible = FindPathToDestructible( closestElementIndex,ai.Position);
                 //IElement[,] elements = new IElement[GameSize.X - 1, GameSize.Y - 1];
                 /*lock (_ElementsListLockObject)
@@ -786,37 +780,37 @@ namespace FriendshipExploder.Logic
                 //ToDO: ha bomba van a közelében bújjon el.
                 //Az Elements lista = NotAvailablePoints;
 
-                
-                
-                
+
+
+
 
 
                 //if (nearestPlayer != null && PositionDifference(nearestPlayer, ai) <= 20)//ToDo: ai.Bomb.explosionSize vagy ami lesz
                 {
                     //ToDo: Go and Install bomb
                     //ToDo: hide and wait until Explosion + x seconds
-               // }
-                //else
-                //{
+                    // }
+                    //else
+                    //{
                     //ToDo: follow player
                     //ToDO: AI javítása nullcheckekkel, ha egyedül lenne mit csináljon.
                     //if (nearestPlayer.Position.X - ai.Position.X < 0 && CanStepToPos(ai, new System.Windows.Vector(-1 * ai.Speed, 0)))
                     //{
-                        //StartMove(PlayerAction.left, ai);
-                        //StopMove(PlayerAction.left, ai);
+                    //StartMove(PlayerAction.left, ai);
+                    //StopMove(PlayerAction.left, ai);
                     //}
 
                     //if (!CanStepToPos(ai, new System.Windows.Vector(-1 * ai.Speed, 0)))
                     //{
-                       // int aiNextPosX = ai.Position.X + (-1 * ai.Speed);//Kiszervezni az egészet külön metódusba.
-                        //int aiNextPosY = ai.Position.Y;
-                        //IElement blockingElement = elements[aiNextPosX, aiNextPosY];
-                        
-                        //List<Point> availablePath = FindAvailablePath(ai, aiNextPosX, aiNextPosY);
-                        //List<PlayerAction> availableRoundaboutActions = FindAvailableRoundaboutActions(ai, aiNextPosX, aiNextPosY);
-                        //availableRoundaboutActions.ForEach(Action => Action.Pop);
-                        //ToDo: jó irány keresése a megkerüléshez, majd móaction-ök meghívása sorban.
-                        //;
+                    // int aiNextPosX = ai.Position.X + (-1 * ai.Speed);//Kiszervezni az egészet külön metódusba.
+                    //int aiNextPosY = ai.Position.Y;
+                    //IElement blockingElement = elements[aiNextPosX, aiNextPosY];
+
+                    //List<Point> availablePath = FindAvailablePath(ai, aiNextPosX, aiNextPosY);
+                    //List<PlayerAction> availableRoundaboutActions = FindAvailableRoundaboutActions(ai, aiNextPosX, aiNextPosY);
+                    //availableRoundaboutActions.ForEach(Action => Action.Pop);
+                    //ToDo: jó irány keresése a megkerüléshez, majd móaction-ök meghívása sorban.
+                    //;
                     //}
 
                     //if (nearestPlayer.Position.Y - ai.Position.Y < 0 && CanStepToPos(ai, new System.Windows.Vector(0, -1 * ai.Speed)))
@@ -853,7 +847,7 @@ namespace FriendshipExploder.Logic
                    Math.Abs(player.Position.Y - ai.Position.Y);
         }
 
-       
+
         private List<IElement> CollectBombs()
         {
 
@@ -873,22 +867,36 @@ namespace FriendshipExploder.Logic
         {
             int aiPosX = (int)Math.Floor((decimal)(ai.Position.X / GameRectSize));
             int aiPosY = (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize));
-            if (aiPosX > 0 && Elements[aiPosX-1, aiPosY] == null)
+            if (aiPosX > 0 && Elements[aiPosX - 1, aiPosY] == null)
             {
                 StartMove(PlayerAction.left, ai);
+                //if (Math.Abs((int)Math.Floor((decimal)(ai.Position.X / GameRectSize)) - bomb.Position.X) > 5)
+                //{
+                //    StopMove(PlayerAction.left, ai);
+                //    Thread.Sleep(4500);
+                //}
             }
-            else if (Math.Abs(aiPosX - bomb.Position.X) < 5)
+            else if (aiPosY < Elements.GetLength(0) && Elements[aiPosY + 1, aiPosX] == null)
             {
-                if (aiPosY > 0 && Elements[aiPosX, aiPosY-1] == null)
-                {
-                    StartMove(PlayerAction.up, ai);
-                }
-                else if (aiPosY < Elements.GetLength(1) && Elements[aiPosX, aiPosY+1] == null)
-                {
-                    StartMove(PlayerAction.down, ai);
-                }
+                StartMove(PlayerAction.right, ai);
 
             }
+            else if (Math.Abs((int)Math.Floor((decimal)(ai.Position.X / GameRectSize)) - bomb.Position.X) < 5)
+            {
+                if (aiPosY > 0 && Elements[aiPosX, aiPosY - 1] == null)
+                {
+                    StartMove(PlayerAction.up, ai);
+
+
+                }
+                else if (aiPosY < Elements.GetLength(1) && Elements[aiPosX, aiPosY + 1] == null)
+                {
+                    StartMove(PlayerAction.down, ai);
+
+
+                }
+            }
+
         }
 
 
@@ -896,24 +904,24 @@ namespace FriendshipExploder.Logic
         //Optimalizáció még erősen szükséges
         Node[,] ReconstructToNodes()
         {
-            Node[,] lvlMatrix = new Node[PlayGroundSize[0],PlayGroundSize[1]];
+            Node[,] lvlMatrix = new Node[PlayGroundSize[0], PlayGroundSize[1]];
             for (int i = 0; i < Elements.GetLength(0); i++)
             {
                 for (int j = 0; j < Elements.GetLength(1); j++)
                 {
-                    if (Elements[i,j] == null)
+                    if (Elements[i, j] == null)
                     {
-                        lvlMatrix[i,j] = new Node("floor",true, new Point(i,j));
+                        lvlMatrix[i, j] = new Node("floor", true, new Point(i, j));
                     }
-                    else if (Elements[i,j] is Wall)
+                    else if (Elements[i, j] is Wall)
                     {
-                        lvlMatrix[i,j] =new Node("wall", false, Elements[i, j].Position);
+                        lvlMatrix[i, j] = new Node("wall", false, Elements[i, j].Position);
                     }
-                    else if (Elements[i,j] is FixWall)
+                    else if (Elements[i, j] is FixWall)
                     {
-                        lvlMatrix[i,j] = new Node("fixwall", false,Elements[i,j].Position);
+                        lvlMatrix[i, j] = new Node("fixwall", false, Elements[i, j].Position);
                     }
-                    else if (Elements[i,j] is Bomb)
+                    else if (Elements[i, j] is Bomb)
                     {
                         lvlMatrix[i, j] = new Node("bomb", false, Elements[i, j].Position);
 
@@ -947,7 +955,7 @@ namespace FriendshipExploder.Logic
                 closedSet.Add(currentNode);
                 foreach (var x in targetArea)
                 {
-                    if (x.X == currentNode.Position.X && x.Y == currentNode.Position.Y && lvlMatrix[x.X,x.Y].Walkable)
+                    if (x.X == currentNode.Position.X && x.Y == currentNode.Position.Y && lvlMatrix[x.X, x.Y].Walkable)
                     {
                         if (aiCurrentIndexX == currentNode.Position.X && aiCurrentIndexY == currentNode.Position.Y)
                         {
@@ -956,15 +964,12 @@ namespace FriendshipExploder.Logic
                             return pathself;
                         }
                         List<Point> path = PathRetrace(lvlMatrix[aiCurrentIndexX, aiCurrentIndexY], currentNode);
-                        return path;    
+                        return path;
                     }
-                    
-
                 }
-
-                foreach (Node neighbor in GetNeighbors(currentNode,lvlMatrix))
+                foreach (Node neighbor in GetNeighbors(currentNode, lvlMatrix))
                 {
-                    if (!neighbor.Walkable|| closedSet.Contains(neighbor))
+                    if (!neighbor.Walkable || closedSet.Contains(neighbor))
                     {
                         continue;
                     }
@@ -988,26 +993,27 @@ namespace FriendshipExploder.Logic
         public List<Point> GetTargetArea(Node target)
         {
             List<Point> targetArea = new List<Point>();
- 
+
             for (int x = -1; x <= 1; x++)
             {
                 for (int y = -1; y <= 1; y++)
                 {
-                    if (x== 0 & y == 0)
+                    if (x == 0 & y == 0)
                     {
                         continue;
                     }
 
-                    if (x != y && x != -1*y && (target.Position.X + x) > -1 && (target.Position.Y + y) > -1)
+                    if (x != y && x != -1 * y && (target.Position.X + x) > -1 && (target.Position.Y + y) > -1)
                     {
                         int thisX = target.Position.X + x;
                         int thisY = target.Position.Y + y;
-                        if (Elements[thisX, thisY] == null){
+                        if (Elements[thisX, thisY] == null)
+                        {
                             targetArea.Add(new Point(thisX, thisY));
                         }
-                        
+
                     }
-                    
+
                 }
             }
             return targetArea;
@@ -1040,10 +1046,10 @@ namespace FriendshipExploder.Logic
                     }
                 }
             }
-            
+
             return targetArea;
         }
-        public List<Node> GetNeighbors(Node node,Node[,] lvlMatrix)
+        public List<Node> GetNeighbors(Node node, Node[,] lvlMatrix)
         {
             List<Node> neighbors = new List<Node>();
             for (int x = -1; x <= 1; x++)
@@ -1055,7 +1061,7 @@ namespace FriendshipExploder.Logic
                         continue;
                     }
 
-                    if (x != y && x != -1*y)
+                    if (x != y && x != -1 * y)
                     {
                         int checkX = node.Position.X + x;
                         int checkY = node.Position.Y + y;
@@ -1064,7 +1070,7 @@ namespace FriendshipExploder.Logic
                             neighbors.Add(lvlMatrix[checkX, checkY]);
                         }
                     }
-                    
+
                 }
             }
             return neighbors;
@@ -1113,18 +1119,18 @@ namespace FriendshipExploder.Logic
         {
             int aiCurrentIndexX = (int)Math.Floor((decimal)(aiPosition.X / GameRectSize));
             int aiCurrentIndexY = (int)Math.Floor((decimal)(aiPosition.Y / GameRectSize));
-            bool [,]vis = new bool[PlayGroundSize[0], PlayGroundSize[1]]; //Bool tömb, azt nézi, hogy mely elemek vannak feldolgozva
-            int[] dRow = new int[] {-1,0,1,0}; // Csak arra kell, hogy végig tudjon iterálni a szomszédokon
+            bool[,] vis = new bool[PlayGroundSize[0], PlayGroundSize[1]]; //Bool tömb, azt nézi, hogy mely elemek vannak feldolgozva
+            int[] dRow = new int[] { -1, 0, 1, 0 }; // Csak arra kell, hogy végig tudjon iterálni a szomszédokon
             int[] dCol = new int[] { 0, 1, 0, -1 };
             Queue<int[]> indexQueue = new Queue<int[]>(); //A queue amibe kigyűjti az elemeket
-            indexQueue.Enqueue(new int[] {aiCurrentIndexX,aiCurrentIndexY});
+            indexQueue.Enqueue(new int[] { aiCurrentIndexX, aiCurrentIndexY });
             vis[aiCurrentIndexX, aiCurrentIndexY] = true;
             while (indexQueue.Count != 0)
             {
                 int[] cell = indexQueue.Peek(); //Megnézi a queue tetején lévő elemet
                 int x = cell[0];
                 int y = cell[1];
-                if (Elements[x,y] is Wall) 
+                if (Elements[x, y] is Wall)
                 {
                     return cell;
                     break;
@@ -1133,7 +1139,7 @@ namespace FriendshipExploder.Logic
                 {
                     indexQueue.Dequeue(); //Ha nem fal dequeueoljuk
                 }
-                if (!(Elements[x,y] is FixWall))
+                if (!(Elements[x, y] is FixWall))
                 {
                     for (int i = 0; i < 4; i++) //Végig iterálunk a négy környező elemen
                     {
@@ -1146,9 +1152,9 @@ namespace FriendshipExploder.Logic
                         }
                     }
                 }
-                
+
             }
-            return new int[] {-1,-1};
+            return new int[] { -1, -1 };
         }
         private bool isValid(bool[,] vis, int row, int col)
         {
@@ -1156,7 +1162,7 @@ namespace FriendshipExploder.Logic
             {
                 return false;
             }
-            if (vis[row,col]) //Ha már látogattuk, nem valid
+            if (vis[row, col]) //Ha már látogattuk, nem valid
             {
                 return false;
             }
