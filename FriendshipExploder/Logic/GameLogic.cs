@@ -451,9 +451,16 @@ namespace FriendshipExploder.Logic
                 Point playerNextUpperLeftCornerIndexes = PixelToMatrixCoordinate(playerNextUpperLeftCornerPixel);
                 Point playerNextBottomLeftCornerIndexes = PixelToMatrixCoordinate(playerNextBottomLeftCornerPixel);
 
+                List<Point> cornerPoints = new List<Point>() {
+                    playerNextUpperRightCornerIndexes,
+                    playerNextBottomRightCornerIndexes,
+                    playerNextUpperLeftCornerIndexes,
+                    playerNextBottomLeftCornerIndexes
+                };
+
                 if (direction.X < 0)//Left
                 {
-                    if (playerNextUpperRightCornerIndexes.X < 0)
+                    if (cornerPoints.Any(point => point.X < 0))
                     {
                         return false;
                     }
@@ -465,11 +472,11 @@ namespace FriendshipExploder.Logic
                         Elements[playerNextUpperLeftCornerIndexes.X, playerNextUpperLeftCornerIndexes.Y] != null ||
                         Elements[playerNextBottomLeftCornerIndexes.X, playerNextBottomLeftCornerIndexes.Y] != null)
                     {
-                        if ((Elements[playerNextIndexes.X, playerNextIndexes.Y] is Bomb nextBomb) && currentBomb != null && nextBomb.Equals(currentBomb))
+                        if (playerNextIndexes.X >= 0 && (Elements[playerNextIndexes.X, playerNextIndexes.Y] is Bomb nextBomb) && currentBomb != null && nextBomb.Equals(currentBomb))
                         {
                             return true;//Lejöhet arról a bombáról, ami alá került lerakásra.
                         }
-                        else if (Elements[playerNextIndexes.X, playerNextIndexes.Y] is Bomb c && c.Explode)
+                        else if (playerNextIndexes.X >= 0 && Elements[playerNextIndexes.X, playerNextIndexes.Y] is Bomb c && c.Explode)
                         {
                             return true;//Odaléphet a robbanásba, de belehal.
                         }
@@ -479,7 +486,7 @@ namespace FriendshipExploder.Logic
                 }
                 else if (direction.X > 0)
                 {
-                    if (playerNextUpperRightCornerIndexes.X >= PlayGroundSize[0] - 1)
+                    if (cornerPoints.Any(point => point.X >= PlayGroundSize[0] - 1))
                     {
                         return false;
                     }
@@ -489,11 +496,11 @@ namespace FriendshipExploder.Logic
                         (Elements[playerNextUpperLeftCornerIndexes.X, playerNextUpperLeftCornerIndexes.Y] != null && !(Elements[playerNextUpperLeftCornerIndexes.X, playerNextUpperLeftCornerIndexes.Y] is Bomb)) ||
                         (Elements[playerNextBottomLeftCornerIndexes.X, playerNextBottomLeftCornerIndexes.Y] != null && !(Elements[playerNextBottomLeftCornerIndexes.X, playerNextBottomLeftCornerIndexes.Y] is Bomb)))
                     {
-                        if ((Elements[playerNextIndexes.X, playerNextIndexes.Y] is Bomb nextBomb) && currentBomb != null && nextBomb.Equals(currentBomb))
+                        if (playerNextIndexes.X < PlayGroundSize[0] && (Elements[playerNextIndexes.X, playerNextIndexes.Y] is Bomb nextBomb) && currentBomb != null && nextBomb.Equals(currentBomb))
                         {
                             return true;//Lejöhet arról a bombáról, ami alá került lerakásra.
                         }
-                        else if (Elements[playerNextIndexes.X, playerNextIndexes.Y] is Bomb c && c.Explode)
+                        else if (playerNextIndexes.X < PlayGroundSize[0] && Elements[playerNextIndexes.X, playerNextIndexes.Y] is Bomb c && c.Explode)
                         {
                             return true;//Odaléphet a robbanásba, de belehal.
                         }
@@ -503,7 +510,7 @@ namespace FriendshipExploder.Logic
                 }
                 else if (direction.Y < 0)//Up
                 {
-                    if (playerNextUpperRightCornerIndexes.Y < 0)
+                    if (cornerPoints.Any(point => point.Y < 0))
                     {
                         return false;
                     }
@@ -513,11 +520,11 @@ namespace FriendshipExploder.Logic
                     Elements[playerNextUpperLeftCornerIndexes.X, playerNextUpperLeftCornerIndexes.Y] != null ||
                     (Elements[playerNextBottomLeftCornerIndexes.X, playerNextBottomLeftCornerIndexes.Y] != null && !(Elements[playerNextBottomLeftCornerIndexes.X, playerNextBottomLeftCornerIndexes.Y] is Bomb)))
                     {
-                        if ((Elements[playerNextIndexes.X, playerNextIndexes.Y] is Bomb nextBomb) && currentBomb != null && nextBomb.Equals(currentBomb))
+                        if (playerNextIndexes.Y >= 0 && (Elements[playerNextIndexes.X, playerNextIndexes.Y] is Bomb nextBomb) && currentBomb != null && nextBomb.Equals(currentBomb))
                         {
                             return true;//Lejöhet arról a bombáról, ami alá került lerakásra.
                         }
-                        else if (Elements[playerNextIndexes.X, playerNextIndexes.Y] is Bomb c && c.Explode)
+                        else if (playerNextIndexes.Y >= 0 && Elements[playerNextIndexes.X, playerNextIndexes.Y] is Bomb c && c.Explode)
                         {
                             return true;//Odaléphet a robbanásba, de belehal.
                         }
@@ -527,7 +534,7 @@ namespace FriendshipExploder.Logic
                 }
                 else
                 {
-                    if (playerNextUpperRightCornerIndexes.Y >= PlayGroundSize[1] - 1)
+                    if (cornerPoints.Any(point => point.Y >= PlayGroundSize[1] - 1))
                     {
                         return false;
                     }
@@ -537,11 +544,11 @@ namespace FriendshipExploder.Logic
                         (Elements[playerNextUpperLeftCornerIndexes.X, playerNextUpperLeftCornerIndexes.Y] != null && !(Elements[playerNextUpperLeftCornerIndexes.X, playerNextUpperLeftCornerIndexes.Y] is Bomb)) ||
                         Elements[playerNextBottomLeftCornerIndexes.X, playerNextBottomLeftCornerIndexes.Y] != null))
                     {
-                        if ((Elements[playerNextIndexes.X, playerNextIndexes.Y] is Bomb nextBomb) && currentBomb != null && nextBomb.Equals(currentBomb))
+                        if (playerNextIndexes.Y < PlayGroundSize[0] && (Elements[playerNextIndexes.X, playerNextIndexes.Y] is Bomb nextBomb) && currentBomb != null && nextBomb.Equals(currentBomb))
                         {
                             return true;//Lejöhet arról a bombáról, ami alá került lerakásra.
                         }
-                        else if (Elements[playerNextIndexes.X, playerNextIndexes.Y] is Bomb c && c.Explode)
+                        else if (playerNextIndexes.Y < PlayGroundSize[0] && Elements[playerNextIndexes.X, playerNextIndexes.Y] is Bomb c && c.Explode)
                         {
                             return true;//Odaléphet a robbanásba, de belehal.
                         }
@@ -719,7 +726,7 @@ namespace FriendshipExploder.Logic
                 //Bomba lerakása
                 case PlayerAction.bombudlr:
                 case PlayerAction.bombwasd:
-                    if (!pl.SetBombPressed)
+                    if (pl != null && !pl.SetBombPressed)
                     {
                         pl.SetBombPressed = true;//It is necessary, else a btn press is called more than once.
                         Act(PlayerAction.bombudlr, pl);
@@ -731,7 +738,7 @@ namespace FriendshipExploder.Logic
                 //Action
                 case PlayerAction.actionudlr:
                 case PlayerAction.actionwasd:
-                    if (!pl.ActionPressed)
+                    if (pl != null && !pl.ActionPressed)
                     {
                         pl.ActionPressed = true;//It is necessary, else a btn press is called more than once.
                         Act(PlayerAction.actionudlr, pl);
@@ -1479,7 +1486,7 @@ namespace FriendshipExploder.Logic
                 {
                     //ToDo: follow player
                     //ToDO: AI javítása nullcheckekkel, ha egyedül lenne mit csináljon.
-                    if (nearestPlayer.Position.X - ai.Position.X < 0 && CanStepToPos(ai, new System.Windows.Vector(-1 * ai.Speed, 0)))
+                    if (nearestPlayer != null && nearestPlayer.Position.X - ai.Position.X < 0 && CanStepToPos(ai, new System.Windows.Vector(-1 * ai.Speed, 0)))
                     {
                         StartMove(PlayerAction.left, ai);
                         StopMove(PlayerAction.left, ai);
