@@ -64,7 +64,7 @@
 
   <ItemGroup>
     <Resource Include="Fonts\bomberman.TTF">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Images\Bombs\0_Bomb.png" />
     <Resource Include="Images\Bombs\0_BombExplode.png" />
