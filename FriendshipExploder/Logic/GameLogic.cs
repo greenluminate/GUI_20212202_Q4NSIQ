@@ -684,7 +684,7 @@ namespace FriendshipExploder.Logic
             Parallel.ForEach(aiTasks, task => task.Start());//Hogy amennyire csak lehet egyszerre induljanak
         }
 
-        private async void AIWakeUp(Player ai)
+        private async void AIWakeUp(Player ai) 
         {
             Thread.Sleep(1000);//1 másodperc előny a valódi játékosoknak
             while (true)//ToDo: Majd amgí nem igaz, hogy vége
@@ -709,11 +709,12 @@ namespace FriendshipExploder.Logic
                             IElement currentBomb = bomb;
                             while (Elements[currentBomb.Position.X, currentBomb.Position.Y] is Bomb && aiPosY == bomb.Position.Y)
                             {
-                                Hide(bomb, ai);
+                               Hide(bomb, ai);
                             }
+                            
 
                         }
-
+                        
                     }
 
                 }
