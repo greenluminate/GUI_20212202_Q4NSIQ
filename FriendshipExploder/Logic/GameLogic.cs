@@ -1149,15 +1149,15 @@ namespace FriendshipExploder.Logic
                             }
                             break;
                         case ElementType.SpeedUp:
-                            if (player.Speed < (int)GameSize.X / 200)
+                            if (player.Speed < (int)GameSize.X / 225)
                             {
-                                player.Speed += (int)GameSize.X / 10;
+                                player.Speed += (int)GameSize.X / 500;
                             }
                             break;
                         case ElementType.SpeedDown:
                             if (player.Speed > (int)GameSize.X / 300)
                             {
-                                player.Speed -= (int)GameSize.X / 10;
+                                player.Speed -= (int)GameSize.X / 500;
                             }
                             break;
                         case ElementType.Schedule:
@@ -1274,9 +1274,7 @@ namespace FriendshipExploder.Logic
                 Bomb newBomb = pl.Bomb.BombCopy(
                                 newBombCoords,
                                 pl.ActionPressed ? ElementType.ScheduledBomb : ElementType.Bomb,
-                                new Point((int)((newBombCoords.X == 0 ? newBombCoords.X : newBombCoords.X) * GameRectSize), (int)((newBombCoords.Y == 0 ? newBombCoords.Y : newBombCoords.Y) * GameRectSize)));//ToDo: valszeg nem jól van eltárolva itt és emiatt rossz helyre rúgja; HA nem ó, akkor +1 kell mindegyikhez
-                                                                                                                                                                                                               //new Point((int)((newBombCoords.X == 0 ? newBombCoords.X : newBombCoords.X - 1) * GameRectSize) + 1, (int)((newBombCoords.Y == 0 ? newBombCoords.Y : newBombCoords.Y - 1) * GameRectSize) + 1));//ToDo: valszeg nem jól van eltárolva itt és emiatt rossz helyre rúgja; HA nem ó, akkor +1 kell mindegyikhez
-                                                                                                                                                                                                               //new Point((int)(pl.Position.X + (GameRectSize * PlayerWidthRate) / 2), (int)(pl.Position.Y + (GameRectSize * (PlayerHeightRate + PlayerHeightRateHangsIn)) / 2)));//ToDo: valszeg nem jól van eltárolva itt és emiatt rossz helyre rúgja
+                                new Point((int)(newBombCoords.X * GameRectSize), (int)(newBombCoords.Y * GameRectSize)));
                 lock (pl._bombListLockObject)
                 {
                     pl.BombList.Add(newBomb);
