@@ -218,10 +218,10 @@ namespace FriendshipExploder.Logic
                 Thread.Sleep(1000);
                 DateTime StartDate = DateTime.Now;
 
-                while (!this.Timer.Equals("00:00"))
+                while (!this.Timer.Equals("00:00") && !RoundOver)
                 {
                     Thread.Sleep(50);
-                    if (!GamePaused)
+                    if (!GamePaused && !RoundOver)
                     {
                         this.Timer = StartTime.AddTicks(StartDate.Ticks - DateTime.Now.Ticks).ToString(@"mm\:ss");
                     }
@@ -244,7 +244,7 @@ namespace FriendshipExploder.Logic
                 int endX = PlayGroundSize[0] - 1;
                 int endY = PlayGroundSize[1] - 1;
 
-                while (!(startX >= endX) || !(startY >= endY))
+                while (!RoundOver && (!(startX >= endX) || !(startY >= endY)))
                 {
                     //Horizontal fill top
                     for (int x = startX; x < endX; x++)
@@ -360,6 +360,11 @@ namespace FriendshipExploder.Logic
                             Thread.Sleep(1);
                         }
                         Players.Remove(pl);
+
+                        if (Players.Count == 0)
+                        {
+                            RoundOver = true;
+                        }
                     }
                 });
             }
@@ -1107,6 +1112,11 @@ namespace FriendshipExploder.Logic
                                 {
                                     (Elements[i, j] as Bomb).Player.Kills++;
                                     Players.Remove(player);
+
+                                    if (Players.Count == 0)
+                                    {
+                                        RoundOver = true;
+                                    }
                                 }
                             }
                             break;
@@ -1138,6 +1148,10 @@ namespace FriendshipExploder.Logic
             //            {
             //                (Powerups[playerIndexes.X, playerIndexes.Y] as Bomb).Player.Kills++;
             //                Players.Remove(player);
+            //if (Players.Count == 0)
+            //{
+            //    RoundOver = true;
+            //}
             //            }
             //            break;
             //        case ElementType.Player://Betegség átpasszolása :3
@@ -1237,7 +1251,6 @@ namespace FriendshipExploder.Logic
                                     if (row < Elements.GetLength(0) - 1)
                                     {
                                         ExplosionEffects(row, newBomb.Position.Y, newBomb, pl);
-                                        //ExplosionEffects(row, j, bomb, explosionImg, pl);
                                         if (BombStopper(row, newBomb.Position.Y))
                                         {
                                             break;
@@ -1323,7 +1336,7 @@ namespace FriendshipExploder.Logic
             }
         }
 
-        private void ExplosionEffects(int row, int col, Bomb bomb, Player pl)//ImageBrush image,
+        private void ExplosionEffects(int row, int col, Bomb bomb, Player pl)
         {
             if (!(Elements[row, col] is FixWall))
             {
@@ -1386,6 +1399,11 @@ namespace FriendshipExploder.Logic
                                     {
                                         Players.Remove(player);
                                         pl.Kills++;
+
+                                        if (Players.Count == 0)
+                                        {
+                                            RoundOver = true;
+                                        }
                                     }
                                 }
                             );
