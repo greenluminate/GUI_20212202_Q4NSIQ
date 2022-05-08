@@ -702,12 +702,12 @@ namespace FriendshipExploder.Logic
                     {
                         if (pt.X > (int)Math.Floor((decimal)(ai.Position.X / GameRectSize)))
                         {
-                            if (pt.X > (int)Math.Floor((decimal)(ai.Position.X / GameRectSize)))
+                            if (pt.X > (int)Math.Floor((decimal)(ai.Position.X / GameRectSize)) && CanStepToPos(ai, new System.Windows.Vector(0, ai.Speed)))
                             {
 
                                     StartMove(PlayerAction.right, ai);
                                     StopMove(PlayerAction.right, ai);
-                                    Thread.Sleep(50);
+                                    Thread.Sleep(20);
                                     break;
                                         
                                     
@@ -719,12 +719,12 @@ namespace FriendshipExploder.Logic
                         }
                         else if(pt.X < (int)Math.Floor((decimal)(ai.Position.X / GameRectSize)))
                         {
-                            if (pt.X < (int)Math.Floor((decimal)(ai.Position.X / GameRectSize)))
+                            if (pt.X < (int)Math.Floor((decimal)(ai.Position.X / GameRectSize)) && CanStepToPos(ai, new System.Windows.Vector(0, -1* ai.Speed)))
                             {
                                 
                                     StartMove(PlayerAction.left, ai);
                                     StopMove(PlayerAction.left, ai);
-                                    Thread.Sleep(50);
+                                    Thread.Sleep(20);
                                     break;
                                     
                                 
@@ -734,12 +734,12 @@ namespace FriendshipExploder.Logic
                         }
                         else if (pt.Y > (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize)))
                         {
-                            if (pt.Y > (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize)))
+                            if (pt.Y > (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize)) && CanStepToPos(ai, new System.Windows.Vector(0, ai.Speed)))
                             {
                                 
                                     StartMove(PlayerAction.down, ai);
                                     StopMove(PlayerAction.down, ai);
-                                    Thread.Sleep(50);
+                                    Thread.Sleep(20);
                                     break;
                                     
 
@@ -749,12 +749,12 @@ namespace FriendshipExploder.Logic
                         }
                         else if (pt.Y < (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize)))
                         {
-                            if (pt.Y < (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize)))
+                            if (pt.Y < (int)Math.Floor((decimal)(ai.Position.Y / GameRectSize)) && CanStepToPos(ai, new System.Windows.Vector(0, -1 * ai.Speed)))
                             {
 
                                 StartMove(PlayerAction.up, ai);
                                 StopMove(PlayerAction.up, ai);
-                                Thread.Sleep(50);
+                                Thread.Sleep(20);
                                 break;
 
 
@@ -765,10 +765,7 @@ namespace FriendshipExploder.Logic
                         else if (area.Contains(pt))
                         {
                             Act(PlayerAction.bombudlr, ai);
-                            StartMove(PlayerAction.left, ai);
-                            StopMove(PlayerAction.left, ai);
-                            StartMove(PlayerAction.down, ai);
-                            StopMove(PlayerAction.down, ai);
+                            List<IElement> e = FindHiding(ai.Position, Elements);
                             break;
                         }
 
@@ -861,7 +858,19 @@ namespace FriendshipExploder.Logic
         }
 
        
-       
+        private List<IElement> FindHiding(Point startingPoint, IElement[,] elements)
+        {
+            List<IElement> bombPlaces = new List<IElement>();
+            foreach (var element in elements)
+            {
+                if (element is Bomb)
+                {
+                    bombPlaces.Add(element);
+                }
+            }
+            return bombPlaces;
+
+        }
 
         private List<Point> FindAvailablePath(Player ai, int aiNextPosX, int aiNextPosY)
         {
