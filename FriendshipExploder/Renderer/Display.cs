@@ -174,8 +174,7 @@ namespace FriendshipExploder.Renderer
                         }
                         brush = new ImageBrush(new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "GameBackground", "0_timerbg.png"), UriKind.RelativeOrAbsolute)));
                         drawingContext.DrawRectangle(brush, new Pen(Brushes.Black, 0), new Rect(size.Width / 2 - (gameRectSize * 1.5), 0, gameRectSize * 3, size.Height * 0.05 + gameRectSize / 2));
-                        drawingContext.DrawText(new FormattedText(gameModel.Timer, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, 30, Brushes.White, VisualTreeHelper.GetDpi(this).PixelsPerDip), new Point(size.Width / 2 - (30 * 1.5), size.Height * 0.025));
-                        //30-ast lecserélni responsive értékre.
+                        drawingContext.DrawText(new FormattedText(gameModel.Timer, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, size.Width / 64, Brushes.White, VisualTreeHelper.GetDpi(this).PixelsPerDip), new Point(size.Width / 2 - (30 * 1.5), size.Height * 0.025));
 
 
                         //futam vége

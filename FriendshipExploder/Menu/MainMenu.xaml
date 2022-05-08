@@ -9,11 +9,13 @@
         WindowState="Maximized"
         WindowStyle="None"
         Background="{Binding MenuBackground}"
-        Title="MainMenu" Height="450" Width="800">
+        Title="MainMenu" Height="450"
+        Width ="800">
     <Window.DataContext>
         <vms:MainMenuViewModel/>
     </Window.DataContext>
     <Window.Resources>
+        <FontFamily x:Key="font" >/Fonts/#Bomberman</FontFamily>
         <Style TargetType="Button" x:Key="roundedbtn">
             <Style.Resources>
                 <Style TargetType="Border">
@@ -22,8 +24,9 @@
             </Style.Resources>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontSize" Value="{Binding ButtonFontSize}"/>
             <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontFamily" Value="{StaticResource font}"/>
             <Setter Property="Margin" Value="20,20,20,20"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="Background" Value="DimGray"/>
@@ -36,18 +39,35 @@
         <Style TargetType="Label" x:Key="palyer_lb">
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
-            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontSize" Value="{Binding LabelFontSize}"/>
             <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontFamily" Value="{StaticResource font}"/>
             <Setter Property="Foreground" Value="White"/>
         </Style>
         <Style TargetType="Label" x:Key="binding_lb">
             <Setter Property="HorizontalAlignment" Value="Right"/>
-            <!--<Setter Property="Content" Value="{Binding Path=[0]}"/>-->
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
-            <Setter Property="FontSize" Value="24"/>
             <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontFamily" Value="{StaticResource font}"/>
             <Setter Property="Foreground" Value="Black"/>
+        </Style>
+        <Style TargetType="Label" x:Key="playgrounds_lb">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontFamily" Value="{StaticResource font}"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+        <Style TargetType="Label" x:Key="rounds_lb">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="{Binding LabelFontSize}"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontFamily" Value="{StaticResource font}"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+        <Style TargetType="ComboBox" x:Key="rounds_cb">
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="FontFamily" Value="{StaticResource font}"/>
+            <Setter Property="Width" Value="150"/>
         </Style>
     </Window.Resources>
 
@@ -79,7 +99,7 @@
             <Border Grid.Row="1" Style="{StaticResource palyer_border}">
                 <DockPanel>
                     <Label Content="Player 1" Style="{StaticResource palyer_lb}"/>
-                    <ComboBox SelectedIndex="0" IsEnabled="{Binding Player1KeyBindingEnabled}" ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.KeyBindings, Mode=TwoWay}" SelectedItem="{Binding Player1SelectedKeyBinding}">
+                    <ComboBox SelectedIndex="0" IsEnabled="{Binding Player1KeyBindingEnabled}" ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.KeyBindings, Mode=TwoWay}" SelectedItem="{Binding Player1SelectedKeyBinding}" FontSize="{Binding LabelFontSize}" >
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <Label Content="{Binding Path=., Mode=TwoWay}" Style="{StaticResource binding_lb}"/>
@@ -91,7 +111,7 @@
             <Border Grid.Row="2" Style="{StaticResource palyer_border}">
                 <DockPanel>
                     <Label Content="Player 2" Style="{StaticResource palyer_lb}"/>
-                    <ComboBox SelectedIndex="0" IsEnabled="{Binding Player2KeyBindingEnabled}" ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.KeyBindings}" SelectedItem="{Binding Player2SelectedKeyBinding}">
+                    <ComboBox SelectedIndex="0" IsEnabled="{Binding Player2KeyBindingEnabled}" ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.KeyBindings}" SelectedItem="{Binding Player2SelectedKeyBinding}" FontSize="{Binding LabelFontSize}" >
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <Label Content="{Binding}" Style="{StaticResource binding_lb}"/>
@@ -103,7 +123,7 @@
             <Border Grid.Row="3" Style="{StaticResource palyer_border}">
                 <DockPanel>
                     <Label Content="Player 3" Style="{StaticResource palyer_lb}"/>
-                    <ComboBox SelectedIndex="0" IsEnabled="{Binding Player3KeyBindingEnabled}" ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.KeyBindings}" SelectedItem="{Binding Player3SelectedKeyBinding}">
+                    <ComboBox SelectedIndex="0" IsEnabled="{Binding Player3KeyBindingEnabled}" ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.KeyBindings}" SelectedItem="{Binding Player3SelectedKeyBinding}" FontSize="{Binding LabelFontSize}" >
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <Label Content="{Binding}" Style="{StaticResource binding_lb}"/>
@@ -116,26 +136,27 @@
         </Grid>
         <Grid Grid.Column="2" Opacity="{Binding ThirdColumnOpacity}">
             <Grid.RowDefinitions>
-                <RowDefinition Height="2*"></RowDefinition>
-                <RowDefinition Height="8*"></RowDefinition>
+                <RowDefinition Height="1*"></RowDefinition>
+                <RowDefinition Height="5*"></RowDefinition>
+                <RowDefinition Height="4*"></RowDefinition>
                 <RowDefinition Height="1*"></RowDefinition>
                 <RowDefinition Height="2*"></RowDefinition>
-                <RowDefinition Height="2*"></RowDefinition>
+                <RowDefinition Height="1*"></RowDefinition>
             </Grid.RowDefinitions>
-            <ListBox ItemsSource="{Binding Playgrounds}" SelectedItem="{Binding SelectedPlayground}" IsEnabled="{Binding PlaygroundsEnabled}" Grid.Row="1" Margin="10,10,10,10" Background="Transparent" HorizontalContentAlignment="Stretch">
+            <Image Grid.Row="1" Source="{Binding PlaygroundImage}" />
+            <ListBox ItemsSource="{Binding Playgrounds}" SelectedItem="{Binding SelectedPlayground}" IsEnabled="{Binding PlaygroundsEnabled}" Grid.Row="2" Margin="10,10,10,10" Background="Transparent" HorizontalContentAlignment="Stretch" FontSize="{Binding LabelFontSize}" >
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Border BorderBrush="LightGray" BorderThickness="2" Margin="10,10,10,10" HorizontalAlignment="Stretch">
-                            <Label Foreground="White" FontSize="24" FontWeight="Bold" Content="{Binding}">
-                            </Label>
+                            <Label Content="{Binding}" Style="{StaticResource playgrounds_lb}" />
                         </Border>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <Border Grid.Row="2" BorderBrush="LightGray" BorderThickness="2" Margin="10,10,10,10" HorizontalAlignment="Stretch">
+            <Border Grid.Row="3" BorderBrush="LightGray" BorderThickness="2" Margin="10,10,10,10" HorizontalAlignment="Stretch">
                 <DockPanel>
-                    <Label Foreground="White" FontSize="24" FontWeight="Bold" Content="Rounds:" VerticalAlignment="Center" />
-                    <ComboBox FontSize="24" Width="150" HorizontalAlignment="Right" SelectedIndex="{Binding RoundsSelected}" IsEnabled="{Binding RoundsEnabled}">
+                    <Label Content="Rounds:" Style="{StaticResource rounds_lb}" />
+                    <ComboBox SelectedIndex="{Binding RoundsSelected}" IsEnabled="{Binding RoundsEnabled}" Style="{StaticResource rounds_cb}" FontSize="{Binding LabelFontSize}">
                         <ComboBoxItem>1</ComboBoxItem>
                         <ComboBoxItem>2</ComboBoxItem>
                         <ComboBoxItem>3</ComboBoxItem>
@@ -144,7 +165,7 @@
                     </ComboBox>
                 </DockPanel>
             </Border>
-            <Button Grid.Row="3" Command="{Binding StartCommand}" Content="Start game" Style="{StaticResource roundedbtn}" Click="Button_Click"/>
+            <Button Grid.Row="4" Command="{Binding StartCommand}" Content="Start game" Style="{StaticResource roundedbtn}" Click="Button_Click"/>
         </Grid>
     </Grid>
 </Window>

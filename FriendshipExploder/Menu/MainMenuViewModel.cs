@@ -28,6 +28,7 @@ namespace FriendshipExploder.Menu
             set {
                 SetProperty(ref selectedPlayground, value);
                 (StartCommand as RelayCommand).NotifyCanExecuteChanged();
+                UpdatePreviewImage();
             } 
         }
         private bool playgroundsEnabled;
@@ -35,6 +36,20 @@ namespace FriendshipExploder.Menu
         {
             get { return playgroundsEnabled; }
             set { SetProperty(ref playgroundsEnabled, value); }
+        }
+
+        private int buttonFontSize;
+        public int ButtonFontSize
+        {
+            get { return buttonFontSize; }
+            set { SetProperty(ref buttonFontSize, value); }
+        }
+
+        private double labelFontSize;
+        public double LabelFontSize
+        {
+            get { return labelFontSize; }
+            set { SetProperty(ref labelFontSize, value); }
         }
 
 
@@ -150,8 +165,18 @@ namespace FriendshipExploder.Menu
         }
 
 
+        private string playgroundImage;
+        public string PlaygroundImage
+        {
+            get { return playgroundImage; }
+            set { SetProperty(ref playgroundImage, value); }
+        }
+
+
         public MainMenuViewModel()
         {
+            ButtonFontSize = (int)System.Windows.SystemParameters.PrimaryScreenWidth / 80;
+            LabelFontSize = (int)System.Windows.SystemParameters.PrimaryScreenWidth / 96;
             MenuBackground = new ImageBrush(new BitmapImage(new Uri($"pack://application:,,,/Images/GameBackground/0_GameBackground.jpg")));
             LoadPlaygrounds();
             NewGameEnabled = true;
@@ -289,5 +314,9 @@ namespace FriendshipExploder.Menu
             }
         }
 
+        private void UpdatePreviewImage()
+        {
+            PlaygroundImage = $"../Playgrounds/Preview/{SelectedPlayground}.jpg";
+        }
     }
 }

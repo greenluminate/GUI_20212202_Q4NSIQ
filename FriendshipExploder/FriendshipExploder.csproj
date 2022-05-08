@@ -41,7 +41,25 @@
     <None Remove="Images\Powerups\SpeedDown.png" />
     <None Remove="Images\Powerups\SpeedUp.png" />
     <None Remove="Images\Walls\0_Wall.png" />
-    <None Remove="Playgrounds\playground_1.txt" />
+    <None Remove="Playgrounds\playground 1.txt" />
+    <None Remove="Playgrounds\playground 2.txt" />
+    <None Remove="Playgrounds\Preview\playground 1.jpg" />
+    <None Remove="Playgrounds\Preview\playground 2.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Playgrounds\playground 1.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Playgrounds\playground 2.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Playgrounds\Preview\playground 1.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Playgrounds\Preview\playground 2.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -81,9 +99,6 @@
     <Resource Include="Images\Powerups\SpeedDown.png" />
     <Resource Include="Images\Powerups\SpeedUp.png" />
     <Resource Include="Images\Walls\0_Wall.png" />
-    <Content Include="Playgrounds\playground_1.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 
   <ItemGroup>
