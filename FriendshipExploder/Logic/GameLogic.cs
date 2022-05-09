@@ -2148,6 +2148,7 @@ namespace FriendshipExploder.Logic
                         Monitor.PulseAll(_TimerLockObject);
                     }
 
+                    Thread.Sleep(2000);
                     Task.WaitAll(tasks.ToArray());
                     RoundOver = false;
                     LoadNext(playgrounds.Dequeue());
