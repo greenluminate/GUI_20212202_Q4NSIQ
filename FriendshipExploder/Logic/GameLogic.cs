@@ -833,7 +833,6 @@ namespace FriendshipExploder.Logic
                     {
                         pl.SetBombPressed = true;//It is necessary, else a btn press is called more than once.
                         Act(PlayerAction.bombudlr, pl);
-                        pl.SetBombPressed = false;
                         await Task.Delay(1);
                     }
                     break;
@@ -1686,138 +1685,145 @@ namespace FriendshipExploder.Logic
 
         private async void AIWakeUp(Player ai)
         {
-            Thread.Sleep(1000);//1 másodperc előny a valódi játékosoknak
-            while (ai != null && !RoundOver)//ToDo: Majd amgí nem igaz, hogy vége
+            try
             {
-                double playerHeight = GameRectSize * PlayerHeightRate;
-                double playerWidth = GameRectSize * PlayerWidthRate;
-                Player nearestPlayer = NearestPlayer(ai);
-                Point plPosition = PlayerPixelToMatrixCoordinate(nearestPlayer.Position);
-                int plPosX = plPosition.X;
-                int plPosY = plPosition.Y;
-                int[] playPositionInInt = new int[] { plPosX, plPosY };
-                List<IElement> bombs = CollectBombs();
-                Node[,] lvlMatrix = ReconstructToNodes();
-                int[] targetElementIndex = FindNearestDestructible(ai.Position);
-                Node playerTarget = lvlMatrix[playPositionInInt[0], playPositionInInt[1]];
-                Node target = lvlMatrix[targetElementIndex[0], targetElementIndex[1]];
-                Point aiPosition = PlayerPixelToMatrixCoordinate(new Point((int)(ai.Position.X-playerWidth/2),(int)(ai.Position.Y-playerHeight)));
-                int aiPosX = aiPosition.X;
-                int aiPosY = aiPosition.Y;
-                Point aiPositionUp = PlayerPixelToMatrixCoordinate(new Point((int)(ai.Position.X - playerWidth / 2), (int)(ai.Position.Y + playerHeight)));
-                int aiPosUpX = aiPositionUp.X;
-                int aiPosUpY = aiPositionUp.Y;
-                List<Point> area = GetTargetArea(target);
-                List<Point> playerArea = GetTargetArea(playerTarget);
-                List<Point> path = FindPathToDestructible(FindNearestDestructible(ai.Position), ai.Position, lvlMatrix, area);
-                List<Point> pathToPlayer = FindPathToDestructible(playPositionInInt, ai.Position, lvlMatrix,playerArea);
-                foreach (var bomb in bombs)
+                Thread.Sleep(1000);//1 másodperc előny a valódi játékosoknak
+                while (ai != null && !ai.Explode && !RoundOver)//ToDo: Majd amgí nem igaz, hogy vége
                 {
-                    if (bomb != null)
+                    double playerHeight = GameRectSize * PlayerHeightRate;
+                    double playerWidth = GameRectSize * PlayerWidthRate;
+                    Player nearestPlayer = NearestPlayer(ai);
+                    Point plPosition = PlayerPixelToMatrixCoordinate(nearestPlayer.Position);
+                    int plPosX = plPosition.X;
+                    int plPosY = plPosition.Y;
+                    int[] playPositionInInt = new int[] { plPosX, plPosY };
+                    List<IElement> bombs = CollectBombs();
+                    Node[,] lvlMatrix = ReconstructToNodes();
+                    int[] targetElementIndex = FindNearestDestructible(ai.Position);
+                    Node playerTarget = lvlMatrix[playPositionInInt[0], playPositionInInt[1]];
+                    Node target = lvlMatrix[targetElementIndex[0], targetElementIndex[1]];
+                    Point aiPosition = PlayerPixelToMatrixCoordinate(new Point((int)(ai.Position.X - playerWidth / 2), (int)(ai.Position.Y - playerHeight)));
+                    int aiPosX = aiPosition.X;
+                    int aiPosY = aiPosition.Y;
+                    Point aiPositionUp = PlayerPixelToMatrixCoordinate(new Point((int)(ai.Position.X - playerWidth / 2), (int)(ai.Position.Y + playerHeight)));
+                    int aiPosUpX = aiPositionUp.X;
+                    int aiPosUpY = aiPositionUp.Y;
+                    List<Point> area = GetTargetArea(target);
+                    List<Point> playerArea = GetTargetArea(playerTarget);
+                    List<Point> path = FindPathToDestructible(FindNearestDestructible(ai.Position), ai.Position, lvlMatrix, area);
+                    List<Point> pathToPlayer = FindPathToDestructible(playPositionInInt, ai.Position, lvlMatrix, playerArea);
+                    foreach (var bomb in bombs)
                     {
-                        if (GetBombArea(bomb).Contains(aiPosition) || bomb.Position.X == aiPosition.X && bomb.Position.Y == aiPosition.Y)
+                        if (bomb != null)
                         {
-                            
-                            while (Elements[bomb.Position.X, bomb.Position.Y] is Bomb && aiPosY == bomb.Position.Y)
+                            if (GetBombArea(bomb).Contains(aiPosition) || bomb.Position.X == aiPosition.X && bomb.Position.Y == aiPosition.Y)
                             {
-                                Hide(bomb,ai);
+
+                                while (Elements[bomb.Position.X, bomb.Position.Y] is Bomb && aiPosY == bomb.Position.Y)
+                                {
+                                    Hide(bomb, ai);
+                                }
+                                StopMove(PlayerAction.up, ai);
+                                StopMove(PlayerAction.down, ai);
+                                StopMove(PlayerAction.left, ai);
+                                StopMove(PlayerAction.right, ai);
                             }
-                            StopMove(PlayerAction.up, ai);
-                            StopMove(PlayerAction.down, ai);
-                            StopMove(PlayerAction.left, ai);
-                            StopMove(PlayerAction.right, ai);
                         }
                     }
-                }
-                if (path != null)
-                {
-                    foreach (var pt in path)
+                    if (path != null)
                     {
-                        if (pt.X > aiPosX && Elements[aiPosX + 1, aiPosY] == null)
+                        foreach (var pt in path)
                         {
-                            StartMove(PlayerAction.right, ai);
-                            StopMove(PlayerAction.right, ai);
-                            Thread.Sleep(20);
-                            break;
+                            if (pt.X > aiPosX && Elements[aiPosX + 1, aiPosY] == null)
+                            {
+                                StartMove(PlayerAction.right, ai);
+                                StopMove(PlayerAction.right, ai);
+                                Thread.Sleep(20);
+                                break;
 
-                        }
-                        else if (pt.X < aiPosX)
-                        {
-                            StartMove(PlayerAction.left, ai);
-                            StopMove(PlayerAction.left, ai);
-                            Thread.Sleep(20);
-                            break;
-                        }
-                        else if (pt.Y > aiPosY)
-                        {
-                            StartMove(PlayerAction.down, ai);
-                            StopMove(PlayerAction.down, ai);
-                            Thread.Sleep(20);
-                            break;
-                        }
-                        else if (pt.Y < aiPosY)
-                        {
-                            StartMove(PlayerAction.up, ai);
-                            StopMove(PlayerAction.up, ai);
-                            Thread.Sleep(20);
-                            break;
-                        }
-                        else if (area.Contains(pt))
-                        {
-                            StartAct(PlayerAction.bombudlr,ai);
-                            break;
+                            }
+                            else if (pt.X < aiPosX)
+                            {
+                                StartMove(PlayerAction.left, ai);
+                                StopMove(PlayerAction.left, ai);
+                                Thread.Sleep(20);
+                                break;
+                            }
+                            else if (pt.Y > aiPosY)
+                            {
+                                StartMove(PlayerAction.down, ai);
+                                StopMove(PlayerAction.down, ai);
+                                Thread.Sleep(20);
+                                break;
+                            }
+                            else if (pt.Y < aiPosY)
+                            {
+                                StartMove(PlayerAction.up, ai);
+                                StopMove(PlayerAction.up, ai);
+                                Thread.Sleep(20);
+                                break;
+                            }
+                            else if (area.Contains(pt))
+                            {
+                                StartAct(PlayerAction.bombudlr, ai);
+                                StopMove(PlayerAction.bombudlr, ai);
+                                break;
+                            }
                         }
                     }
-                }
-                else if(pathToPlayer != null)
-                {
-                    foreach (var pt in pathToPlayer)
+                    else if (pathToPlayer != null)
                     {
-                        if (pt.X > aiPosX)
+                        foreach (var pt in pathToPlayer)
                         {
-                            StartMove(PlayerAction.right, ai);
-                            StopMove(PlayerAction.right, ai);
-                            Thread.Sleep(20);
-                            break;
+                            if (pt.X > aiPosX)
+                            {
+                                StartMove(PlayerAction.right, ai);
+                                StopMove(PlayerAction.right, ai);
+                                Thread.Sleep(20);
+                                break;
 
-                        }
-                        else if (pt.X < aiPosX)
-                        {
-                            StartMove(PlayerAction.left, ai);
-                            StopMove(PlayerAction.left, ai);
-                            Thread.Sleep(20);
-                            break;
-                        }
-                        else if (pt.Y > aiPosY)
-                        {
-                            StartMove(PlayerAction.down, ai);
-                            StopMove(PlayerAction.down, ai);
-                            Thread.Sleep(20);
-                            break;
-                        }
-                        else if (pt.Y < aiPosY)
-                        {
-                            StartMove(PlayerAction.up, ai);
-                            StopMove(PlayerAction.up, ai);
-                            Thread.Sleep(20);
-                            break;
-                        }
-                        else if (area.Contains(pt))
-                        {
-                            StartAct(PlayerAction.bombudlr, ai);
-                            break;
+                            }
+                            else if (pt.X < aiPosX)
+                            {
+                                StartMove(PlayerAction.left, ai);
+                                StopMove(PlayerAction.left, ai);
+                                Thread.Sleep(20);
+                                break;
+                            }
+                            else if (pt.Y > aiPosY)
+                            {
+                                StartMove(PlayerAction.down, ai);
+                                StopMove(PlayerAction.down, ai);
+                                Thread.Sleep(20);
+                                break;
+                            }
+                            else if (pt.Y < aiPosY)
+                            {
+                                StartMove(PlayerAction.up, ai);
+                                StopMove(PlayerAction.up, ai);
+                                Thread.Sleep(20);
+                                break;
+                            }
+                            else if (area.Contains(pt))
+                            {
+                                StartAct(PlayerAction.bombudlr, ai);
+                                StopMove(PlayerAction.bombudlr, ai);
+                                break;
+                            }
                         }
                     }
 
                 }
-               
-               
+            }
+            catch (Exception)
+            {
 
+                if (!RoundOver && ai != null && !ai.Explode)
+                {
+                    AIWakeUp(ai);
+                }
             }
         }
-
-
-        
 
         private Player NearestPlayer(Player ai)
         {
@@ -1849,41 +1855,41 @@ namespace FriendshipExploder.Logic
         }
 
 
-        
 
-        private void Hide(IElement bomb,Player ai)
+
+        private void Hide(IElement bomb, Player ai)
         {
-            
+
             Point aiPosition = PlayerPixelToMatrixCoordinate(ai.Position);
             int aiPosX = aiPosition.X;
             int aiPosY = aiPosition.Y;
-            
-                if (aiPosX > 0 && (Elements[aiPosX - 1, aiPosY] == null || (Elements[aiPosX - 1, aiPosY] is Bomb b && Elements[aiPosX, aiPosY] is Bomb borigi && b.Equals(borigi))))
-                {
-                    StartMove(PlayerAction.left, ai);
-                    
-                }
-                else if (aiPosY < Elements.GetLength(0) && (Elements[aiPosY + 1, aiPosX] == null  || (Elements[aiPosY + 1, aiPosX] is Bomb bundernext && Elements[aiPosX, aiPosY] is Bomb bunder && bundernext.Equals(bunder))))
-                {
-                    StartMove(PlayerAction.right, ai);
-                    
-                }
-                else if ((aiPosX - bomb.Position.X) < 5)
-                {
-                    if (aiPosY > 0 && (Elements[aiPosX, aiPosY - 1] == null || (Elements[aiPosX, aiPosY - 1] is Bomb bupundernext && Elements[aiPosX, aiPosY] is Bomb bupunder && bupundernext.Equals(bupunder))))
-                    {
-                        StartMove(PlayerAction.up, ai);
-                       
 
-                    }
-                    else if (aiPosY < Elements.GetLength(1) && (Elements[aiPosX, aiPosY + 1] == null || (Elements[aiPosX, aiPosY + 1] is Bomb bdownundernext && Elements[aiPosX, aiPosY] is Bomb bdownunder && bdownundernext.Equals(bdownunder))))
-                    {
-                        StartMove(PlayerAction.down, ai);
-                    
-                        
+            if (aiPosX > 0 && (Elements[aiPosX - 1, aiPosY] == null || (Elements[aiPosX - 1, aiPosY] is Bomb b && Elements[aiPosX, aiPosY] is Bomb borigi && b.Equals(borigi))))
+            {
+                StartMove(PlayerAction.left, ai);
 
-                    }
-                
+            }
+            else if (aiPosY < Elements.GetLength(0) && (Elements[aiPosY + 1, aiPosX] == null || (Elements[aiPosY + 1, aiPosX] is Bomb bundernext && Elements[aiPosX, aiPosY] is Bomb bunder && bundernext.Equals(bunder))))
+            {
+                StartMove(PlayerAction.right, ai);
+
+            }
+            else if ((aiPosX - bomb.Position.X) < 5)
+            {
+                if (aiPosY > 0 && (Elements[aiPosX, aiPosY - 1] == null || (Elements[aiPosX, aiPosY - 1] is Bomb bupundernext && Elements[aiPosX, aiPosY] is Bomb bupunder && bupundernext.Equals(bupunder))))
+                {
+                    StartMove(PlayerAction.up, ai);
+
+
+                }
+                else if (aiPosY < Elements.GetLength(1) && (Elements[aiPosX, aiPosY + 1] == null || (Elements[aiPosX, aiPosY + 1] is Bomb bdownundernext && Elements[aiPosX, aiPosY] is Bomb bdownunder && bdownundernext.Equals(bdownunder))))
+                {
+                    StartMove(PlayerAction.down, ai);
+
+
+
+                }
+
             }
 
         }
