@@ -97,8 +97,8 @@ namespace FriendshipExploder.Logic
             {
                 string[] rows = File.ReadAllLines(@$"Playgrounds\{file}.txt");
 
-                PlayGroundSize[0] = rows[0].Length;
-                PlayGroundSize[1] = rows.Length;
+                PlayGroundSize[0] = rows[0].Length + 1;
+                PlayGroundSize[1] = rows.Length + 1;
 
                 Elements = new IElement[PlayGroundSize[0], PlayGroundSize[1]];
                 Powerups = new IElement[PlayGroundSize[0], PlayGroundSize[1]];
