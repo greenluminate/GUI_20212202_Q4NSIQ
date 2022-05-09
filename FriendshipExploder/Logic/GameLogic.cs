@@ -245,13 +245,16 @@ namespace FriendshipExploder.Logic
                     }
                     else
                     {
-                        long stopDifference = StartDate.Ticks - DateTime.Now.Ticks;
-
-                        lock (_TimerLockObject)
+                        if (!RoundOver)
                         {
-                            Monitor.Wait(_TimerLockObject);
+                            long stopDifference = StartDate.Ticks - DateTime.Now.Ticks;
+
+                            lock (_TimerLockObject)
+                            {
+                                Monitor.Wait(_TimerLockObject);
+                            }
+                            StartDate = DateTime.Now.AddTicks(stopDifference);
                         }
-                        StartDate = DateTime.Now.AddTicks(stopDifference);
                     }
                 }
             }, TaskCreationOptions.LongRunning);
