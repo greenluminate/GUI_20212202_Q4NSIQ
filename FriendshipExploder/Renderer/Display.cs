@@ -187,14 +187,14 @@ namespace FriendshipExploder.Renderer
                         }
                         brush = new ImageBrush(new BitmapImage(new Uri(Path.Combine("..", "..", "..", "Images", "GameBackground", "0_timerbg.png"), UriKind.RelativeOrAbsolute)));
                         drawingContext.DrawRectangle(brush, new Pen(Brushes.Black, 0), new Rect(size.Width / 2 - (gameRectSize * 1.5), 0, gameRectSize * 3, size.Height * 0.05 + gameRectSize / 2));
-                        drawingContext.DrawText(new FormattedText(gameModel.Timer, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Verdana"), size.Width / 64, Brushes.White, VisualTreeHelper.GetDpi(this).PixelsPerDip), new Point(size.Width / 2 - ((size.Width / 64) * 1.5), size.Height * 0.025));
+                        drawingContext.DrawText(new FormattedText(gameModel.Timer, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, size.Width / 64, Brushes.White, VisualTreeHelper.GetDpi(this).PixelsPerDip), new Point(size.Width / 2 - ((size.Width / 64) * 1.5), size.Height * 0.025));
 
 
                         //futam vége
                         if (gameModel.RoundOver)
                         {
                             drawingContext.DrawRectangle(Brushes.LightGray, new Pen(Brushes.Red, 4), new Rect((size.Width / 2) - (size.Width / 4), (size.Height / 2) - (size.Height / 12), size.Width / 2, size.Height / 6));
-                            FormattedText text = new FormattedText("Round over!", CultureInfo.GetCultureInfo("hu-hu"), FlowDirection.LeftToRight, new Typeface("Verdana"), size.Width / 24, Brushes.Red, VisualTreeHelper.GetDpi(this).PixelsPerDip);
+                            FormattedText text = new FormattedText("Round over!", CultureInfo.GetCultureInfo("hu-hu"), FlowDirection.LeftToRight, typeface, size.Width / 24, Brushes.Red, VisualTreeHelper.GetDpi(this).PixelsPerDip);
                             Point textLocation = new Point((size.Width / 2) - (text.WidthIncludingTrailingWhitespace / 2), (size.Height / 2) - (text.Height / 2));
                             drawingContext.DrawText(text, textLocation);
                         }
@@ -205,7 +205,7 @@ namespace FriendshipExploder.Renderer
                             ImageBrush backgr = new ImageBrush(new BitmapImage(new Uri($"pack://application:,,,/Images/GameBackground/scboard.png")));
 
                             drawingContext.DrawRectangle(backgr, new Pen(Brushes.Black, 0), new Rect((size.Width / 2) - (size.Width / 4), (size.Height / 2) - (size.Height / 10), size.Width / 2, size.Height / 5));
-                            FormattedText scoreText = new FormattedText("Score", CultureInfo.GetCultureInfo("hu-hu"), FlowDirection.LeftToRight, new Typeface("Verdana"), size.Width / 40, Brushes.White, VisualTreeHelper.GetDpi(this).PixelsPerDip);
+                            FormattedText scoreText = new FormattedText("Score", CultureInfo.GetCultureInfo("hu-hu"), FlowDirection.LeftToRight, typeface, size.Width / 40, Brushes.White, VisualTreeHelper.GetDpi(this).PixelsPerDip);
                             Point textLocation = new Point((size.Width / 2) - (scoreText.WidthIncludingTrailingWhitespace / 2), (size.Height / 2) - (size.Height / 10) + 10);
                             drawingContext.DrawText(scoreText, textLocation);
 
@@ -215,7 +215,7 @@ namespace FriendshipExploder.Renderer
                             if (pl != null)
                             {
                                 //Pl 1
-                                FormattedText player1Text = new FormattedText($"Player 1: {pl.Kills} kill", CultureInfo.GetCultureInfo("hu-hu"), FlowDirection.LeftToRight, new Typeface("Verdana"), size.Width / 65, Brushes.White, VisualTreeHelper.GetDpi(this).PixelsPerDip);
+                                FormattedText player1Text = new FormattedText($"Player 1: {pl.Kills} kill", CultureInfo.GetCultureInfo("hu-hu"), FlowDirection.LeftToRight, typeface, size.Width / 65, Brushes.White, VisualTreeHelper.GetDpi(this).PixelsPerDip);
                                 textLocation = new Point((size.Width / 2) - (size.Width / 4) + 20, (size.Height / 2) - (size.Height / 10) + startHeight);
                                 drawingContext.DrawText(player1Text, textLocation);
                                 startHeight += player1Text.Height + 10;
@@ -225,7 +225,7 @@ namespace FriendshipExploder.Renderer
                             if (pl != null)
                             {
                                 //Pl 2
-                                FormattedText player2Text = new FormattedText($"Player 2: {pl.Kills} kill", CultureInfo.GetCultureInfo("hu-hu"), FlowDirection.LeftToRight, new Typeface("Verdana"), size.Width / 65, Brushes.White, VisualTreeHelper.GetDpi(this).PixelsPerDip);
+                                FormattedText player2Text = new FormattedText($"Player 2: {pl.Kills} kill", CultureInfo.GetCultureInfo("hu-hu"), FlowDirection.LeftToRight, typeface, size.Width / 65, Brushes.White, VisualTreeHelper.GetDpi(this).PixelsPerDip);
                                 textLocation = new Point((size.Width / 2) - (size.Width / 4) + 20, (size.Height / 2) - (size.Height / 10) + startHeight);
                                 drawingContext.DrawText(player2Text, textLocation);
                                 startHeight += player2Text.Height + 10;
@@ -235,7 +235,7 @@ namespace FriendshipExploder.Renderer
                             if (pl != null)
                             {
                                 //Pl 3
-                                FormattedText player3Text = new FormattedText($"Player 3: {pl.Kills} kill", CultureInfo.GetCultureInfo("hu-hu"), FlowDirection.LeftToRight, new Typeface("Verdana"), size.Width / 65, Brushes.White, VisualTreeHelper.GetDpi(this).PixelsPerDip);
+                                FormattedText player3Text = new FormattedText($"Player 3: {pl.Kills} kill", CultureInfo.GetCultureInfo("hu-hu"), FlowDirection.LeftToRight, typeface, size.Width / 65, Brushes.White, VisualTreeHelper.GetDpi(this).PixelsPerDip);
                                 textLocation = new Point((size.Width / 2) - (size.Width / 4) + 20, (size.Height / 2) - (size.Height / 10) + startHeight);
                                 drawingContext.DrawText(player3Text, textLocation);
                             }
