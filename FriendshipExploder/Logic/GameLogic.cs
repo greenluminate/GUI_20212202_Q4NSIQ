@@ -2016,10 +2016,13 @@ namespace FriendshipExploder.Logic
             }
             else
             {
-                RoundOver = true; //round over
-                /*Thread.Sleep(2000);
-                RoundOver = false;
-                LoadNext(playgrounds.Dequeue());*/
+                new Task(() =>
+                {
+                    RoundOver = true; //round over
+                    Thread.Sleep(2000);
+                    RoundOver = false;
+                    LoadNext(playgrounds.Dequeue());
+                }, TaskCreationOptions.LongRunning).Start();
             }
         }
 
@@ -2027,6 +2030,5 @@ namespace FriendshipExploder.Logic
         {
             PlayersStore.Where(p => p.Id == pl.Id).FirstOrDefault().SumOfKills = pl.Kills;
         }
-
     }
 }
