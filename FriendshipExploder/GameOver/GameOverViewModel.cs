@@ -114,7 +114,7 @@ namespace FriendshipExploder.GameOver
 
         private void LoadScore()
         {
-            var players = logic.Players.OrderByDescending(pl => pl.SumOfKills).ToList();
+            var players = logic.PlayersForScore.OrderByDescending(pl => pl.SumOfKills).ToList();
             
             if (players.Count > 0)
             {

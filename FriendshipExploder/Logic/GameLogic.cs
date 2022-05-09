@@ -25,6 +25,7 @@ namespace FriendshipExploder.Logic
         public IElement[,] Powerups { get; set; }
 
         public List<Player> Players { get; set; }
+        public List<Player> PlayersForScore { get; set; }
 
         //játéktér mérete (cella x, cella y)
         public int[] PlayGroundSize { get; set; }
@@ -45,10 +46,12 @@ namespace FriendshipExploder.Logic
         public double PlayerWidthRate { get; set; }
         public bool GamePaused { get; set; }
         public bool RoundOver { get; set; }
+        public bool GameOver { get; set; }
         public bool RoundScore { get; set; }
 
         public GameLogic()
         {
+            Timer = "";
             _ElementsListLockObject = new object();
             _PowerupsListLockObject = new object();
             _PlayersListLockObject = new object();
@@ -57,6 +60,7 @@ namespace FriendshipExploder.Logic
             rnd = new Random();
 
             Players = new List<Player>();
+            PlayersForScore = new List<Player>();
 
             playgrounds = new Queue<string[]>();
             PlayGroundSize = new int[2];
@@ -66,6 +70,7 @@ namespace FriendshipExploder.Logic
             PlayerWidthRate = 0.6;
 
             RoundOver = false;
+            GameOver = false;
             RoundScore = false;
 
             //Ha választott pálya design, akkor betöltjük azt válaszott mennyiségszer a queue-ba, ha randomizáltat választotak a fixek közül, akkor random tötljülk be a fixeket
@@ -212,7 +217,7 @@ namespace FriendshipExploder.Logic
             }
 
             AITaskCreator();
-            CountDown(150);
+            CountDown(10); //150
         }
 
         private void CountDown(int seconds)
@@ -375,11 +380,12 @@ namespace FriendshipExploder.Logic
                         }
                         Thread.Sleep(1);
                     }
+                    PlayersForScore.Add(Players[i]);
                     Players.Remove(Players[i]);
                     i--;
                     if (Players.Count == 0)
                     {
-                        RoundOver = true;
+                        RoundEnd();
                     }
                 }
             }
@@ -1182,11 +1188,12 @@ namespace FriendshipExploder.Logic
                                 if (Elements[i, j].Explode)
                                 {
                                     (Elements[i, j] as Bomb).Player.Kills++;
+                                    PlayersForScore.Add(player);
                                     Players.Remove(player);
 
                                     if (Players.Count == 0)
                                     {
-                                        RoundOver = true;
+                                        RoundEnd();
                                     }
                                 }
                             }
@@ -1495,12 +1502,13 @@ namespace FriendshipExploder.Logic
                                 {
                                     if (player != null)
                                     {
+                                        PlayersForScore.Add(player);
                                         Players.Remove(player);
                                         pl.Kills++;
 
                                         if (Players.Count == 0)
                                         {
-                                            RoundOver = true;
+                                            RoundEnd();
                                         }
                                     }
                                 }
@@ -1993,6 +2001,18 @@ namespace FriendshipExploder.Logic
                 return false;
             }
             return true;
+        }
+
+        private void RoundEnd()
+        {
+            if (playgrounds.Count == 0)
+            {
+                GameOver = true;//game over
+            }
+            else
+            {
+                RoundOver = true; //round over
+            }
         }
 
     }

@@ -34,7 +34,7 @@ namespace FriendshipExploder
             InitializeComponent();
             this.mainMenuLogic = new MainMenuLogic();
             this.gameLogic = new GameLogic();
-            this.gameCtrontroller = new GameController(gameLogic); //Esetle gegyet írni menüre.
+            this.gameCtrontroller = new GameController(gameLogic);
 
             DispatcherTimer timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromMilliseconds(30);
@@ -82,6 +82,20 @@ namespace FriendshipExploder
         {
             //ToDo: Monitorozni, hogy csak akkor fusson le, ha nincs másik ablak megnyitva, különben várjon.
             display.InvalidateVisual();
+
+            if (gameLogic.GameOver)
+            {
+                GameOverWindow go = new GameOverWindow(gameLogic);
+                if (go.ShowDialog() == true)
+                {
+                    MainMenu menu = new MainMenu(gameLogic);
+                    if (menu.ShowDialog() == false)
+                    {
+                        Application.Current.Shutdown();
+                    }
+                }
+                gameLogic.GameOver = false;
+            }
         }
     }
 }

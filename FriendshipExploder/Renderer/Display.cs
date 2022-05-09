@@ -242,6 +242,7 @@ namespace FriendshipExploder.Renderer
                         }
 
 
+
                         //megállítva
                         if (gameModel.GamePaused)
                         {
