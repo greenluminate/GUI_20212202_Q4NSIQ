@@ -991,7 +991,7 @@ namespace FriendshipExploder.Logic
                 switch (player.HeadDirection)
                 {
                     case PlayerDirection.up:
-                        if (playerIndexes.Y - 1 >= 0 && Elements[playerIndexes.X, playerIndexes.Y - 1] is Bomb b && playerCenter.Y - b.PositionPixel.Y < player.Position.Y * PlayerHeightRate * GameRectSize / 2 + GameRectSize / 2 + 10)
+                        if (player.CanKick && playerIndexes.Y - 1 >= 0 && Elements[playerIndexes.X, playerIndexes.Y - 1] is Bomb b && playerCenter.Y - b.PositionPixel.Y < player.Position.Y * PlayerHeightRate * GameRectSize / 2 + GameRectSize / 2 + 10)
                         {
                             while (b.Explode != true && b.Position.Y - 1 >= 0 && Elements[b.Position.X, b.Position.Y - 1] == null)
                             {
@@ -1036,7 +1036,7 @@ namespace FriendshipExploder.Logic
                         }
                         break;
                     case PlayerDirection.down:
-                        if (playerIndexes.Y + 1 < PlayGroundSize[1] - 1 && Elements[playerIndexes.X, playerIndexes.Y + 1] is Bomb bdown && playerCenter.Y + bdown.PositionPixel.Y < player.Position.Y * PlayerHeightRate * GameRectSize / 2 + GameRectSize / 2 + 10)
+                        if (player.CanKick && playerIndexes.Y + 1 < PlayGroundSize[1] - 1 && Elements[playerIndexes.X, playerIndexes.Y + 1] is Bomb bdown && playerCenter.Y + bdown.PositionPixel.Y < player.Position.Y * PlayerHeightRate * GameRectSize / 2 + GameRectSize / 2 + 10)
                         {
                             while (bdown.Explode != true && bdown.Position.Y + 1 < PlayGroundSize[1] - 1 && Elements[bdown.Position.X, bdown.Position.Y + 1] == null)
                             {
@@ -1080,7 +1080,7 @@ namespace FriendshipExploder.Logic
                         }
                         break;
                     case PlayerDirection.left:
-                        if (playerIndexes.X - 1 >= 0 && Elements[playerIndexes.X - 1, playerIndexes.Y] is Bomb bleft && playerCenter.X - bleft.PositionPixel.X < player.Position.X * PlayerWidthRate * GameRectSize / 2 + GameRectSize / 2 + 10)
+                        if (player.CanKick && playerIndexes.X - 1 >= 0 && Elements[playerIndexes.X - 1, playerIndexes.Y] is Bomb bleft && playerCenter.X - bleft.PositionPixel.X < player.Position.X * PlayerWidthRate * GameRectSize / 2 + GameRectSize / 2 + 10)
                         {
                             while (bleft.Explode != true && bleft.Position.X - 1 >= 0 && Elements[bleft.Position.X - 1, bleft.Position.Y] == null)
                             {
@@ -1124,7 +1124,7 @@ namespace FriendshipExploder.Logic
                         }
                         break;
                     case PlayerDirection.right:
-                        if (playerIndexes.X + 1 < PlayGroundSize[0] - 1 && Elements[playerIndexes.X + 1, playerIndexes.Y] is Bomb bright && playerCenter.X + bright.PositionPixel.X < player.Position.X * PlayerWidthRate * GameRectSize / 2 + GameRectSize / 2 + 10)
+                        if (player.CanKick && playerIndexes.X + 1 < PlayGroundSize[0] - 1 && Elements[playerIndexes.X + 1, playerIndexes.Y] is Bomb bright && playerCenter.X + bright.PositionPixel.X < player.Position.X * PlayerWidthRate * GameRectSize / 2 + GameRectSize / 2 + 10)
                         {
                             while (bright.Explode != true && bright.Position.X + 1 < PlayGroundSize[0] - 1 && Elements[bright.Position.X + 1, bright.Position.Y] == null)
                             {
@@ -1465,7 +1465,7 @@ namespace FriendshipExploder.Logic
 
                 Bomb newBomb = pl.Bomb.BombCopy(
                                 newBombCoords,
-                                pl.ActionPressed ? ElementType.ScheduledBomb : ElementType.Bomb,
+                                pl.ActionPressed && pl.CanSchedule ? ElementType.ScheduledBomb : ElementType.Bomb,
                                 new Point((int)(newBombCoords.X * GameRectSize), (int)(newBombCoords.Y * GameRectSize)));
                 lock (pl._bombListLockObject)
                 {
@@ -1566,7 +1566,7 @@ namespace FriendshipExploder.Logic
                                     }
                                 }
                             }
-                        },TaskCreationOptions.LongRunning));
+                        }, TaskCreationOptions.LongRunning));
 
                         explosionTasks.Add(new Task(() =>
                         {

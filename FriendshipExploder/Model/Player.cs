@@ -54,14 +54,15 @@ namespace FriendshipExploder.Model
             BombList = new List<Bomb>();
             _bombListLockObject = new object();
             _triggerBombLockObject = new object();
-            BombAmount = 3;
+            BombAmount = 1;
             Kills = 0;//Lehet azelőző körös killszámot át kéne adni, de nem feltélen, sőt külön fájlba is menthetnénk a körök között az addigi killeket, vagy mindegy hová.
             SumOfKills = 0;
             HasDesease = false;
-            CanKick = true;
+            CanKick = false;
             ActionPressed = false;
             SetBombPressed = false;
             Explode = false;
+            CanSchedule = false;
         }
 
         public void SetupKeyBinding(int binding)

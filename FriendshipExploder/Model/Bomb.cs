@@ -26,7 +26,7 @@ namespace FriendshipExploder.Model
         public Bomb(Player player, ElementType ElementType)
         {
             this.Player = player;
-            this.ExplosionRange = 3;
+            this.ExplosionRange = 1;
             Explode = false;
             this.ElementType = ElementType;
             PositionPixel = new Point();
@@ -48,7 +48,5 @@ namespace FriendshipExploder.Model
             Bomb bomb = (obj as Bomb);
             return this.Position.X == bomb.Position.X && this.Position.Y == bomb.Position.Y && this.Player == bomb.Player;
         }
-
-
     }
 }
