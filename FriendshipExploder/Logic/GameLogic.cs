@@ -744,6 +744,7 @@ namespace FriendshipExploder.Logic
                     {
                         pl.SetBombPressed = true;//It is necessary, else a btn press is called more than once.
                         Act(PlayerAction.bombudlr, pl);
+                        pl.SetBombPressed = false;
                         await Task.Delay(1);
                     }
                     break;
@@ -1526,7 +1527,7 @@ namespace FriendshipExploder.Logic
 
             List<Task> aiTasks = ais.Select(ai => new Task(() => AIWakeUp(ai), TaskCreationOptions.LongRunning)).ToList();
             //ToDo: kirakni a tasklistet;
-            Parallel.ForEach(aiTasks, task => task.Start());//Hogy amennyire csak lehet egyszerre induljanak
+            Parallel.ForEach(aiTasks, task => task.Start());//Hogy amennyire csak lehet egyszerre induljanaks
         }
 
         private async void AIWakeUp(Player ai)
@@ -1534,28 +1535,40 @@ namespace FriendshipExploder.Logic
             Thread.Sleep(1000);//1 másodperc előny a valódi játékosoknak
             while (!RoundOver)//ToDo: Majd amgí nem igaz, hogy vége
             {
+                double playerHeight = GameRectSize * PlayerHeightRate;
+                double playerWidth = GameRectSize * PlayerWidthRate;
+                Player nearestPlayer = NearestPlayer(ai);
+                Point plPosition = PlayerPixelToMatrixCoordinate(nearestPlayer.Position);
+                int plPosX = plPosition.X;
+                int plPosY = plPosition.Y;
+                int[] playPositionInInt = new int[] { plPosX, plPosY };
                 List<IElement> bombs = CollectBombs();
                 Node[,] lvlMatrix = ReconstructToNodes();
                 int[] targetElementIndex = FindNearestDestructible(ai.Position);
-
+                Node playerTarget = lvlMatrix[playPositionInInt[0], playPositionInInt[1]];
                 Node target = lvlMatrix[targetElementIndex[0], targetElementIndex[1]];
-                Point aiPosition = PlayerPixelToMatrixCoordinate(ai.Position);
+                Point aiPosition = PlayerPixelToMatrixCoordinate(new Point((int)(ai.Position.X-playerWidth/2),(int)(ai.Position.Y-playerHeight)));
                 int aiPosX = aiPosition.X;
                 int aiPosY = aiPosition.Y;
-
                 List<Point> area = GetTargetArea(target);
+                List<Point> playerArea = GetTargetArea(playerTarget);
                 List<Point> path = FindPathToDestructible(FindNearestDestructible(ai.Position), ai.Position, lvlMatrix, area);
+                List<Point> pathToPlayer = FindPathToDestructible(playPositionInInt, ai.Position, lvlMatrix,playerArea);
                 foreach (var bomb in bombs)
                 {
                     if (bomb != null)
                     {
                         if (GetBombArea(bomb).Contains(aiPosition) || bomb.Position.X == aiPosition.X && bomb.Position.Y == aiPosition.Y)
                         {
-                            IElement currentBomb = bomb;
-                            while (Elements[currentBomb.Position.X, currentBomb.Position.Y] is Bomb && aiPosY == bomb.Position.Y)
+                            
+                            while (Elements[bomb.Position.X, bomb.Position.Y] is Bomb && aiPosY == bomb.Position.Y)
                             {
-                                Hide(bomb, ai);
+                                Hide(bomb,ai);
                             }
+                            StopMove(PlayerAction.up, ai);
+                            StopMove(PlayerAction.down, ai);
+                            StopMove(PlayerAction.left, ai);
+                            StopMove(PlayerAction.right, ai);
                         }
                     }
                 }
@@ -1594,76 +1607,60 @@ namespace FriendshipExploder.Logic
                         }
                         else if (area.Contains(pt))
                         {
-                            StartAct(PlayerAction.bombudlr, ai);
+                            StartAct(PlayerAction.bombudlr,ai);
                             break;
                         }
                     }
                 }
-
-                //List<IElement> pathToDestructible = FindPathToDestructible( closestElementIndex,ai.Position);
-                //IElement[,] elements = new IElement[GameSize.X - 1, GameSize.Y - 1];
-                /*lock (_ElementsListLockObject)
+                else if(pathToPlayer != null)
                 {
-                    Elements.ForEach(element => elements[element.Position.X, element.Position.Y] = element);
-                }*/
-                //ToDo: amíg az időből nem telt el 30 perc, addig keressen fixen skilleket. Az legyen a prioritása.
-                Player nearestPlayer = NearestPlayer(ai);
-                //ToDO: ha bomba van a közelében bújjon el.
-                //Az Elements lista = NotAvailablePoints;
+                    foreach (var pt in pathToPlayer)
+                    {
+                        if (pt.X > aiPosX)
+                        {
+                            StartMove(PlayerAction.right, ai);
+                            StopMove(PlayerAction.right, ai);
+                            Thread.Sleep(20);
+                            break;
 
+                        }
+                        else if (pt.X < aiPosX)
+                        {
+                            StartMove(PlayerAction.left, ai);
+                            StopMove(PlayerAction.left, ai);
+                            Thread.Sleep(20);
+                            break;
+                        }
+                        else if (pt.Y > aiPosY)
+                        {
+                            StartMove(PlayerAction.down, ai);
+                            StopMove(PlayerAction.down, ai);
+                            Thread.Sleep(20);
+                            break;
+                        }
+                        else if (pt.Y < aiPosY)
+                        {
+                            StartMove(PlayerAction.up, ai);
+                            StopMove(PlayerAction.up, ai);
+                            Thread.Sleep(20);
+                            break;
+                        }
+                        else if (area.Contains(pt))
+                        {
+                            StartAct(PlayerAction.bombudlr, ai);
+                            break;
+                        }
+                    }
 
-
-
-
-
-                //if (nearestPlayer != null && PositionDifference(nearestPlayer, ai) <= 20)//ToDo: ai.Bomb.explosionSize vagy ami lesz
-                {
-                    //ToDo: Go and Install bomb
-                    //ToDo: hide and wait until Explosion + x seconds
-                    // }
-                    //else
-                    //{
-                    //ToDo: follow player
-                    //ToDO: AI javítása nullcheckekkel, ha egyedül lenne mit csináljon.
-                    //if (nearestPlayer != null && nearestPlayer.Position.X - ai.Position.X < 0 && CanStepToPos(ai, new System.Windows.Vector(-1 * ai.Speed, 0)))
-                    //{
-                    //    StartMove(PlayerAction.left, ai);
-                    //    StopMove(PlayerAction.left, ai);
-                    //}
-
-                    //if (!CanStepToPos(ai, new System.Windows.Vector(-1 * ai.Speed, 0)))
-                    //{
-                    // int aiNextPosX = ai.Position.X + (-1 * ai.Speed);//Kiszervezni az egészet külön metódusba.
-                    //int aiNextPosY = ai.Position.Y;
-                    //IElement blockingElement = elements[aiNextPosX, aiNextPosY];
-
-                    //List<Point> availablePath = FindAvailablePath(ai, aiNextPosX, aiNextPosY);
-                    //List<PlayerAction> availableRoundaboutActions = FindAvailableRoundaboutActions(ai, aiNextPosX, aiNextPosY);
-                    //availableRoundaboutActions.ForEach(Action => Action.Pop);
-                    //ToDo: jó irány keresése a megkerüléshez, majd móaction-ök meghívása sorban.
-                    //;
-                    //}
-
-                    //if (nearestPlayer.Position.Y - ai.Position.Y < 0 && CanStepToPos(ai, new System.Windows.Vector(0, -1 * ai.Speed)))
-                    //{
-                    //    StartMove(PlayerAction.up, ai);
-                    //    StopMove(PlayerAction.up, ai);
-                    //}
-
-                    //if (nearestPlayer.Position.X - ai.Position.X > 0 && CanStepToPos(ai, new System.Windows.Vector(ai.Speed, 0)))
-                    //{
-                    //    StartMove(PlayerAction.right, ai);
-                    //    StopMove(PlayerAction.right, ai);
-                    //}
-
-                    //if (nearestPlayer.Position.Y - ai.Position.Y > 0 && CanStepToPos(ai, new System.Windows.Vector(0, ai.Speed)))
-                    //{
-                    //    StartMove(PlayerAction.down, ai);
-                    //    StopMove(PlayerAction.down, ai);
-                    //}
                 }
+               
+               
+
             }
         }
+
+
+        
 
         private Player NearestPlayer(Player ai)
         {
@@ -1694,35 +1691,42 @@ namespace FriendshipExploder.Logic
 
         }
 
-        private void Hide(IElement bomb, Player ai)
+
+        
+
+        private void Hide(IElement bomb,Player ai)
         {
+            
             Point aiPosition = PlayerPixelToMatrixCoordinate(ai.Position);
             int aiPosX = aiPosition.X;
             int aiPosY = aiPosition.Y;
+            
+                if (aiPosX > 0 && (Elements[aiPosX - 1, aiPosY] == null || (Elements[aiPosX - 1, aiPosY] is Bomb b && Elements[aiPosX, aiPosY] is Bomb borigi && b.Equals(borigi))))
+                {
+                    StartMove(PlayerAction.left, ai);
+                    
+                }
+                else if (aiPosY < Elements.GetLength(0) && (Elements[aiPosY + 1, aiPosX] == null  || (Elements[aiPosY + 1, aiPosX] is Bomb bundernext && Elements[aiPosX, aiPosY] is Bomb bunder && bundernext.Equals(bunder))))
+                {
+                    StartMove(PlayerAction.right, ai);
+                    
+                }
+                else if ((aiPosX - bomb.Position.X) < 5)
+                {
+                    if (aiPosY > 0 && (Elements[aiPosX, aiPosY - 1] == null || (Elements[aiPosX, aiPosY - 1] is Bomb bupundernext && Elements[aiPosX, aiPosY] is Bomb bupunder && bupundernext.Equals(bupunder))))
+                    {
+                        StartMove(PlayerAction.up, ai);
+                       
 
-            if (aiPosX > 0 && (Elements[aiPosX - 1, aiPosY] == null || (Elements[aiPosX - 1, aiPosY] is Bomb b && Elements[aiPosX, aiPosY] is Bomb borigi && b.Equals(borigi))))
-            {
-                StartMove(PlayerAction.left, ai);
-                //if (Math.Abs((int)Math.Floor((decimal)(ai.Position.X / GameRectSize)) - bomb.Position.X) > 5)
-                //{
-                //    StopMove(PlayerAction.left, ai);
-                //    Thread.Sleep(4500);
-                //}
-            }
-            else if (aiPosY < Elements.GetLength(0) && (Elements[aiPosY + 1, aiPosX] == null || (Elements[aiPosY + 1, aiPosX] is Bomb bundernext && Elements[aiPosX, aiPosY] is Bomb bunder && bundernext.Equals(bunder))))
-            {
-                StartMove(PlayerAction.right, ai);
-            }
-            else if ((aiPosX - bomb.Position.X) < 5)
-            {
-                if (aiPosY > 0 && (Elements[aiPosX, aiPosY - 1] == null || (Elements[aiPosX, aiPosY - 1] is Bomb bupundernext && Elements[aiPosX, aiPosY] is Bomb bupunder && bupundernext.Equals(bupunder))))
-                {
-                    StartMove(PlayerAction.up, ai);
-                }
-                else if (aiPosY < Elements.GetLength(1) && (Elements[aiPosX, aiPosY + 1] == null || (Elements[aiPosX, aiPosY + 1] is Bomb bdownundernext && Elements[aiPosX, aiPosY] is Bomb bdownunder && bdownundernext.Equals(bdownunder))))
-                {
-                    StartMove(PlayerAction.down, ai);
-                }
+                    }
+                    else if (aiPosY < Elements.GetLength(1) && (Elements[aiPosX, aiPosY + 1] == null || (Elements[aiPosX, aiPosY + 1] is Bomb bdownundernext && Elements[aiPosX, aiPosY] is Bomb bdownunder && bdownundernext.Equals(bdownunder))))
+                    {
+                        StartMove(PlayerAction.down, ai);
+                    
+                        
+
+                    }
+                
             }
 
         }
