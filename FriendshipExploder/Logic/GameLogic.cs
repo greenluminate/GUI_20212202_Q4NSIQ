@@ -308,7 +308,7 @@ namespace FriendshipExploder.Logic
             }
 
             AITaskCreator();
-            CountDown(5);
+            CountDown(150);
         }
 
         private void CountDown(int seconds)
@@ -1666,9 +1666,19 @@ namespace FriendshipExploder.Logic
                     {
                         //Mivel másik bombát is ért a robbanás ezért az is felrobban.
                         //ToDo: ez így nem jó, triggerelni kell a robbanását, nem újrakezdeni. Ami miatt kétszer akarna felrobbanni.
-                        lock (t._bombTriggerLock)
+                        if (t.ElementType == ElementType.ScheduledBomb)
                         {
-                            Monitor.Pulse(t._bombTriggerLock);
+                            lock (t.Player._triggerBombLockObject)
+                            {
+                                Monitor.Pulse(t.Player._triggerBombLockObject);
+                            }
+                        }
+                        else
+                        {
+                            lock (t._bombTriggerLock)
+                            {
+                                Monitor.Pulse(t._bombTriggerLock);
+                            }
                         }
                     }
                     else if (Elements[row, col] is Wall w)//ToDo: || Elements[row, col] is Skill/Booster   ami lesz a neve
