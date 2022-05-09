@@ -31,7 +31,7 @@ namespace FriendshipExploder.Logic
         public int[] PlayGroundSize { get; set; }
 
         //kockák mérete
-        private int GameRectSize { get; set; }
+        public int GameRectSize { get; set; }
 
         private Point GameSize { get; set; }
 
@@ -90,7 +90,7 @@ namespace FriendshipExploder.Logic
         public void LoadPlayground(string file, int rounds)
         {
             this.Rounds = rounds;
-            this.CurrentRound = 0;
+            this.CurrentRound = rounds + 1;
             playgrounds.Clear();
 
             if (Directory.Exists("Playgrounds") && File.Exists(@$"Playgrounds\{file}.txt"))
@@ -125,6 +125,34 @@ namespace FriendshipExploder.Logic
                 FixCharacterPosition(gameRectSize);
             }
             this.GameRectSize = gameRectSize;
+
+            if (Players.All(pl => pl.Position == new Point(0, 0)))
+            {
+                lock (_PlayersListLockObject)
+                {
+                    Players = new List<Player>();
+                    foreach (var pl in PlayersStore)
+                    {
+                        Point position = new Point();
+                        switch (pl.Id)
+                        {
+                            case 0:
+                                position = new Point(2, 2);
+                                break;
+                            case 1:
+                                position = new Point(2, GameSize.Y - GameRectSize);
+                                break;
+                            case 2:
+                                position = new Point(GameSize.X - GameRectSize, GameSize.Y - 2 - GameRectSize);
+                                break;
+                            default:
+                                position = new Point(2, 2);
+                                break;
+                        }
+                        Players.Add(new Player(pl.Id, position, pl.KeyBinding));
+                    }
+                }
+            }
         }
 
         //karakter reszponzivitása átméretezésnél
@@ -172,7 +200,7 @@ namespace FriendshipExploder.Logic
 
         private void LoadNext(string[] grounds)
         {
-            this.CurrentRound++;
+            this.CurrentRound--;
             lock (_ElementsListLockObject)
             {
                 for (int i = 0; i < PlayGroundSize[0]; i++)
@@ -182,15 +210,6 @@ namespace FriendshipExploder.Logic
                         Elements[i, j] = null;
                         Powerups[i, j] = null;
                     }
-                }
-            }
-
-            lock (_PlayersListLockObject)
-            {
-                Players = new List<Player>();
-                foreach (var pl in PlayersStore)
-                {
-                    Players.Add(new Player(pl.Id, pl.Position, pl.KeyBinding));
                 }
             }
 
@@ -249,8 +268,47 @@ namespace FriendshipExploder.Logic
                 }
             }
 
+            if (CurrentRound >= Rounds)
+            {
+                lock (_PlayersListLockObject)
+                {
+                    Players = new List<Player>();
+                    foreach (var pl in PlayersStore)
+                    {
+                        Players.Add(new Player(pl.Id, new Point(0, 0), pl.KeyBinding));
+                    }
+                }
+            }
+            else
+            {
+                lock (_PlayersListLockObject)
+                {
+                    Players = new List<Player>();
+                    foreach (var pl in PlayersStore)
+                    {
+                        Point position = new Point();
+                        switch (pl.Id)
+                        {
+                            case 0:
+                                position = new Point(2, 2);
+                                break;
+                            case 1:
+                                position = new Point(2, GameSize.Y - GameRectSize);
+                                break;
+                            case 2:
+                                position = new Point(GameSize.X - GameRectSize, GameSize.Y - 2 - GameRectSize);
+                                break;
+                            default:
+                                position = new Point(2, 2);
+                                break;
+                        }
+                        Players.Add(new Player(pl.Id, position, pl.KeyBinding));
+                    }
+                }
+            }
+
             AITaskCreator();
-            CountDown(5); //150
+            CountDown(5);
         }
 
         private void CountDown(int seconds)
@@ -454,7 +512,7 @@ namespace FriendshipExploder.Logic
 
                         lock (_PlayersListLockObject)
                         {
-                            if (i <= Players.Count)
+                            if (i < Players.Count)
                             {
                                 SavePlayerScore(Players[i]);
                                 Players.Remove(Players[i]);
@@ -1670,8 +1728,11 @@ namespace FriendshipExploder.Logic
 
         private bool BombStopper(int row, int col)
         {
-            return Elements[row, col] != null ||
-                   Players.Any(player => PlayerPixelToMatrixCoordinate(player.Position) == new Point(row, col));
+            lock (_ElementsListLockObject)
+            {
+                return Elements[row, col] != null ||
+                       Players.Any(player => PlayerPixelToMatrixCoordinate(player.Position) == new Point(row, col));
+            }
         }
         private void AITaskCreator()
         {
@@ -1680,7 +1741,7 @@ namespace FriendshipExploder.Logic
 
             List<Task> aiTasks = ais.Select(ai => new Task(() => AIWakeUp(ai), TaskCreationOptions.LongRunning)).ToList();
             //Ezeket nem biztos, hogy hozzá kell adni, hisz maguktól si megszűnnek létezni, ha a karakter null lesz és pedig null lesz.
-            Parallel.ForEach(aiTasks, task => { task.Start(); tasks.Add(task); });//Hogy amennyire csak lehet egyszerre induljanak
+            Parallel.ForEach(aiTasks, task => { task.Start(); });//Hogy amennyire csak lehet egyszerre induljanak
         }
 
         private async void AIWakeUp(Player ai)
@@ -1718,7 +1779,6 @@ namespace FriendshipExploder.Logic
                         {
                             if (GetBombArea(bomb).Contains(aiPosition) || bomb.Position.X == aiPosition.X && bomb.Position.Y == aiPosition.Y)
                             {
-
                                 while (Elements[bomb.Position.X, bomb.Position.Y] is Bomb && aiPosY == bomb.Position.Y)
                                 {
                                     Hide(bomb, ai);
@@ -2180,6 +2240,7 @@ namespace FriendshipExploder.Logic
                         Monitor.PulseAll(_TimerLockObject);
                     }
 
+                    Players.ForEach(pl => pl = null);
                     Thread.Sleep(2000);
                     Task.WaitAll(tasks.ToArray());
                     RoundOver = false;
@@ -2191,7 +2252,7 @@ namespace FriendshipExploder.Logic
 
         private void SavePlayerScore(Player pl)
         {
-            //PlayersStore.Where(p => p.Id == pl.Id).FirstOrDefault().SumOfKills = pl.Kills;
+            PlayersStore.Where(p => p.Id == pl.Id).FirstOrDefault().SumOfKills += pl.Kills;
         }
     }
 }
