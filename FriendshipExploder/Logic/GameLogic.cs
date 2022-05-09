@@ -177,6 +177,7 @@ namespace FriendshipExploder.Logic
 
             lock (_PlayersListLockObject)
             {
+                Players = new List<Player>();
                 foreach (var pl in PlayersStore)
                 {
                     Players.Add(new Player(pl.Id, pl.Position, pl.KeyBinding));
