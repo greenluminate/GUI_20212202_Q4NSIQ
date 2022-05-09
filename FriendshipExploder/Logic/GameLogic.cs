@@ -428,7 +428,7 @@ namespace FriendshipExploder.Logic
                     SavePlayerScore(Players[i]);
                     Players.Remove(Players[i]);
                     i--;
-                    if (Players.Count == 0)
+                    if (Players.Count == 1)
                     {
                         RoundEnd();
                     }
@@ -1236,7 +1236,7 @@ namespace FriendshipExploder.Logic
                                     SavePlayerScore(player);
                                     Players.Remove(player);
 
-                                    if (Players.Count == 0)
+                                    if (Players.Count == 1)
                                     {
                                         RoundEnd();
                                     }
@@ -1551,7 +1551,7 @@ namespace FriendshipExploder.Logic
                                         Players.Remove(player);
                                         pl.Kills++;
 
-                                        if (Players.Count == 0)
+                                        if (Players.Count == 1)
                                         {
                                             RoundEnd();
                                         }
@@ -1585,7 +1585,7 @@ namespace FriendshipExploder.Logic
         private async void AIWakeUp(Player ai)
         {
             Thread.Sleep(1000);//1 másodperc előny a valódi játékosoknak
-            while (!RoundOver)//ToDo: Majd amgí nem igaz, hogy vége
+            while (ai != null && !RoundOver)//ToDo: Majd amgí nem igaz, hogy vége
             {
                 List<IElement> bombs = CollectBombs();
                 Node[,] lvlMatrix = ReconstructToNodes();
