@@ -128,30 +128,30 @@ namespace FriendshipExploder.Logic
 
             /*if (Players.All(pl => pl.Position == new Point(0, 0)))
             {*/
-            lock (_PlayersListLockObject)
-            {
-                Players = new List<Player>();
-                foreach (var pl in PlayersStore)
+                lock (_PlayersListLockObject)
                 {
-                    Point position = new Point();
-                    switch (pl.Id)
+                    Players = new List<Player>();
+                    foreach (var pl in PlayersStore)
                     {
-                        case 0:
-                            position = new Point(2, 2);
-                            break;
-                        case 1:
-                            position = new Point(2, GameSize.Y - (2 * GameRectSize));
-                            break;
-                        case 2:
-                            position = new Point(GameSize.X - GameRectSize, GameSize.Y - 2 - GameRectSize);
-                            break;
-                        default:
-                            position = new Point(2, 2);
-                            break;
+                        Point position = new Point();
+                        switch (pl.Id)
+                        {
+                            case 0:
+                                position = new Point(2, 2);
+                                break;
+                            case 1:
+                                position = new Point(2, GameSize.Y - (2 * GameRectSize));
+                                break;
+                            case 2:
+                                position = new Point(GameRectSize * (PlayGroundSize[0] - 2), GameSize.Y - (2 * GameRectSize));
+                                break;
+                            default:
+                                position = new Point(2, 2);
+                                break;
+                        }
+                        Players.Add(new Player(pl.Id, position, pl.KeyBinding));
                     }
-                    Players.Add(new Player(pl.Id, position, pl.KeyBinding));
                 }
-            }
             //}
         }
 
@@ -296,7 +296,7 @@ namespace FriendshipExploder.Logic
                                 position = new Point(2, GameSize.Y - (2 * GameRectSize));
                                 break;
                             case 2:
-                                position = new Point(GameSize.X - GameRectSize, GameSize.Y - (2 * GameRectSize));
+                                position = new Point(GameRectSize * (PlayGroundSize[0] - 2), GameSize.Y - (2 * GameRectSize));
                                 break;
                             default:
                                 position = new Point(2, 2);
