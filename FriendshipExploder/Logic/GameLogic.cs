@@ -91,9 +91,6 @@ namespace FriendshipExploder.Logic
                 PlayGroundSize[0] = rows[0].Length;
                 PlayGroundSize[1] = rows.Length;
 
-                Elements = new IElement[PlayGroundSize[0], PlayGroundSize[1]];
-                Powerups = new IElement[PlayGroundSize[0], PlayGroundSize[1]];
-
                 for (int i = 0; i < rounds; i++)
                 {
                     playgrounds.Enqueue(rows);
@@ -163,6 +160,9 @@ namespace FriendshipExploder.Logic
 
         private void LoadNext(string[] grounds)
         {
+            Elements = new IElement[PlayGroundSize[0], PlayGroundSize[1]];
+            Powerups = new IElement[PlayGroundSize[0], PlayGroundSize[1]];
+
             foreach (var pl in PlayersStore)
             {
                 Players.Add(pl);
