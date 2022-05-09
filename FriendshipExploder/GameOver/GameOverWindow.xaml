@@ -97,7 +97,7 @@
         </Border>
         <Label Grid.Column="3" Grid.Row="5" Content="{Binding ThirdKill}" Style="{StaticResource killLabel}" />
 
-        <Button Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="3" Content="Back to main menu" Click="Button_Click"  Style="{StaticResource roundedbtn}"/>
+        <Button Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="3" Content="Exit game" Click="Button_Click"  Style="{StaticResource roundedbtn}"/>
 
     </Grid>
 </Window>

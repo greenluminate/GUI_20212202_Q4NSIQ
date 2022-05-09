@@ -82,6 +82,8 @@ namespace FriendshipExploder.Logic
 
         public void LoadPlayground(string file, int rounds)
         {
+            playgrounds.Clear();
+
             if (Directory.Exists("Playgrounds") && File.Exists(@$"Playgrounds\{file}.txt"))
             {
                 string[] rows = File.ReadAllLines(@$"Playgrounds\{file}.txt");

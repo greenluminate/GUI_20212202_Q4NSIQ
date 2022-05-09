@@ -88,11 +88,7 @@ namespace FriendshipExploder
                 GameOverWindow go = new GameOverWindow(gameLogic);
                 if (go.ShowDialog() == true)
                 {
-                    MainMenu menu = new MainMenu(gameLogic);
-                    if (menu.ShowDialog() == false)
-                    {
-                        Application.Current.Shutdown();
-                    }
+                    Application.Current.Shutdown();
                 }
                 gameLogic.GameOver = false;
             }
