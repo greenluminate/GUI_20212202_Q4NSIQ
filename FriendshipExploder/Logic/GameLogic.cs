@@ -240,7 +240,7 @@ namespace FriendshipExploder.Logic
             }
 
             AITaskCreator();
-            CountDown(10); //150
+            CountDown(150); //150
         }
 
         private void CountDown(int seconds)
@@ -426,8 +426,13 @@ namespace FriendshipExploder.Logic
                         }
                         Thread.Sleep(1);
                     }
-                    SavePlayerScore(Players[i]);
-                    Players.Remove(Players[i]);
+
+                    lock (_PlayersListLockObject)
+                    {
+                        SavePlayerScore(Players[i]);
+                        Players.Remove(Players[i]);
+                    }
+
                     i--;
                     if (Players.Count == 1)
                     {
@@ -1231,9 +1236,11 @@ namespace FriendshipExploder.Logic
                         case ElementType.Bomb://Ha belesétálunk egy robbanásba, szintén meghalunk
                             lock (_PlayersListLockObject)
                             {
-                                if (Elements[i, j].Explode)
+                                if (Elements[i, j].Explode && !player.Explode)
                                 {
+                                    player.Explode = true;
                                     (Elements[i, j] as Bomb).Player.Kills++;
+
                                     SavePlayerScore(player);
                                     Players.Remove(player);
 
@@ -1496,12 +1503,25 @@ namespace FriendshipExploder.Logic
 
                     if (Elements[row, col] is null)
                     {
+                        RectangleF elementRect = new RectangleF((float)row * GameRectSize, (float)col * GameRectSize, (float)GameRectSize, (float)GameRectSize);
+
                         //Mivel az elementsben nincsenek bene a playerek.
-                        playersToKill = Players.Where(player =>
-                                    (int)Math.Floor((decimal)(player.Position.X / GameRectSize)) == row &&
-                                    (int)Math.Floor((decimal)(player.Position.Y / GameRectSize)) == col)
-                                    .ToList();
-                        playersToKill.ForEach(player => player.Explode = true);
+                        Players.ForEach(player =>
+                        {
+                            //RectangleF playerRect = new RectangleF((float)player.Position.X, (float)(player.Position.Y - (GameRectSize * PlayerHeightRateHangsIn)), (float)(PlayerWidthRate * GameRectSize), (float)(PlayerHeightRate * GameRectSize));
+                            RectangleF playerRect = new RectangleF((float)player.Position.X, (float)player.Position.Y, (float)(PlayerWidthRate * GameRectSize), (float)((PlayerHeightRate - PlayerHeightRateHangsIn) * GameRectSize));
+                            if (playerRect.IntersectsWith(elementRect) && !player.Explode)
+                            {
+                                playersToKill.Add(player);
+                                player.Explode = true;
+                                pl.Kills++;
+                            }
+                        });
+                        //playersToKill = Players.Where(player =>
+                        //            (int)Math.Floor((decimal)(player.Position.X / GameRectSize)) == row &&
+                        //            (int)Math.Floor((decimal)(player.Position.Y / GameRectSize)) == col)
+                        //            .ToList();
+                        //playersToKill.ForEach(player => player.Explode = true);
                         if (playersToKill.Count == 0 && bomb != null)
                         {
                             bomb.Explode = true;
@@ -1522,7 +1542,7 @@ namespace FriendshipExploder.Logic
                         w.Explode = true;
                     }
 
-                    for (int i = 0; i < 1400; i++)
+                    for (int i = 0; i < 1000; i++)
                     {
                         lock (_TimerLockObject)
                         {
@@ -1536,8 +1556,7 @@ namespace FriendshipExploder.Logic
 
                     lock (_ElementsListLockObject)
                     {
-                        Elements[row, col] = null;//Ide jön a logika, hogy melyi skill töltsön be. %-os esélyeket találunk ki.
-
+                        Elements[row, col] = null;
                     }
 
                     if (playersToKill.Count > 0)
@@ -1550,7 +1569,6 @@ namespace FriendshipExploder.Logic
                                     {
                                         SavePlayerScore(player);
                                         Players.Remove(player);
-                                        pl.Kills++;
 
                                         if (Players.Count == 1)
                                         {
@@ -1569,9 +1587,7 @@ namespace FriendshipExploder.Logic
         private bool BombStopper(int row, int col)
         {
             return Elements[row, col] != null ||
-                   Players.Any(player =>
-                       (int)Math.Floor((decimal)(player.Position.X / GameRectSize)) == row &&
-                       (int)Math.Floor((decimal)(player.Position.Y / GameRectSize)) == col);
+                   Players.Any(player => PlayerPixelToMatrixCoordinate(player.Position) == new Point(row, col));
         }
         private void AITaskCreator()
         {
