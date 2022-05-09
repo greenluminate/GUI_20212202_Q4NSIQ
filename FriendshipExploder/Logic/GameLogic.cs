@@ -423,7 +423,7 @@ namespace FriendshipExploder.Logic
                 }
             }, TaskCreationOptions.LongRunning);
 
-            countDownTask.ContinueWith((cdtask) => deadlyWallsTask);
+            countDownTask.ContinueWith((cdtask) => deadlyWallsTask.Start());
             lock (_TasksLockObject)
             {
                 tasks.Add(deadlyWallsTask);
@@ -432,37 +432,46 @@ namespace FriendshipExploder.Logic
 
         private void PlayerKiller(Point playerCoords)
         {
-            for (int i = 0; i < Players.Count; i++)
+            Task playerKillerTask = new Task(() =>
             {
-                if (PlayerPixelToMatrixCoordinate(Players[i].Position) == playerCoords)
+                for (int i = 0; i < Players.Count; i++)
                 {
-                    Players[i].Explode = true;
-
-                    for (int j = 0; j < 200; j++)
+                    if (PlayerPixelToMatrixCoordinate(Players[i].Position) == playerCoords)
                     {
-                        if (GamePaused)
+                        Players[i].Explode = true;
+
+                        for (int j = 0; j < 200; j++)
                         {
-                            lock (_TimerLockObject)
+                            if (GamePaused)
                             {
-                                Monitor.Wait(_TimerLockObject);
+                                lock (_TimerLockObject)
+                                {
+                                    Monitor.Wait(_TimerLockObject);
+                                }
+                            }
+                            Thread.Sleep(1);
+                        }
+
+                        lock (_PlayersListLockObject)
+                        {
+                            if (i <= Players.Count)
+                            {
+                                SavePlayerScore(Players[i]);
+                                Players.Remove(Players[i]);
                             }
                         }
-                        Thread.Sleep(1);
-                    }
 
-                    lock (_PlayersListLockObject)
-                    {
-                        SavePlayerScore(Players[i]);
-                        Players.Remove(Players[i]);
-                    }
-
-                    i--;
-                    if (Players.Count <= 1)
-                    {
-                        RoundEnd();
+                        i--;
+                        if (Players.Count <= 1 && !RoundOver)
+                        {
+                            RoundEnd();
+                        }
                     }
                 }
-            }
+            }, TaskCreationOptions.LongRunning);
+
+            playerKillerTask.Start();
+            tasks.Add(playerKillerTask);
         }
 
         public enum PlayerAction
@@ -2144,6 +2153,7 @@ namespace FriendshipExploder.Logic
         {
             if (playgrounds.Count == 0)
             {
+                RoundOver = true; //round over
                 GameOver = true;//game over
             }
             else
@@ -2157,7 +2167,7 @@ namespace FriendshipExploder.Logic
                         Monitor.PulseAll(_TimerLockObject);
                     }
 
-                    //Thread.Sleep(2000);
+                    Thread.Sleep(2000);
                     Task.WaitAll(tasks.ToArray());
                     RoundOver = false;
                     LoadNext(playgrounds.Dequeue());
