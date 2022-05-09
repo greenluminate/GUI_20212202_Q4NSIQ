@@ -250,7 +250,7 @@ namespace FriendshipExploder.Logic
             }
 
             AITaskCreator();
-            CountDown(150); //150
+            CountDown(5); //150
         }
 
         private void CountDown(int seconds)
@@ -284,7 +284,15 @@ namespace FriendshipExploder.Logic
                     }
                 }
             }, TaskCreationOptions.LongRunning);
-            countDownTask.ContinueWith((t) =>
+
+            lock (_TasksLockObject)
+            {
+                tasks.Add(countDownTask);
+            }
+            countDownTask.Start();
+
+
+            Task deadlyWallsTask = new Task(() =>
             {
                 int startX = 0;
                 int startY = 0;
@@ -413,12 +421,13 @@ namespace FriendshipExploder.Logic
                     endX--;
                     endY--;
                 }
-            });
+            }, TaskCreationOptions.LongRunning);
+
+            countDownTask.ContinueWith((cdtask) => deadlyWallsTask);
             lock (_TasksLockObject)
             {
-                tasks.Add(countDownTask);
+                tasks.Add(deadlyWallsTask);
             }
-            countDownTask.Start();
         }
 
         private void PlayerKiller(Point playerCoords)
@@ -2148,7 +2157,7 @@ namespace FriendshipExploder.Logic
                         Monitor.PulseAll(_TimerLockObject);
                     }
 
-                    Thread.Sleep(2000);
+                    //Thread.Sleep(2000);
                     Task.WaitAll(tasks.ToArray());
                     RoundOver = false;
                     LoadNext(playgrounds.Dequeue());
