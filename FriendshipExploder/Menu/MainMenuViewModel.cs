@@ -289,7 +289,7 @@ namespace FriendshipExploder.Menu
                 if (pl != "[Disabled]")
                 {
                     int bindingNum = KeyBindings.IndexOf(pl);
-                    logic.Players.Add(
+                    logic.PlayersStore.Add(
                                     new Player(i,
                                     new System.Drawing.Point(2, i * 120),
                                     (Model.KeyBinding)bindingNum - 1)

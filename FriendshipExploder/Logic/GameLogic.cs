@@ -25,7 +25,7 @@ namespace FriendshipExploder.Logic
         public IElement[,] Powerups { get; set; }
 
         public List<Player> Players { get; set; }
-        public List<Player> PlayersForScore { get; set; }
+        public List<Player> PlayersStore { get; set; }
 
         //játéktér mérete (cella x, cella y)
         public int[] PlayGroundSize { get; set; }
@@ -60,7 +60,7 @@ namespace FriendshipExploder.Logic
             rnd = new Random();
 
             Players = new List<Player>();
-            PlayersForScore = new List<Player>();
+            PlayersStore = new List<Player>();
 
             playgrounds = new Queue<string[]>();
             PlayGroundSize = new int[2];
@@ -161,6 +161,11 @@ namespace FriendshipExploder.Logic
 
         private void LoadNext(string[] grounds)
         {
+            foreach (var pl in PlayersStore)
+            {
+                Players.Add(pl);
+            }
+
             //Betöltjük a válaszott pályadesignt = enumok (vagy fix, vagy random kérés) a választott menyniségű játékossal.
             for (int i = 0; i < PlayGroundSize[0] - 1; i++)
             {
@@ -380,7 +385,7 @@ namespace FriendshipExploder.Logic
                         }
                         Thread.Sleep(1);
                     }
-                    PlayersForScore.Add(Players[i]);
+                    SavePlayerScore(Players[i]);
                     Players.Remove(Players[i]);
                     i--;
                     if (Players.Count == 0)
@@ -1188,7 +1193,7 @@ namespace FriendshipExploder.Logic
                                 if (Elements[i, j].Explode)
                                 {
                                     (Elements[i, j] as Bomb).Player.Kills++;
-                                    PlayersForScore.Add(player);
+                                    SavePlayerScore(player);
                                     Players.Remove(player);
 
                                     if (Players.Count == 0)
@@ -1502,7 +1507,7 @@ namespace FriendshipExploder.Logic
                                 {
                                     if (player != null)
                                     {
-                                        PlayersForScore.Add(player);
+                                        SavePlayerScore(player);
                                         Players.Remove(player);
                                         pl.Kills++;
 
@@ -2012,7 +2017,15 @@ namespace FriendshipExploder.Logic
             else
             {
                 RoundOver = true; //round over
+                Thread.Sleep(2000);
+                RoundOver = false;
+                LoadNext(playgrounds.Dequeue());
             }
+        }
+
+        private void SavePlayerScore(Player pl)
+        {
+            PlayersStore.Where(p => p.Id == pl.Id).FirstOrDefault().SumOfKills = pl.Kills;
         }
 
     }
