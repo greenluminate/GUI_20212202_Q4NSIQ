@@ -126,8 +126,8 @@ namespace FriendshipExploder.Logic
             }
             this.GameRectSize = gameRectSize;
 
-            if (Players.All(pl => pl.Position == new Point(0, 0)))
-            {
+            /*if (Players.All(pl => pl.Position == new Point(0, 0)))
+            {*/
                 lock (_PlayersListLockObject)
                 {
                     Players = new List<Player>();
@@ -140,7 +140,7 @@ namespace FriendshipExploder.Logic
                                 position = new Point(2, 2);
                                 break;
                             case 1:
-                                position = new Point(2, GameSize.Y - GameRectSize);
+                                position = new Point(2, GameSize.Y - (2 * GameRectSize));
                                 break;
                             case 2:
                                 position = new Point(GameSize.X - GameRectSize, GameSize.Y - 2 - GameRectSize);
@@ -152,7 +152,7 @@ namespace FriendshipExploder.Logic
                         Players.Add(new Player(pl.Id, position, pl.KeyBinding));
                     }
                 }
-            }
+            //}
         }
 
         //karakter reszponzivitása átméretezésnél
@@ -293,10 +293,10 @@ namespace FriendshipExploder.Logic
                                 position = new Point(2, 2);
                                 break;
                             case 1:
-                                position = new Point(2, GameSize.Y - GameRectSize);
+                                position = new Point(2, GameSize.Y - (2 * GameRectSize));
                                 break;
                             case 2:
-                                position = new Point(GameSize.X - GameRectSize, GameSize.Y - 2 - GameRectSize);
+                                position = new Point(GameSize.X - GameRectSize, GameSize.Y - (2 * GameRectSize));
                                 break;
                             default:
                                 position = new Point(2, 2);
