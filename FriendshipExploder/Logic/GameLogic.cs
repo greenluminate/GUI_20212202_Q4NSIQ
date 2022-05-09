@@ -91,6 +91,9 @@ namespace FriendshipExploder.Logic
                 PlayGroundSize[0] = rows[0].Length;
                 PlayGroundSize[1] = rows.Length;
 
+                Elements = new IElement[PlayGroundSize[0], PlayGroundSize[1]];
+                Powerups = new IElement[PlayGroundSize[0], PlayGroundSize[1]];
+
                 for (int i = 0; i < rounds; i++)
                 {
                     playgrounds.Enqueue(rows);
@@ -160,12 +163,24 @@ namespace FriendshipExploder.Logic
 
         private void LoadNext(string[] grounds)
         {
-            Elements = new IElement[PlayGroundSize[0], PlayGroundSize[1]];
-            Powerups = new IElement[PlayGroundSize[0], PlayGroundSize[1]];
-
-            foreach (var pl in PlayersStore)
+            lock (_ElementsListLockObject)
             {
-                Players.Add(pl);
+                for (int i = 0; i < PlayGroundSize[0]; i++)
+                {
+                    for (int j = 0; j < PlayGroundSize[1]; j++)
+                    {
+                        Elements[i, j] = null;
+                        Powerups[i, j] = null;
+                    }
+                }
+            }
+
+            lock (_PlayersListLockObject)
+            {
+                foreach (var pl in PlayersStore)
+                {
+                    Players.Add(new Player(pl.Id, pl.Position, pl.KeyBinding));
+                }
             }
 
             //Betöltjük a válaszott pályadesignt = enumok (vagy fix, vagy random kérés) a választott menyniségű játékossal.
@@ -2047,13 +2062,14 @@ namespace FriendshipExploder.Logic
                     Thread.Sleep(2000);
                     RoundOver = false;
                     LoadNext(playgrounds.Dequeue());
+                    Players.ForEach(x => { x.Speed = (int)GameSize.X / 300; });
                 }, TaskCreationOptions.LongRunning).Start();
             }
         }
 
         private void SavePlayerScore(Player pl)
         {
-            PlayersStore.Where(p => p.Id == pl.Id).FirstOrDefault().SumOfKills = pl.Kills;
+            //PlayersStore.Where(p => p.Id == pl.Id).FirstOrDefault().SumOfKills = pl.Kills;
         }
     }
 }
