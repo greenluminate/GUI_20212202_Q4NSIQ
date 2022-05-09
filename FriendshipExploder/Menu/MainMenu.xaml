@@ -102,7 +102,7 @@
                     <ComboBox SelectedIndex="0" IsEnabled="{Binding Player1KeyBindingEnabled}" ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.KeyBindings, Mode=TwoWay}" SelectedItem="{Binding Player1SelectedKeyBinding}" FontSize="{Binding LabelFontSize}" >
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
-                                <Label Content="{Binding Path=., Mode=TwoWay}" Style="{StaticResource binding_lb}"/>
+                                <Label Content="{Binding Path=., Mode=TwoWay}" Style="{StaticResource binding_lb}" FontSize="{Binding LabelFontSize}"/>
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
