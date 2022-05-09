@@ -41,6 +41,7 @@ namespace FriendshipExploder.Logic
         public object _PowerupsListLockObject { get; set; }
         public object _PlayersListLockObject { get; set; }
         public object _TimerLockObject { get; set; }
+        public object _TasksLockObject { get; set; }
         public double PlayerHeightRate { get; set; }
         public double PlayerHeightRateHangsIn { get; set; }
         public double PlayerWidthRate { get; set; }
@@ -48,6 +49,10 @@ namespace FriendshipExploder.Logic
         public bool RoundOver { get; set; }
         public bool GameOver { get; set; }
         public bool RoundScore { get; set; }
+        public int CurrentRound { get; set; }
+        public int Rounds { get; set; }
+
+        List<Task> tasks;
 
         public GameLogic()
         {
@@ -56,6 +61,7 @@ namespace FriendshipExploder.Logic
             _PowerupsListLockObject = new object();
             _PlayersListLockObject = new object();
             _TimerLockObject = new object();
+            _TasksLockObject = new object();
 
             rnd = new Random();
 
@@ -73,6 +79,7 @@ namespace FriendshipExploder.Logic
             GameOver = false;
             RoundScore = false;
 
+            tasks = new List<Task>();
             //Ha választott pálya design, akkor betöltjük azt válaszott mennyiségszer a queue-ba, ha randomizáltat választotak a fixek közül, akkor random tötljülk be a fixeket
 
 
@@ -82,6 +89,8 @@ namespace FriendshipExploder.Logic
 
         public void LoadPlayground(string file, int rounds)
         {
+            this.Rounds = rounds;
+            this.CurrentRound = 0;
             playgrounds.Clear();
 
             if (Directory.Exists("Playgrounds") && File.Exists(@$"Playgrounds\{file}.txt"))
@@ -163,6 +172,7 @@ namespace FriendshipExploder.Logic
 
         private void LoadNext(string[] grounds)
         {
+            this.CurrentRound++;
             lock (_ElementsListLockObject)
             {
                 for (int i = 0; i < PlayGroundSize[0]; i++)
@@ -404,6 +414,10 @@ namespace FriendshipExploder.Logic
                     endY--;
                 }
             });
+            lock (_TasksLockObject)
+            {
+                tasks.Add(countDownTask);
+            }
             countDownTask.Start();
         }
 
@@ -434,7 +448,7 @@ namespace FriendshipExploder.Logic
                     }
 
                     i--;
-                    if (Players.Count == 1)
+                    if (Players.Count <= 1)
                     {
                         RoundEnd();
                     }
@@ -891,7 +905,7 @@ namespace FriendshipExploder.Logic
 
         private void PlayerKickOrTriggerStarter(Player player)
         {//ToDo: bool állítás 
-            new Task(() =>
+            Task kickOrTriggerTask = new Task(() =>
             {
                 Point playerCenter = new Point((int)(player.Position.X + (GameRectSize * PlayerWidthRate) / 2), (int)(player.Position.Y + (GameRectSize * PlayerHeightRate) / 2));
                 Point playerIndexes = PlayerPixelToMatrixCoordinate(player.Position);
@@ -1077,7 +1091,10 @@ namespace FriendshipExploder.Logic
                     default:
                         break;
                 }
-            }, TaskCreationOptions.LongRunning).Start();
+            }, TaskCreationOptions.LongRunning);
+
+            tasks.Add(kickOrTriggerTask);
+            kickOrTriggerTask.Start();
         }
 
         //private void TriggerScheduledBombs(Player player)
@@ -1130,12 +1147,17 @@ namespace FriendshipExploder.Logic
                             switch (rnd.Next(0, 3))
                             {
                                 case 0:
-                                    new Task(() =>
+                                    Task bombAmountDownDeseaseTask = new Task(() =>
                                     {
                                         int originalBombAmount = player.BombAmount;
                                         player.BombAmount = 1;
                                         for (int i = 0; i < 10000; i++)
                                         {
+                                            if (player is null)
+                                            {
+                                                break;
+                                            }
+
                                             if (GamePaused)
                                             {
                                                 lock (_TimerLockObject)
@@ -1147,15 +1169,23 @@ namespace FriendshipExploder.Logic
                                         }
                                         player.HasDesease = false;
                                         player.BombAmount = originalBombAmount;
-                                    }, TaskCreationOptions.LongRunning).Start();
+                                    }, TaskCreationOptions.LongRunning);
+
+                                    tasks.Add(bombAmountDownDeseaseTask);
+                                    bombAmountDownDeseaseTask.Start();
                                     break;
                                 case 1:
-                                    new Task(() =>
+                                    Task playerSpeedDownTask = new Task(() =>
                                     {
                                         int originalSpeed = player.Speed;
                                         player.Speed = (int)GameSize.X / 360;
                                         for (int i = 0; i < 10000; i++)
                                         {
+                                            if (player is null)
+                                            {
+                                                break;
+                                            }
+
                                             if (GamePaused)
                                             {
                                                 lock (_TimerLockObject)
@@ -1167,15 +1197,23 @@ namespace FriendshipExploder.Logic
                                         }
                                         player.HasDesease = false;
                                         player.Speed = originalSpeed;
-                                    }, TaskCreationOptions.LongRunning).Start();
+                                    }, TaskCreationOptions.LongRunning);
+
+                                    tasks.Add(playerSpeedDownTask);
+                                    playerSpeedDownTask.Start();
                                     break;
                                 case 2:
-                                    new Task(() =>
+                                    Task explosionRangeDownTask = new Task(() =>
                                     {
                                         int originalBombExplosionRange = player.Bomb.ExplosionRange;
                                         player.Bomb.ExplosionRange = 1;
                                         for (int i = 0; i < 10000; i++)
                                         {
+                                            if (player is null)
+                                            {
+                                                break;
+                                            }
+
                                             if (GamePaused)
                                             {
                                                 lock (_TimerLockObject)
@@ -1187,7 +1225,10 @@ namespace FriendshipExploder.Logic
                                         }
                                         player.HasDesease = false;
                                         player.Bomb.ExplosionRange = originalBombExplosionRange;
-                                    }, TaskCreationOptions.LongRunning).Start();
+                                    }, TaskCreationOptions.LongRunning);
+
+                                    tasks.Add(explosionRangeDownTask);
+                                    explosionRangeDownTask.Start();
                                     break;
                                 default://ToDo: Inverse control
                                     break;
@@ -1244,7 +1285,7 @@ namespace FriendshipExploder.Logic
                                     SavePlayerScore(player);
                                     Players.Remove(player);
 
-                                    if (Players.Count == 1)
+                                    if (Players.Count <= 1)
                                     {
                                         RoundEnd();
                                     }
@@ -1350,7 +1391,7 @@ namespace FriendshipExploder.Logic
                     Elements[i, j] = newBomb;
                 }
 
-                new Task(() =>
+                Task bombTask = new Task(() =>
                 {
                     if (newBomb.ElementType == ElementType.ScheduledBomb)
                     {
@@ -1372,6 +1413,11 @@ namespace FriendshipExploder.Logic
                                         Monitor.Wait(_TimerLockObject);
                                     }
                                 }
+
+                                if (RoundOver || GameOver)
+                                {
+                                    break;
+                                }
                                 Thread.Sleep(1);
                             }
 
@@ -1390,7 +1436,7 @@ namespace FriendshipExploder.Logic
                         }
                     }
 
-                    if (newBomb != null)
+                    if (newBomb != null && !RoundOver)
                     {
                         newBomb.Explode = true;
 
@@ -1464,11 +1510,23 @@ namespace FriendshipExploder.Logic
                             }
                         }, TaskCreationOptions.LongRunning));
 
-                        Parallel.ForEach(explosionTasks, t => t.Start());
-
-                        Trigger(pl, newBomb, newBomb.Position.X, newBomb.Position.Y, newBomb.ElementType == ElementType.ScheduledBomb ? 0 : 1500);
+                        if (!RoundOver)
+                        {
+                            Parallel.ForEach(explosionTasks, t => { t.Start(); tasks.Add(t); });
+                        }
+                        if (!RoundOver)
+                        {
+                            Trigger(pl, newBomb, newBomb.Position.X, newBomb.Position.Y, newBomb.ElementType == ElementType.ScheduledBomb ? 0 : 1500);
+                        }
                     }
-                }, TaskCreationOptions.LongRunning).Start();
+                }, TaskCreationOptions.LongRunning);
+
+                bombTask.Start();
+
+                if (newBomb.ElementType != ElementType.ScheduledBomb)
+                {
+                    tasks.Add(bombTask);
+                }
             }
         }
 
@@ -1497,7 +1555,7 @@ namespace FriendshipExploder.Logic
         {
             if (!(Elements[row, col] is FixWall))
             {
-                new Task(() =>
+                Task explosionEffectTask = new Task(() =>
                 {
                     List<Player> playersToKill = new List<Player>();//Players mert egy mezőn több player is lehet
 
@@ -1551,6 +1609,11 @@ namespace FriendshipExploder.Logic
                                 Monitor.Wait(_TimerLockObject);
                             }
                         }
+
+                        if (RoundOver || GameOver)
+                        {
+                            break;
+                        }
                         Thread.Sleep(1);
                     }
 
@@ -1570,7 +1633,7 @@ namespace FriendshipExploder.Logic
                                         SavePlayerScore(player);
                                         Players.Remove(player);
 
-                                        if (Players.Count == 1)
+                                        if (Players.Count <= 1)
                                         {
                                             RoundEnd();
                                         }
@@ -1580,7 +1643,10 @@ namespace FriendshipExploder.Logic
                         }
                     }
 
-                }, TaskCreationOptions.LongRunning).Start();
+                }, TaskCreationOptions.LongRunning);
+
+                explosionEffectTask.Start();
+                tasks.Add(explosionEffectTask);
             }
         }
 
@@ -1595,8 +1661,8 @@ namespace FriendshipExploder.Logic
             ais.AddRange(Players.Where(player => player.KeyBinding == Model.KeyBinding.ai));
 
             List<Task> aiTasks = ais.Select(ai => new Task(() => AIWakeUp(ai), TaskCreationOptions.LongRunning)).ToList();
-            //ToDo: kirakni a tasklistet;
-            Parallel.ForEach(aiTasks, task => task.Start());//Hogy amennyire csak lehet egyszerre induljanak
+            //Ezeket nem biztos, hogy hozzá kell adni, hisz maguktól si megszűnnek létezni, ha a karakter null lesz és pedig null lesz.
+            Parallel.ForEach(aiTasks, task => { task.Start(); tasks.Add(task); });//Hogy amennyire csak lehet egyszerre induljanak
         }
 
         private async void AIWakeUp(Player ai)
@@ -2076,7 +2142,13 @@ namespace FriendshipExploder.Logic
                 new Task(() =>
                 {
                     RoundOver = true; //round over
-                    Thread.Sleep(2000);
+                    //Thread.Sleep(2000);//Ide taskbevárás
+                    lock (_TimerLockObject)
+                    {
+                        Monitor.PulseAll(_TimerLockObject);
+                    }
+
+                    Task.WaitAll(tasks.ToArray());
                     RoundOver = false;
                     LoadNext(playgrounds.Dequeue());
                     Players.ForEach(x => { x.Speed = (int)GameSize.X / 300; });
