@@ -112,7 +112,7 @@
             <Border Grid.Row="2" Style="{StaticResource palyer_border}">
                 <DockPanel>
                     <Label Content="Player 2" Style="{StaticResource palyer_lb}"/>
-                    <ComboBox SelectedIndex="0" IsEnabled="{Binding Player2KeyBindingEnabled}" ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.KeyBindings}" SelectedItem="{Binding Player2SelectedKeyBinding}" FontSize="{Binding LabelFontSize}" VerticalContentAlignment="Center" >
+                    <ComboBox SelectedIndex="0" IsEnabled="{Binding Player2KeyBindingEnabled}" ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.KeyBindings}" SelectedItem="{Binding Player2SelectedKeyBinding}" FontSize="{Binding ComboBoxFontSize}" VerticalContentAlignment="Center" >
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <Label Content="{Binding}" Style="{StaticResource binding_lb}"/>
@@ -124,7 +124,7 @@
             <Border Grid.Row="3" Style="{StaticResource palyer_border}">
                 <DockPanel>
                     <Label Content="Player 3" Style="{StaticResource palyer_lb}"/>
-                    <ComboBox SelectedIndex="0" IsEnabled="{Binding Player3KeyBindingEnabled}" ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.KeyBindings}" SelectedItem="{Binding Player3SelectedKeyBinding}" FontSize="{Binding LabelFontSize}" VerticalContentAlignment="Center" >
+                    <ComboBox SelectedIndex="0" IsEnabled="{Binding Player3KeyBindingEnabled}" ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.KeyBindings}" SelectedItem="{Binding Player3SelectedKeyBinding}" FontSize="{Binding ComboBoxFontSize}" VerticalContentAlignment="Center" >
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <Label Content="{Binding}" Style="{StaticResource binding_lb}"/>
@@ -145,7 +145,7 @@
                 <RowDefinition Height="1*"></RowDefinition>
             </Grid.RowDefinitions>
             <Image Grid.Row="1" Source="{Binding PlaygroundImage}" />
-            <ListBox ItemsSource="{Binding Playgrounds}" SelectedItem="{Binding SelectedPlayground}" IsEnabled="{Binding PlaygroundsEnabled}" Grid.Row="2" Margin="10,10,10,10" Background="Transparent" HorizontalContentAlignment="Stretch" FontSize="{Binding LabelFontSize}" >
+            <ListBox ItemsSource="{Binding Playgrounds}" SelectedItem="{Binding SelectedPlayground}" IsEnabled="{Binding PlaygroundsEnabled}" Grid.Row="2" Margin="10,10,10,10" Background="Transparent" HorizontalContentAlignment="Stretch" FontSize="{Binding ComboBoxFontSize}" >
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Border BorderBrush="LightGray" BorderThickness="2" Margin="10,10,10,10" HorizontalAlignment="Stretch">
@@ -157,7 +157,7 @@
             <Border Grid.Row="3" BorderBrush="LightGray" BorderThickness="2" Margin="10,10,10,10" HorizontalAlignment="Stretch">
                 <DockPanel>
                     <Label Content="Rounds:" Style="{StaticResource rounds_lb}" />
-                    <ComboBox SelectedIndex="{Binding RoundsSelected}" IsEnabled="{Binding RoundsEnabled}" Style="{StaticResource rounds_cb}" FontSize="{Binding LabelFontSize}">
+                    <ComboBox SelectedIndex="{Binding RoundsSelected}" IsEnabled="{Binding RoundsEnabled}" Style="{StaticResource rounds_cb}" FontSize="{Binding ComboBoxFontSize}">
                         <ComboBoxItem>1</ComboBoxItem>
                         <ComboBoxItem>2</ComboBoxItem>
                         <ComboBoxItem>3</ComboBoxItem>
