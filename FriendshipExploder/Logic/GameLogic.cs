@@ -343,11 +343,11 @@ namespace FriendshipExploder.Logic
                 }
             }, TaskCreationOptions.LongRunning);
 
+            countDownTask.Start();
             lock (_TasksLockObject)
             {
                 tasks.Add(countDownTask);
             }
-            countDownTask.Start();
 
 
             Task deadlyWallsTask = new Task(() =>
@@ -529,7 +529,10 @@ namespace FriendshipExploder.Logic
             }, TaskCreationOptions.LongRunning);
 
             playerKillerTask.Start();
-            tasks.Add(playerKillerTask);
+            lock (_TasksLockObject)
+            {
+                tasks.Add(playerKillerTask);
+            }
         }
 
         public enum PlayerAction
@@ -1169,8 +1172,11 @@ namespace FriendshipExploder.Logic
                 }
             }, TaskCreationOptions.LongRunning);
 
-            tasks.Add(kickOrTriggerTask);
             kickOrTriggerTask.Start();
+            lock (_TasksLockObject)
+            {
+                tasks.Add(kickOrTriggerTask);
+            }
         }
 
         //private void TriggerScheduledBombs(Player player)
@@ -1247,8 +1253,11 @@ namespace FriendshipExploder.Logic
                                         player.BombAmount = originalBombAmount;
                                     }, TaskCreationOptions.LongRunning);
 
-                                    tasks.Add(bombAmountDownDeseaseTask);
                                     bombAmountDownDeseaseTask.Start();
+                                    lock (_TasksLockObject)
+                                    {
+                                        tasks.Add(bombAmountDownDeseaseTask);
+                                    }
                                     break;
                                 case 1:
                                     Task playerSpeedDownTask = new Task(() =>
@@ -1275,8 +1284,11 @@ namespace FriendshipExploder.Logic
                                         player.Speed = originalSpeed;
                                     }, TaskCreationOptions.LongRunning);
 
-                                    tasks.Add(playerSpeedDownTask);
                                     playerSpeedDownTask.Start();
+                                    lock (_TasksLockObject)
+                                    {
+                                        tasks.Add(playerSpeedDownTask);
+                                    }
                                     break;
                                 case 2:
                                     Task explosionRangeDownTask = new Task(() =>
@@ -1303,8 +1315,11 @@ namespace FriendshipExploder.Logic
                                         player.Bomb.ExplosionRange = originalBombExplosionRange;
                                     }, TaskCreationOptions.LongRunning);
 
-                                    tasks.Add(explosionRangeDownTask);
                                     explosionRangeDownTask.Start();
+                                    lock (_TasksLockObject)
+                                    {
+                                        tasks.Add(explosionRangeDownTask);
+                                    }
                                     break;
                                 default://ToDo: Inverse control
                                     break;
@@ -1551,7 +1566,7 @@ namespace FriendshipExploder.Logic
                                     }
                                 }
                             }
-                        }));
+                        },TaskCreationOptions.LongRunning));
 
                         explosionTasks.Add(new Task(() =>
                         {
@@ -1588,7 +1603,14 @@ namespace FriendshipExploder.Logic
 
                         if (!RoundOver)
                         {
-                            Parallel.ForEach(explosionTasks, t => { t.Start(); tasks.Add(t); });
+                            Parallel.ForEach(explosionTasks, t =>
+                            {
+                                t.Start();
+                                lock (_TasksLockObject)
+                                {
+                                    tasks.Add(t);
+                                }
+                            });
                         }
                         if (!RoundOver)
                         {
@@ -1601,7 +1623,10 @@ namespace FriendshipExploder.Logic
 
                 if (newBomb.ElementType != ElementType.ScheduledBomb)
                 {
-                    tasks.Add(bombTask);
+                    lock (_TasksLockObject)
+                    {
+                        tasks.Add(bombTask);
+                    }
                 }
             }
         }
@@ -1732,7 +1757,10 @@ namespace FriendshipExploder.Logic
                 }, TaskCreationOptions.LongRunning);
 
                 explosionEffectTask.Start();
-                tasks.Add(explosionEffectTask);
+                lock (_TasksLockObject)
+                {
+                    tasks.Add(explosionEffectTask);
+                }
             }
         }
 
