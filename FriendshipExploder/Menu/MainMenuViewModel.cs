@@ -52,6 +52,13 @@ namespace FriendshipExploder.Menu
             set { SetProperty(ref labelFontSize, value); }
         }
 
+        private double comboBoxFontSize;
+        public double ComboBoxFontSize
+        {
+            get { return comboBoxFontSize; }
+            set { SetProperty(ref comboBoxFontSize, value); }
+        }
+
 
         public ICommand NewGameCommand { get; set; }
         public ICommand NextCommand { get; set; }
@@ -177,6 +184,7 @@ namespace FriendshipExploder.Menu
         {
             ButtonFontSize = (int)System.Windows.SystemParameters.PrimaryScreenWidth / 80;
             LabelFontSize = (int)System.Windows.SystemParameters.PrimaryScreenWidth / 96;
+            comboBoxFontSize = (int)System.Windows.SystemParameters.PrimaryScreenWidth / 85;
             MenuBackground = new ImageBrush(new BitmapImage(new Uri($"pack://application:,,,/Images/GameBackground/0_GameBackground.jpg")));
             LoadPlaygrounds();
             NewGameEnabled = true;

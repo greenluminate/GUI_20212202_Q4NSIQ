@@ -100,10 +100,10 @@
             <Border Grid.Row="1" Style="{StaticResource palyer_border}">
                 <DockPanel>
                     <Label Content="Player 1" Style="{StaticResource palyer_lb}"/>
-                    <ComboBox SelectedIndex="0" IsEnabled="{Binding Player1KeyBindingEnabled}" ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.KeyBindings, Mode=TwoWay}" SelectedItem="{Binding Player1SelectedKeyBinding}" FontSize="{Binding LabelFontSize}" VerticalContentAlignment="Center" >
+                    <ComboBox SelectedIndex="0" IsEnabled="{Binding Player1KeyBindingEnabled}" ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.KeyBindings, Mode=TwoWay}" SelectedItem="{Binding Player1SelectedKeyBinding}" FontSize="{Binding ComboBoxFontSize}" VerticalContentAlignment="Center" >
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
-                                <Label Content="{Binding Path=., Mode=TwoWay}" Style="{StaticResource binding_lb}" FontSize="{Binding LabelFontSize}"/>
+                                <Label Content="{Binding Path=., Mode=TwoWay}" Style="{StaticResource binding_lb}" />
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
