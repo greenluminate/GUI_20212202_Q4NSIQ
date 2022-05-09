@@ -270,6 +270,11 @@ namespace FriendshipExploder.Logic
                     //Horizontal fill top
                     for (int x = startX; x < endX; x++)
                     {
+                        if (RoundOver)
+                        {
+                            break;
+                        }
+
                         if (GamePaused)
                         {
                             lock (_TimerLockObject)
@@ -294,6 +299,11 @@ namespace FriendshipExploder.Logic
                     //Vertical fill right
                     for (int y = startY; y < endY; y++)
                     {
+                        if (RoundOver)
+                        {
+                            break;
+                        }
+
                         if (GamePaused)
                         {
                             lock (_TimerLockObject)
@@ -318,6 +328,11 @@ namespace FriendshipExploder.Logic
                     //Horizontal fill bottom
                     for (int x = endX - 1; x >= startX; x--)
                     {
+                        if (RoundOver)
+                        {
+                            break;
+                        }
+
                         if (GamePaused)
                         {
                             lock (_TimerLockObject)
@@ -341,6 +356,11 @@ namespace FriendshipExploder.Logic
                     //Vertical fill left
                     for (int y = endY - 1; y >= startY; y--)
                     {
+                        if (RoundOver)
+                        {
+                            break;
+                        }
+
                         if (GamePaused)
                         {
                             lock (_TimerLockObject)
