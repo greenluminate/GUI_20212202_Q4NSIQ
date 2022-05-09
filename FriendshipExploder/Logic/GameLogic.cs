@@ -1479,7 +1479,7 @@ namespace FriendshipExploder.Logic
 
             lock (_ElementsListLockObject)
             {
-                if (Elements[i, j] != null && (Elements[i, j] as Bomb).Equals(newBomb))//ToDo: elég az i,j-t kiszedni a bombából
+                if (Elements[i, j] is Bomb && (Elements[i, j] as Bomb).Equals(newBomb))//ToDo: elég az i,j-t kiszedni a bombából
                 {
                     Elements[i, j] = null;
                 }
