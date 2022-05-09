@@ -87,7 +87,7 @@
         <Border Grid.Column="1" Grid.Row="3" BorderThickness="2" BorderBrush="White" Background="Wheat" Grid.RowSpan="2">
             <Label Content="2" Style="{StaticResource placeLabel}" Foreground="White" />
         </Border>
-        <Label Grid.Column="1" Grid.Row="5" Content="{Binding SecondKill}" ContentStringFormat="Kill: {0}" FontFamily="{StaticResource font}" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" Foreground="White"/>
+        <Label Grid.Column="1" Grid.Row="5" Content="{Binding SecondKill}" Style="{StaticResource killLabel}" />
 
 
         <Label Grid.Column="3" Grid.Row="3" Content="{Binding ThirdName}" Style="{StaticResource nameLabel}" />
@@ -95,7 +95,7 @@
         <Border Grid.Column="3" Grid.Row="4" BorderThickness="2" BorderBrush="White" Background="Wheat">
             <Label Content="3" Style="{StaticResource placeLabel}" Foreground="White" />
         </Border>
-        <Label Grid.Column="3" Grid.Row="5" Content="{Binding ThirdKill}" ContentStringFormat="Kill: {0}" FontFamily="{StaticResource font}" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" Foreground="White"/>
+        <Label Grid.Column="3" Grid.Row="5" Content="{Binding ThirdKill}" Style="{StaticResource killLabel}" />
 
         <Button Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="3" Content="Back to main menu" Click="Button_Click"  Style="{StaticResource roundedbtn}"/>
 

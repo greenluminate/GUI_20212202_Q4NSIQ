@@ -249,8 +249,6 @@ namespace FriendshipExploder.Renderer
                             drawingContext.DrawRectangle(new SolidColorBrush(Color.FromArgb(200, 0, 0, 0)), null, new Rect(0, 0, size.Width, size.Height));
                         }
 
-
-                        //ToDo: typeface debug, mert nem működik!!! Lecseréltem addig Verdana-ra.
                     }
                 }
             }
