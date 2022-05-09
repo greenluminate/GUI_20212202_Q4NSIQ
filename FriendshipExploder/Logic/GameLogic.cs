@@ -143,7 +143,7 @@ namespace FriendshipExploder.Logic
                                 position = new Point(2, GameSize.Y - (2 * GameRectSize));
                                 break;
                             case 2:
-                                position = new Point(GameSize.X - GameRectSize, GameSize.Y - 2 - GameRectSize);
+                                position = new Point(GameRectSize * (PlayGroundSize[0] - 2), GameSize.Y - (2 * GameRectSize));
                                 break;
                             default:
                                 position = new Point(2, 2);
@@ -296,7 +296,7 @@ namespace FriendshipExploder.Logic
                                 position = new Point(2, GameSize.Y - (2 * GameRectSize));
                                 break;
                             case 2:
-                                position = new Point(GameSize.X - GameRectSize, GameSize.Y - (2 * GameRectSize));
+                                position = new Point(GameRectSize * (PlayGroundSize[0] - 2), GameSize.Y - (2 * GameRectSize));
                                 break;
                             default:
                                 position = new Point(2, 2);
