@@ -2017,9 +2017,9 @@ namespace FriendshipExploder.Logic
             else
             {
                 RoundOver = true; //round over
-                Thread.Sleep(2000);
+                /*Thread.Sleep(2000);
                 RoundOver = false;
-                LoadNext(playgrounds.Dequeue());
+                LoadNext(playgrounds.Dequeue());*/
             }
         }
 
