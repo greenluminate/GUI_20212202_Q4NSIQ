@@ -308,7 +308,7 @@ namespace FriendshipExploder.Logic
             }
 
             AITaskCreator();
-            CountDown(150);
+            CountDown(100);
         }
 
         private void CountDown(int seconds)
@@ -1497,7 +1497,7 @@ namespace FriendshipExploder.Logic
                     {
                         new Task(() =>
                         {
-                            for (int i = 0; i < 3000; i++)//x másodperc múlva robban a bomba
+                            for (int i = 0; i < 2500; i++)//x másodperc múlva robban a bomba
                             {
                                 lock (_TimerLockObject)
                                 {
@@ -1616,7 +1616,7 @@ namespace FriendshipExploder.Logic
                         }
                         if (!RoundOver)
                         {
-                            Trigger(pl, newBomb, newBomb.Position.X, newBomb.Position.Y, newBomb.ElementType == ElementType.ScheduledBomb ? 800 : 800);
+                            Trigger(pl, newBomb, newBomb.Position.X, newBomb.Position.Y, newBomb.ElementType == ElementType.ScheduledBomb ? 1000 : 1000);
                         }
                     }
                 }, TaskCreationOptions.LongRunning);
@@ -1732,7 +1732,10 @@ namespace FriendshipExploder.Logic
 
                     lock (_ElementsListLockObject)
                     {
-                        Elements[row, col] = null;
+                        if (!(Elements[row, col] is FixWall))
+                        {
+                            Elements[row, col] = null;
+                        }
                     }
 
                     if (playersToKill.Count > 0)
