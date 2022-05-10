@@ -1807,7 +1807,7 @@ namespace FriendshipExploder.Logic
                     int[] targetElementIndex = FindNearestDestructible(ai.Position);
                     Node playerTarget = lvlMatrix[playPositionInInt[0], playPositionInInt[1]];
                     Node target = lvlMatrix[targetElementIndex[0], targetElementIndex[1]];
-                    Point aiPosition = PlayerPixelToMatrixCoordinate(new Point((int)(ai.Position.X - playerWidth / 2), (int)(ai.Position.Y - playerHeight)));
+                    Point aiPosition = PlayerPixelToMatrixCoordinate(ai.Position);
                     int aiPosX = aiPosition.X;
                     int aiPosY = aiPosition.Y;
                     Point aiPositionUp = PlayerPixelToMatrixCoordinate(new Point((int)(ai.Position.X - playerWidth / 2), (int)(ai.Position.Y + playerHeight)));
@@ -1973,7 +1973,7 @@ namespace FriendshipExploder.Logic
                 StartMove(PlayerAction.left, ai);
 
             }
-            else if (aiPosY < Elements.GetLength(0) && (Elements[aiPosY + 1, aiPosX] == null || (Elements[aiPosY + 1, aiPosX] is Bomb bundernext && Elements[aiPosX, aiPosY] is Bomb bunder && bundernext.Equals(bunder))))
+            else if (aiPosY < Elements.GetLength(0) && (Elements[aiPosX + 1, aiPosY] == null || (Elements[aiPosX + 1, aiPosY] is Bomb bundernext && Elements[aiPosX, aiPosY] is Bomb bunder && bundernext.Equals(bunder))))
             {
                 StartMove(PlayerAction.right, ai);
 
@@ -1986,7 +1986,7 @@ namespace FriendshipExploder.Logic
 
 
                 }
-                else if (aiPosY < Elements.GetLength(1) && (Elements[aiPosX, aiPosY + 1] == null || (Elements[aiPosX, aiPosY + 1] is Bomb bdownundernext && Elements[aiPosX, aiPosY] is Bomb bdownunder && bdownundernext.Equals(bdownunder))))
+                else if (aiPosY < Elements.GetLength(1) && (Elements[aiPosX, aiPosY + 1] == null))
                 {
                     StartMove(PlayerAction.down, ai);
 
