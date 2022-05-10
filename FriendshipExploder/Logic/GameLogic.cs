@@ -1372,7 +1372,14 @@ namespace FriendshipExploder.Logic
                                 if (Elements[i, j].Explode && !player.Explode)
                                 {
                                     player.Explode = true;
-                                    (Elements[i, j] as Bomb).Player.Kills++;
+                                    if (player.Id == (Elements[i, j] as Bomb).Player.Id)
+                                    {
+                                        (Elements[i, j] as Bomb).Player.Kills--;//Öngyilkosság mínuszpont
+                                    }
+                                    else
+                                    {
+                                        (Elements[i, j] as Bomb).Player.Kills++;
+                                    }
 
                                     SavePlayerScore(player);
                                     Players.Remove(player);
@@ -1675,7 +1682,14 @@ namespace FriendshipExploder.Logic
                             {
                                 playersToKill.Add(player);
                                 player.Explode = true;
-                                pl.Kills++;
+                                if (pl.Id == player.Id)
+                                {
+                                    pl.Kills--;//Öngyilkosság mínusz pont
+                                }
+                                else
+                                {
+                                    pl.Kills++;
+                                }
                             }
                         });
                         //playersToKill = Players.Where(player =>
@@ -2287,11 +2301,19 @@ namespace FriendshipExploder.Logic
                         Monitor.PulseAll(_TimerLockObject);
                     }
 
+                    Players.ForEach(pl => SavePlayerScore(pl));
                     Players.ForEach(pl => pl = null);
                     Thread.Sleep(2000);
                     Task.WaitAll(tasks.ToArray());
                     RoundOver = false;
-                    LoadNext(playgrounds.Dequeue());
+                    try
+                    {
+                        LoadNext(playgrounds.Dequeue());
+                    }
+                    catch (Exception)
+                    {
+                        GameOver = true;
+                    }
                     Players.ForEach(x => { x.Speed = (int)GameSize.X / 300; });
                 }, TaskCreationOptions.LongRunning).Start();
             }
