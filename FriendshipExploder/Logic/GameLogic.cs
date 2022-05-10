@@ -1026,7 +1026,8 @@ namespace FriendshipExploder.Logic
                         else
                         {
                             Thread.Sleep(300);
-                            if (!player.SetBombPressed)
+                            Point playerXY = PlayerPixelToMatrixCoordinate(player.Position);
+                            if (!player.SetBombPressed && !(Elements[playerXY.X, playerXY.Y] is Bomb onbomb && onbomb.ElementType == ElementType.ScheduledBomb && onbomb.Player == player))
                             {
                                 lock (player._triggerBombLockObject)
                                 {
@@ -1486,6 +1487,7 @@ namespace FriendshipExploder.Logic
                 {
                     if (newBomb.ElementType == ElementType.ScheduledBomb)
                     {
+                        pl.ActionPressed = false;
                         lock (pl._triggerBombLockObject)
                         {
                             Monitor.Wait(pl._triggerBombLockObject);
@@ -1614,7 +1616,7 @@ namespace FriendshipExploder.Logic
                         }
                         if (!RoundOver)
                         {
-                            Trigger(pl, newBomb, newBomb.Position.X, newBomb.Position.Y, newBomb.ElementType == ElementType.ScheduledBomb ? 0 : 1500);
+                            Trigger(pl, newBomb, newBomb.Position.X, newBomb.Position.Y, newBomb.ElementType == ElementType.ScheduledBomb ? 800 : 800);
                         }
                     }
                 }, TaskCreationOptions.LongRunning);
